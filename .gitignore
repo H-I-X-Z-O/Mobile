@@ -1,0 +1,64 @@
+# Các tệp tin được tạo ra bởi Flutter/Dart
+# ---------------------------------------
+.dart_tool/
+.dev_tools/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Các tệp tin cấu hình nhạy cảm (API Keys, Secrets)
+# ---------------------------------------
+.env
+*.secret
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+android/key.properties
+
+# Android cụ thể
+# ---------------------------------------
+*.keystore
+*.jks
+.gradle/
+local.properties
+vc.xml
+lint/intermediates/
+lint/generated/
+lint/outputs/
+android/**/generated/
+
+# iOS/macOS cụ thể
+# ---------------------------------------
+*.swp
+*.lock
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xccheckout
+xcuserdata/
+DerivedData/
+Archives/
+Products/
+Pods/
+.symlinks/
+/ios/Pods/
+/ios/.symlinks/
+/ios/Flutter/App.framework
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/flutter_export_environment.sh
+
+# IDEs (VS Code, IntelliJ, Android Studio)
+# ---------------------------------------
+.vscode/
+.idea/
+*.iml
+*.iws
+.history
+.DS_Store
+
+# Web
+# ---------------------------------------
+.buildlog
