@@ -1,0 +1,58 @@
+name: vocabup
+description: "VocabUp – English vocabulary learning app with interactive flashcards, exercises, and learning path tracking."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ── Firebase ──────────────────────────────────────────────────────────────
+  firebase_core: ^3.3.0
+  firebase_auth: ^5.1.4        # Đăng nhập / Đăng ký (Phase 1.3, 4.1)
+  cloud_firestore: ^5.2.1      # Lưu từ vựng, bài học, tiến độ (Phase 3)
+  firebase_messaging: ^15.1.0  # Thông báo học tập hàng ngày (Phase 6.1)
+  google_sign_in: ^6.2.1       # Đăng nhập bằng Google (Phase 4.2)
+
+  # ── State Management ──────────────────────────────────────────────────────
+  provider: ^6.1.2             # AuthProvider, LearningProvider (Phase 4.1)
+
+  # ── Local Storage / Offline Cache ────────────────────────────────────────
+  hive: ^2.2.3                 # Offline cache từ vựng, tiến độ (Phase 3.2)
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^9.2.2  # Lưu token an toàn
+
+  # ── Audio ─────────────────────────────────────────────────────────────────
+  audioplayers: ^6.1.0         # Phát âm từ vựng (Phase 4.2 – Flashcard)
+  flutter_tts: ^4.2.0          # Text-to-Speech dự phòng (Phase: Vocabulary)
+
+  # ── Clean Architecture Utilities ──────────────────────────────────────────
+  equatable: ^2.0.5            # So sánh Entity/Value Object
+  dartz: ^0.10.1               # Either<Failure, T> cho Use Cases
+
+  # ── UI / Design ───────────────────────────────────────────────────────────
+  google_fonts: ^6.2.1         # Font Inter / Poppins
+  cached_network_image: ^3.4.1 # Cache ảnh thumbnail bài học
+  lottie: ^3.1.2               # Animations (loading, success, empty state)
+  shimmer: ^3.0.0              # Skeleton loading placeholder
+  smooth_page_indicator: ^1.2.0 # Dot indicator cho onboarding
+
+  # ── Connectivity & Utils ──────────────────────────────────────────────────
+  connectivity_plus: ^6.0.3    # Kiểm tra kết nối mạng (Phase 6.2)
+  intl: ^0.19.0                # Định dạng ngày giờ (lịch học)
+  uuid: ^4.5.1                 # Tạo ID duy nhất cho Word/Lesson
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+  # ── Code Generation ───────────────────────────────────────────────────────
+  hive_generator: ^2.0.1       # Generate TypeAdapter cho Hive models
+  build_runner: ^2.4.13        # Chạy code generation
+
+flutter:
+  uses-material-design: true
