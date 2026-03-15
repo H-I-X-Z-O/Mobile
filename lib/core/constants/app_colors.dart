@@ -100,7 +100,7 @@ class AppColors {
   /// Shadow nhẹ dùng cho card
   static List<BoxShadow> cardShadow = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.06),
+      color: Colors.black.withAlpha(15),
       blurRadius: 12,
       offset: const Offset(0, 4),
     ),
@@ -109,7 +109,7 @@ class AppColors {
   /// Shadow nhỏ hơn dùng cho button
   static List<BoxShadow> buttonShadow = [
     BoxShadow(
-      color: const Color(0xFF00C48C).withOpacity(0.30),
+      color: const Color(0xFF00C48C).withAlpha(77),
       blurRadius: 16,
       offset: const Offset(0, 6),
     ),
