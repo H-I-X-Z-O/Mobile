@@ -3,14 +3,16 @@ import 'package:equatable/equatable.dart';
 /// Represents a vocabulary word in the Vocabulary Store feature.
 ///
 /// Fields:
-/// - [englishWord]        : The English word.
-/// - [vietnameseDefinition]: Vietnamese definition/translation.
-/// - [phonetic]           : Phonetic transcription (phiên âm).
-/// - [audioPath]          : Path or URL to the pronunciation audio file.
-/// - [exampleSentence]    : An example sentence using the word.
-/// - [isMemorized]        : Whether the user has marked this word as memorized.
-/// - [category]           : Word category (e.g. Danh từ, Động từ, Tính từ).
+/// - [id]                   : Unique identifier for the word.
+/// - [englishWord]          : The English word.
+/// - [vietnameseDefinition] : Vietnamese definition/translation.
+/// - [phonetic]             : Phonetic transcription (phiên âm).
+/// - [audioPath]            : Path or URL to the pronunciation audio file.
+/// - [exampleSentence]      : An example sentence using the word.
+/// - [isMemorized]          : Whether the user has marked this word as memorized.
+/// - [category]             : Word category (e.g. Danh từ, Động từ, Tính từ).
 class WordEntity extends Equatable {
+  final String id;
   final String englishWord;
   final String vietnameseDefinition;
   final String phonetic;
@@ -20,6 +22,7 @@ class WordEntity extends Equatable {
   final String category;
 
   const WordEntity({
+    required this.id,
     required this.englishWord,
     required this.vietnameseDefinition,
     required this.phonetic,
@@ -29,8 +32,15 @@ class WordEntity extends Equatable {
     required this.category,
   });
 
+  /// Getter tiện ích – dùng bởi module Exercise (GenerateQuizUseCase).
+  String get text => englishWord;
+
+  /// Getter tiện ích – dùng bởi module Exercise (GenerateQuizUseCase).
+  String get definition => vietnameseDefinition;
+
   /// Returns a copy of this entity with the given fields replaced.
   WordEntity copyWith({
+    String? id,
     String? englishWord,
     String? vietnameseDefinition,
     String? phonetic,
@@ -40,6 +50,7 @@ class WordEntity extends Equatable {
     String? category,
   }) {
     return WordEntity(
+      id: id ?? this.id,
       englishWord: englishWord ?? this.englishWord,
       vietnameseDefinition: vietnameseDefinition ?? this.vietnameseDefinition,
       phonetic: phonetic ?? this.phonetic,
@@ -52,6 +63,7 @@ class WordEntity extends Equatable {
 
   @override
   List<Object?> get props => [
+        id,
         englishWord,
         vietnameseDefinition,
         phonetic,
@@ -63,6 +75,7 @@ class WordEntity extends Equatable {
 
   @override
   String toString() => 'WordEntity('
+      'id: $id, '
       'englishWord: $englishWord, '
       'vietnameseDefinition: $vietnameseDefinition, '
       'phonetic: $phonetic, '

@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
-import '../../learning/domain/entities/word_entity.dart';
-import '../../learning/domain/repositories/vocabulary_repository.dart';
+import '../../../learning/domain/entities/word_entity.dart';
+import '../../../learning/domain/repositories/vocabulary_repository.dart';
 import '../entities/question_entity.dart';
 import '../repositories/exercise_repository.dart';
 
