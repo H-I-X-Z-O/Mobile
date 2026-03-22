@@ -24,6 +24,7 @@ dependencies:
   hive: ^2.2.3                 # Offline cache từ vựng, tiến độ (Phase 3.2)
   hive_flutter: ^1.1.0
   flutter_secure_storage: ^9.2.2  # Lưu token an toàn
+  shared_preferences: ^2.3.3  # Cache đơn giản cho Exercise (Phase 3)
 
   # ── Audio ─────────────────────────────────────────────────────────────────
   audioplayers: ^6.1.0         # Phát âm từ vựng (Phase 4.2 – Flashcard)
