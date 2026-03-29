@@ -42,14 +42,12 @@ class NetworkFailure extends Failure {
 
 // ─── Server Failures ──────────────────────────────────────────────────────────
 class ServerFailure extends Failure {
-  const ServerFailure([String message = 'Lỗi máy chủ. Vui lòng thử lại sau.'])
-      : super(message);
+  const ServerFailure([super.message = 'Lỗi máy chủ. Vui lòng thử lại sau.']);
 }
 
 // ─── Cache / Local Failures ───────────────────────────────────────────────────
 class CacheFailure extends Failure {
-  const CacheFailure([String message = 'Lỗi khi đọc dữ liệu cục bộ.'])
-      : super(message);
+  const CacheFailure([super.message = 'Lỗi khi đọc dữ liệu cục bộ.']);
 }
 
 // ─── Permission Failures ──────────────────────────────────────────────────────

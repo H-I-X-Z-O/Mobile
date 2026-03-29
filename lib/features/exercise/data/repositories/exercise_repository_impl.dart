@@ -48,7 +48,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
         // Cache rỗng, ném lại lỗi để UseCase xử lý
         rethrow;
       } on CacheException {
-        throw ServerException(
+        throw const ServerException(
             'Không thể lấy câu hỏi từ cả server lẫn bộ nhớ đệm.');
       }
     }
@@ -97,7 +97,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       try {
         return await localDataSource.getCachedQuizHistory();
       } on CacheException {
-        throw ServerException(
+        throw const ServerException(
             'Không thể lấy lịch sử từ cả server lẫn bộ nhớ đệm.');
       }
     }

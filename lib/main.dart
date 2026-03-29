@@ -1,21 +1,34 @@
 import 'package:flutter/material.dart';
 import 'core/constants/app_colors.dart';
+import 'package:provider/provider.dart';
+import 'features/exercise/presentation/providers/exercise_provider.dart';
+import 'features/exercise/presentation/screens/exercise_screen.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Khởi tạo Firebase (Phase 1.3)
+  // TẠM THỜI COMMENT ĐỂ TEST UI (Tránh lỗi trắng màn hình nếu chưa setup kĩ Firebase)
+  /*
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  */
 
   // TODO (Phase 1.3): Khởi tạo Hive cho offline cache
   // await Hive.initFlutter();
 
-  runApp(const VocabUpApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ExerciseProvider()),
+      ],
+      child: const VocabUpApp(),
+    ),
+  );
 }
 
 class VocabUpApp extends StatelessWidget {
@@ -27,19 +40,7 @@ class VocabUpApp extends StatelessWidget {
       title: 'VocabUp',
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(),
-      home: const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
-          child: Text(
-            'VocabUp',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-          ),
-        ),
-      ),
+      home: const ExerciseScreen(),
     );
   }
 
@@ -50,7 +51,6 @@ class VocabUpApp extends StatelessWidget {
         seedColor: AppColors.primary,
         primary: AppColors.primary,
         secondary: AppColors.primaryLight,
-        background: AppColors.background,
         surface: AppColors.surface,
         error: AppColors.error,
       ),

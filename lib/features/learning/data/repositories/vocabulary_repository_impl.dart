@@ -26,7 +26,7 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
         if (cachedTopics.isNotEmpty) return cachedTopics;
         rethrow;
       } on CacheException {
-        throw ServerException('Lỗi mạng và không có cache (Topics).');
+        throw const ServerException('Lỗi mạng và không có cache (Topics).');
       }
     }
   }
@@ -43,7 +43,7 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
         if (cachedWords.isNotEmpty) return cachedWords;
         rethrow;
       } on CacheException {
-        throw ServerException('Lỗi mạng và không có cache (Words).');
+        throw const ServerException('Lỗi mạng và không có cache (Words).');
       }
     }
   }

@@ -1,6 +1,6 @@
-/// App-level Exception classes
-/// Được ném ra từ Data Layer, sau đó được bắt và chuyển đổi thành [Failure]
-/// ở Repository Implementation
+// App-level Exception classes
+// Được ném ra từ Data Layer, sau đó được bắt và chuyển đổi thành [Failure]
+// ở Repository Implementation
 
 // ─── Base ─────────────────────────────────────────────────────────────────────
 abstract class AppException implements Exception {
@@ -45,14 +45,12 @@ class NetworkException extends AppException {
 // ─── Server Exception ─────────────────────────────────────────────────────────
 class ServerException extends AppException {
   const ServerException(
-      [String message = 'Lỗi máy chủ. Vui lòng thử lại sau.'])
-      : super(message);
+      [super.message = 'Lỗi máy chủ. Vui lòng thử lại sau.']);
 }
 
 // ─── Cache Exception ──────────────────────────────────────────────────────────
 class CacheException extends AppException {
-  const CacheException([String message = 'Lỗi khi đọc dữ liệu cục bộ.'])
-      : super(message);
+  const CacheException([super.message = 'Lỗi khi đọc dữ liệu cục bộ.']);
 }
 
 // ─── Permission Exception ─────────────────────────────────────────────────────

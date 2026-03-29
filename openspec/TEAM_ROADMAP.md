@@ -22,7 +22,7 @@ Dự án được triển khai theo mô hình **Feature-First Clean Architecture
 - [x] **Giai đoạn 2.2 (Interface):** Tạo `ExerciseRepository` abstract class.
 - [x] **Giai đoạn 2.3 (UseCases):** Viết `GenerateQuizUseCase`, `SubmitQuizResultUseCase`.
 - [x] **Giai đoạn 3 (Data):** Triển khai `QuestionModel` và `ExerciseRepositoryImpl`.
-- [ ] **Giai đoạn 4 (UI):** Màn hình làm bài trắc nghiệm & Màn hình kết quả (Scoreboard).
+- [x] **Giai đoạn 4 (UI):** Màn hình làm bài trắc nghiệm & Màn hình kết quả (Scoreboard).
 
 ---
 
