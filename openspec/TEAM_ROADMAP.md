@@ -8,10 +8,10 @@ Dự án được triển khai theo mô hình **Feature-First Clean Architecture
 **Trách nhiệm:** Core Learning (Dữ liệu từ vựng & Flashcards)
 
 - [x] **Giai đoạn 2 (Domain):** Định nghĩa `WordEntity`, `TopicEntity`.
-- [ ] **Giai đoạn 2.2 (Interface):** Tạo `VocabularyRepository` abstract class.
-- [ ] **Giai đoạn 2.3 (UseCases):** Viết `GetWordsByTopic`, `MarkWordAsLearned`.
-- [ ] **Giai đoạn 3 (Data):** Triển khai `WordModel` và `VocabularyRepositoryImpl` (Firestore).
-- [ ] **Giai đoạn 4 (UI):** Màn hình danh sách chủ đề & Màn hình học Flashcard (Flip animation).
+- [x] **Giai đoạn 2.2 (Interface):** Tạo `VocabularyRepository` abstract class.
+- [x] **Giai đoạn 2.3 (UseCases):** Viết `GetWordsByTopic`, `MarkWordAsLearned`.
+- [x] **Giai đoạn 3 (Data):** Triển khai `WordModel` và `VocabularyRepositoryImpl` (Firestore).
+- [x] **Giai đoạn 4 (UI):** Màn hình danh sách chủ đề & Màn hình học Flashcard (Flip animation).
 
 ---
 

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'core/constants/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'features/exercise/presentation/providers/exercise_provider.dart';
-import 'features/exercise/presentation/screens/exercise_screen.dart';
+// import 'features/exercise/presentation/screens/exercise_screen.dart'; // Uncomment khi test Exercise module
+import 'features/learning/presentation/providers/learning_provider.dart';
+import 'features/learning/presentation/screens/topic_list_screen.dart';
 
 // import 'package:firebase_core/firebase_core.dart';
 // import 'firebase_options.dart';
@@ -25,6 +27,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ExerciseProvider()),
+        ChangeNotifierProvider(create: (_) => LearningProvider()),
       ],
       child: const VocabUpApp(),
     ),
@@ -33,14 +36,17 @@ Future<void> main() async {
 
 class VocabUpApp extends StatelessWidget {
   const VocabUpApp({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'VocabUp',
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(),
-      home: const ExerciseScreen(),
+      // Đổi home sang TopicListScreen để test module Learning
+      // Đổi lại ExerciseScreen() khi test module Exercise
+      home: const TopicListScreen(),
+      // home: const ExerciseScreen(),
     );
   }
 
