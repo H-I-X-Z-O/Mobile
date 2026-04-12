@@ -15,9 +15,9 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
   });
 
   @override
-  Future<List<TopicEntity>> getTopics() async {
+  Future<List<TopicEntity>> getTopics(String? userId) async {
     try {
-      final remoteTopics = await remoteDataSource.getTopics();
+      final remoteTopics = await remoteDataSource.getTopics(userId);
       await localDataSource.cacheTopics(remoteTopics);
       return remoteTopics;
     } on ServerException {
@@ -28,6 +28,17 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
       } on CacheException {
         throw const ServerException('Lỗi mạng và không có cache (Topics).');
       }
+    }
+  }
+
+  @override
+  Future<List<WordEntity>> getAllWords() async {
+    try {
+      final remoteWords = await remoteDataSource.getAllWords();
+      // Ta có thể cache lại từng từ nếu muốn, nhưng hiện tại ưu tiên lấy fresh từ remote
+      return remoteWords;
+    } on ServerException {
+      return []; // Trả về rỗng nếu lỗi
     }
   }
 
@@ -49,9 +60,15 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
   }
 
   @override
-  Future<void> markWordAsLearned(String wordId) async {
+  Future<List<dynamic>> getUserVocabStatus(String userId) async {
+    // Để cho đơn giản và khớp với UserVocabStatusEntity, chúng ta chỉ gọi remote
+    return await remoteDataSource.getUserVocabStatus(userId);
+  }
+
+  @override
+  Future<void> markWordAsLearned(String userId, String wordId, String topicId) async {
     try {
-      await remoteDataSource.markWordAsLearned(wordId);
+      await remoteDataSource.markWordAsLearned(userId, wordId, topicId);
       await localDataSource.markWordAsLearnedLocally(wordId);
     } on ServerException {
       await localDataSource.markWordAsLearnedLocally(wordId);

@@ -13,9 +13,9 @@ class GetTopics {
 
   GetTopics(this.repository);
 
-  Future<Either<Failure, List<TopicEntity>>> call() async {
+  Future<Either<Failure, List<TopicEntity>>> call(String? userId) async {
     try {
-      final topics = await repository.getTopics();
+      final topics = await repository.getTopics(userId);
       return Right(topics);
     } catch (e) {
       return const Left(UnknownFailure());

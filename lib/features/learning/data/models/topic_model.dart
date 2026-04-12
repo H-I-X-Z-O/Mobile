@@ -9,6 +9,7 @@ class TopicModel extends TopicEntity {
     required super.name,
     required super.description,
     super.imageUrl,
+    super.order = 0,
     required super.totalWords,
     super.learnedWords = 0,
   });
@@ -20,7 +21,8 @@ class TopicModel extends TopicEntity {
       name: json['name'] as String,
       description: json['description'] as String,
       imageUrl: json['image_url'] as String?,
-      totalWords: json['total_words'] as int,
+      order: json['order'] as int? ?? 0,
+      totalWords: json['total_words'] as int? ?? 0,
       learnedWords: json['learned_words'] as int? ?? 0,
     );
   }
@@ -29,12 +31,35 @@ class TopicModel extends TopicEntity {
   factory TopicModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return TopicModel(
-      id: doc.id,
+      // Ưu tiên dùng topicId (t1, t2...) từ field để mapping với collection vocabularies
+      id: data['topicId'] as String? ?? doc.id,
       name: data['name'] as String,
       description: data['description'] as String,
       imageUrl: data['image_url'] as String?,
-      totalWords: data['total_words'] as int,
+      order: data['order'] as int? ?? 0,
+      totalWords: data['total_words'] as int? ?? 0,
       learnedWords: data['learned_words'] as int? ?? 0,
+    );
+  }
+
+  @override
+  TopicModel copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? imageUrl,
+    int? order,
+    int? totalWords,
+    int? learnedWords,
+  }) {
+    return TopicModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
+      order: order ?? this.order,
+      totalWords: totalWords ?? this.totalWords,
+      learnedWords: learnedWords ?? this.learnedWords,
     );
   }
 
@@ -45,8 +70,10 @@ class TopicModel extends TopicEntity {
       'name': name,
       'description': description,
       'image_url': imageUrl,
+      'order': order,
       'total_words': totalWords,
       'learned_words': learnedWords,
     };
   }
 }
+

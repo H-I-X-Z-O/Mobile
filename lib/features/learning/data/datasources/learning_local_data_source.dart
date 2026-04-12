@@ -16,9 +16,13 @@ abstract class LearningLocalDataSource {
 }
 
 class LearningLocalDataSourceImpl implements LearningLocalDataSource {
-  final SharedPreferences sharedPreferences;
+  SharedPreferences? _prefs;
 
-  LearningLocalDataSourceImpl({required this.sharedPreferences});
+  LearningLocalDataSourceImpl();
+
+  Future<SharedPreferences> get _sharedPreferences async {
+    return _prefs ??= await SharedPreferences.getInstance();
+  }
 
   static const String _cachedTopicsKey = 'CACHED_TOPICS';
   static const String _cachedWordsPrefix = 'CACHED_WORDS_';
@@ -26,7 +30,8 @@ class LearningLocalDataSourceImpl implements LearningLocalDataSource {
   @override
   Future<List<TopicModel>> getCachedTopics() async {
     try {
-      final jsonString = sharedPreferences.getString(_cachedTopicsKey);
+      final prefs = await _sharedPreferences;
+      final jsonString = prefs.getString(_cachedTopicsKey);
       if (jsonString == null) return [];
 
       final List<dynamic> jsonList = json.decode(jsonString) as List<dynamic>;
@@ -42,7 +47,8 @@ class LearningLocalDataSourceImpl implements LearningLocalDataSource {
   Future<void> cacheTopics(List<TopicModel> topics) async {
     try {
       final jsonList = topics.map((t) => t.toJson()).toList();
-      await sharedPreferences.setString(_cachedTopicsKey, json.encode(jsonList));
+      final prefs = await _sharedPreferences;
+      await prefs.setString(_cachedTopicsKey, json.encode(jsonList));
     } catch (e) {
       throw CacheException('Lỗi lưu cache Topics: $e');
     }
@@ -51,8 +57,8 @@ class LearningLocalDataSourceImpl implements LearningLocalDataSource {
   @override
   Future<List<WordModel>> getCachedWords(String topicId) async {
     try {
-      final jsonString =
-          sharedPreferences.getString('$_cachedWordsPrefix$topicId');
+      final prefs = await _sharedPreferences;
+      final jsonString = prefs.getString('$_cachedWordsPrefix$topicId');
       if (jsonString == null) return [];
 
       final List<dynamic> jsonList = json.decode(jsonString) as List<dynamic>;
@@ -68,7 +74,8 @@ class LearningLocalDataSourceImpl implements LearningLocalDataSource {
   Future<void> cacheWords(String topicId, List<WordModel> words) async {
     try {
       final jsonList = words.map((w) => w.toJson()).toList();
-      await sharedPreferences.setString(
+      final prefs = await _sharedPreferences;
+      await prefs.setString(
           '$_cachedWordsPrefix$topicId', json.encode(jsonList));
     } catch (e) {
       throw CacheException('Lỗi lưu cache Words: $e');

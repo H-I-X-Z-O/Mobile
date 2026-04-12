@@ -7,26 +7,28 @@ import '../../domain/entities/word_entity.dart';
 class WordModel extends WordEntity {
   const WordModel({
     required super.id,
+    super.topicId = '',
     required super.englishWord,
     required super.vietnameseDefinition,
     required super.phonetic,
-    required super.audioPath,
+    super.audioUrl = '',
     required super.exampleSentence,
-    required super.isMemorized,
-    required super.category,
+    super.imageUrl,
+    super.level = 'easy',
   });
 
   // ── Factory: Tạo từ Map<String, dynamic> (JSON thuần) ───────────────────
   factory WordModel.fromJson(Map<String, dynamic> json) {
     return WordModel(
-      id: json['id'] as String,
-      englishWord: json['english_word'] as String,
-      vietnameseDefinition: json['vietnamese_definition'] as String,
-      phonetic: json['phonetic'] as String,
-      audioPath: json['audio_path'] as String,
-      exampleSentence: json['example_sentence'] as String,
-      isMemorized: json['is_memorized'] as bool? ?? false,
-      category: json['category'] as String,
+      id: json['id'] as String? ?? '',
+      topicId: json['topicId'] as String? ?? json['topic_id'] as String? ?? '',
+      englishWord: json['eng'] as String? ?? json['english_word'] as String? ?? '',
+      vietnameseDefinition: json['meaning'] as String? ?? json['vietnamese_definition'] as String? ?? '',
+      phonetic: json['pronunciation'] as String? ?? json['pronounciation'] as String? ?? json['phonetic'] as String? ?? json['phonetics'] as String? ?? json['ipa'] as String? ?? json['phien_am'] as String? ?? '',
+      audioUrl: json['audioUrl'] as String? ?? json['audio_url'] as String? ?? '',
+      exampleSentence: json['example'] as String? ?? json['example_sentence'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String? ?? json['image_url'] as String?,
+      level: json['level'] as String? ?? 'easy',
     );
   }
 
@@ -35,13 +37,14 @@ class WordModel extends WordEntity {
     final data = doc.data() as Map<String, dynamic>;
     return WordModel(
       id: doc.id,
-      englishWord: data['english_word'] as String,
-      vietnameseDefinition: data['vietnamese_definition'] as String,
-      phonetic: data['phonetic'] as String,
-      audioPath: data['audio_path'] as String,
-      exampleSentence: data['example_sentence'] as String,
-      isMemorized: data['is_memorized'] as bool? ?? false,
-      category: data['category'] as String,
+      topicId: data['topicId'] as String? ?? '',
+      englishWord: data['eng'] as String? ?? data['english_word'] as String? ?? '',
+      vietnameseDefinition: data['meaning'] as String? ?? data['vietnamese_definition'] as String? ?? '',
+      phonetic: data['pronunciation'] as String? ?? data['pronounciation'] as String? ?? data['phonetic'] as String? ?? data['phonetics'] as String? ?? data['ipa'] as String? ?? data['phien_am'] as String? ?? '',
+      audioUrl: data['audioUrl'] as String? ?? data['audio_url'] as String? ?? '',
+      exampleSentence: data['example'] as String? ?? data['example_sentence'] as String? ?? '',
+      imageUrl: data['imageUrl'] as String? ?? data['image_url'] as String?,
+      level: data['level'] as String? ?? 'easy',
     );
   }
 
@@ -49,13 +52,15 @@ class WordModel extends WordEntity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'english_word': englishWord,
-      'vietnamese_definition': vietnameseDefinition,
-      'phonetic': phonetic,
-      'audio_path': audioPath,
-      'example_sentence': exampleSentence,
-      'is_memorized': isMemorized,
-      'category': category,
+      'topicId': topicId,
+      'eng': englishWord,
+      'meaning': vietnameseDefinition,
+      'pronunciation': phonetic,
+      'audioUrl': audioUrl,
+      'example': exampleSentence,
+      'imageUrl': imageUrl,
+      'level': level,
     };
   }
 }
+

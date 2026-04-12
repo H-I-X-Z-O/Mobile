@@ -8,12 +8,16 @@ import '../entities/word_entity.dart';
 /// (thông qua [GenerateQuizUseCase]).
 abstract class VocabularyRepository {
   /// Lấy danh sách tất cả chủ đề học tập.
-  Future<List<TopicEntity>> getTopics();
+  Future<List<TopicEntity>> getTopics(String? userId);
+  Future<List<WordEntity>> getAllWords();
 
   /// Lấy danh sách từ vựng theo chủ đề [topicId].
   /// (Được dùng bởi cả module Learning lẫn module Exercise)
   Future<List<WordEntity>> getWordsByTopic(String topicId);
 
-  /// Đánh dấu một từ đã được ghi nhớ (learned/memorized).
-  Future<void> markWordAsLearned(String wordId);
+  /// Lấy danh sách tiến độ học tập thực tế của người dùng.
+  Future<List<dynamic>> getUserVocabStatus(String userId);
+
+  /// Đánh dấu một từ đã được ghi nhớ (learned/memorized) cho người dùng [userId].
+  Future<void> markWordAsLearned(String userId, String wordId, String topicId);
 }

@@ -1,35 +1,39 @@
 import 'package:equatable/equatable.dart';
 
-/// Represents a vocabulary word in the Vocabulary Store feature.
+/// Thực thể từ vựng – khớp với bảng `vocabularies` trong DB.
+/// Chỉ chứa dữ liệu tĩnh (nội dung từ), KHÔNG chứa trạng thái tiến độ cá nhân.
 ///
 /// Fields:
-/// - [id]                   : Unique identifier for the word.
-/// - [englishWord]          : The English word.
-/// - [vietnameseDefinition] : Vietnamese definition/translation.
-/// - [phonetic]             : Phonetic transcription (phiên âm).
-/// - [audioPath]            : Path or URL to the pronunciation audio file.
+/// - [id]                   : Unique identifier (vocabId).
+/// - [topicId]              : ID chủ đề chứa từ này.
+/// - [englishWord]          : The English word (eng).
+/// - [vietnameseDefinition] : Vietnamese definition/translation (meaning).
+/// - [phonetic]             : Phonetic transcription (pronunciation).
+/// - [audioUrl]             : URL to the pronunciation audio file.
 /// - [exampleSentence]      : An example sentence using the word.
-/// - [isMemorized]          : Whether the user has marked this word as memorized.
-/// - [category]             : Word category (e.g. Danh từ, Động từ, Tính từ).
+/// - [imageUrl]             : URL ảnh minh hoạ cho từ.
+/// - [level]                : Cấp độ từ vựng (easy, medium, hard).
 class WordEntity extends Equatable {
   final String id;
+  final String topicId;
   final String englishWord;
   final String vietnameseDefinition;
   final String phonetic;
-  final String audioPath;
+  final String audioUrl;
   final String exampleSentence;
-  final bool isMemorized;
-  final String category;
+  final String? imageUrl;
+  final String level;
 
   const WordEntity({
     required this.id,
+    this.topicId = '',
     required this.englishWord,
     required this.vietnameseDefinition,
     required this.phonetic,
-    required this.audioPath,
+    this.audioUrl = '',
     required this.exampleSentence,
-    required this.isMemorized,
-    required this.category,
+    this.imageUrl,
+    this.level = 'easy',
   });
 
   /// Getter tiện ích – dùng bởi module Exercise (GenerateQuizUseCase).
@@ -41,46 +45,47 @@ class WordEntity extends Equatable {
   /// Returns a copy of this entity with the given fields replaced.
   WordEntity copyWith({
     String? id,
+    String? topicId,
     String? englishWord,
     String? vietnameseDefinition,
     String? phonetic,
-    String? audioPath,
+    String? audioUrl,
     String? exampleSentence,
-    bool? isMemorized,
-    String? category,
+    String? imageUrl,
+    String? level,
   }) {
     return WordEntity(
       id: id ?? this.id,
+      topicId: topicId ?? this.topicId,
       englishWord: englishWord ?? this.englishWord,
       vietnameseDefinition: vietnameseDefinition ?? this.vietnameseDefinition,
       phonetic: phonetic ?? this.phonetic,
-      audioPath: audioPath ?? this.audioPath,
+      audioUrl: audioUrl ?? this.audioUrl,
       exampleSentence: exampleSentence ?? this.exampleSentence,
-      isMemorized: isMemorized ?? this.isMemorized,
-      category: category ?? this.category,
+      imageUrl: imageUrl ?? this.imageUrl,
+      level: level ?? this.level,
     );
   }
 
   @override
   List<Object?> get props => [
         id,
+        topicId,
         englishWord,
         vietnameseDefinition,
         phonetic,
-        audioPath,
+        audioUrl,
         exampleSentence,
-        isMemorized,
-        category,
+        imageUrl,
+        level,
       ];
 
   @override
   String toString() => 'WordEntity('
       'id: $id, '
+      'topicId: $topicId, '
       'englishWord: $englishWord, '
       'vietnameseDefinition: $vietnameseDefinition, '
-      'phonetic: $phonetic, '
-      'audioPath: $audioPath, '
-      'exampleSentence: $exampleSentence, '
-      'isMemorized: $isMemorized, '
-      'category: $category)';
+      'level: $level)';
 }
+

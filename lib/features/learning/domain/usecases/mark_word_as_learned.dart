@@ -15,9 +15,10 @@ class MarkWordAsLearned {
 
   MarkWordAsLearned(this.repository);
 
-  Future<Either<Failure, void>> call(String wordId) async {
+  Future<Either<Failure, void>> call(
+      String userId, String wordId, String topicId) async {
     try {
-      await repository.markWordAsLearned(wordId);
+      await repository.markWordAsLearned(userId, wordId, topicId);
       return const Right(null);
     } catch (e) {
       return const Left(
