@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../providers/learning_provider.dart';
 import '../widgets/topic_card.dart';
 import 'vocabulary_list_screen.dart';
 
-/// Màn hình chính của module Learning.
-/// Hiển thị 2 section: "Đang học" và "Tất cả chủ đề".
 class TopicListScreen extends StatefulWidget {
-  const TopicListScreen({super.key});
+  final Function(int)? onNavigate;
+  const TopicListScreen({super.key, this.onNavigate});
 
   @override
   State<TopicListScreen> createState() => _TopicListScreenState();
@@ -26,119 +26,100 @@ class _TopicListScreenState extends State<TopicListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.appTheme;
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Header ─────────────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Chủ đề học tập',
-                          style: AppTextStyles.headingLarge),
-                      SizedBox(height: 4),
-                      Text('Khám phá từ vựng theo lĩnh vực',
-                          style: AppTextStyles.bodySmall),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.person_outline,
-                        color: AppColors.textPrimary, size: 26),
-                  ),
-                ],
-              ),
-            ),
+      appBar: AppBar(
+        title: const Text('Chủ đề học tập', style: AppTextStyles.headingMedium),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => widget.onNavigate?.call(3),
+            icon: Icon(Icons.person_outline, color: t.textPrimary, size: 26),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
             const SizedBox(height: 16),
-            // ── Search bar ─────────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
+                style: TextStyle(color: t.textPrimary),
                 decoration: InputDecoration(
                   hintText: 'Tìm kiếm chủ đề...',
-                  prefixIcon: const Icon(Icons.search,
-                      color: AppColors.textHint, size: 20),
-                  filled: true,
-                  fillColor: AppColors.backgroundSecondary,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
+                  prefixIcon: Icon(Icons.search, color: t.textHint, size: 20),
                 ),
+                onChanged: (val) {
+                  context.read<LearningProvider>().searchTopics(val);
+                },
               ),
             ),
             const SizedBox(height: 20),
-            // ── Body ───────────────────────────────────────────────────────
             Expanded(
               child: Consumer<LearningProvider>(
                 builder: (context, provider, _) {
-                  if (provider.state == LearningState.loading ||
-                      provider.state == LearningState.initial) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                          color: AppColors.primary),
-                    );
+                  if (provider.topicState == LearningState.loading ||
+                      provider.topicState == LearningState.initial) {
+                    return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                   }
-
                   final inProgress = provider.topicsInProgress;
-                  final allTopics = provider.topics;
-
-                  return ListView(
-                    children: [
-                      // -- Section: ĐANG HỌC
+                  final allTopics = provider.filteredTopics;
+                  if (allTopics.isEmpty) {
+                    return const Center(child: Text('Không tìm thấy chủ đề nào.'));
+                  }
+                  return CustomScrollView(
+                    slivers: [
                       if (inProgress.isNotEmpty) ...[
-                        _sectionHeader('ĐANG HỌC'),
-                        ...inProgress.map((topic) => TopicCard(
-                              topic: topic,
+                        SliverToBoxAdapter(child: _sectionHeader(context, 'ĐANG HỌC')),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => TopicCard(
+                              topic: inProgress[index],
                               isHighlighted: true,
-                              onTap: () => _navigateToTopic(context, topic),
-                            )),
-                        const SizedBox(height: 8),
+                              onTap: () => _navigateToTopic(context, inProgress[index]),
+                            ),
+                            childCount: inProgress.length,
+                          ),
+                        ),
                       ],
-                      // -- Section: TẤT CẢ CHỦ ĐỀ
-                      _sectionHeader('TẤT CẢ CHỦ ĐỀ'),
-                      const Divider(height: 1, thickness: 1,
-                          color: AppColors.surfaceBorder,
-                          indent: 20, endIndent: 20),
-                      ...allTopics.map((topic) => Column(
-                            children: [
-                              TopicCard(
-                                topic: topic,
-                                onTap: () =>
-                                    _navigateToTopic(context, topic),
-                              ),
-                              const Divider(
-                                  height: 1,
-                                  thickness: 1,
-                                  color: AppColors.surfaceBorder,
-                                  indent: 78,
-                                  endIndent: 20),
-                            ],
-                          )),
-                      const SizedBox(height: 20),
+                      SliverToBoxAdapter(child: _sectionHeader(context, 'TẤT CẢ CHỦ ĐỀ')),
+                      SliverToBoxAdapter(
+                        child: Divider(indent: 20, endIndent: 20, height: 1, color: t.dividerColor),
+                      ),
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final topic = allTopics[index];
+                            return Column(
+                              children: [
+                                TopicCard(
+                                  topic: topic,
+                                  onTap: () => _navigateToTopic(context, topic),
+                                ),
+                                if (index < allTopics.length - 1)
+                                  Divider(indent: 78, endIndent: 20, color: t.dividerColor),
+                              ],
+                            );
+                          },
+                          childCount: allTopics.length,
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
                     ],
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
-      ),
     );
   }
 
-  Widget _sectionHeader(String title) {
+  Widget _sectionHeader(BuildContext context, String title) {
+    final t = context.appTheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
       child: Text(
@@ -146,23 +127,17 @@ class _TopicListScreenState extends State<TopicListScreen> {
         style: AppTextStyles.labelMedium.copyWith(
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
+          color: t.textSecondary,
         ),
       ),
     );
   }
 
   void _navigateToTopic(BuildContext context, topic) {
+    context.read<LearningProvider>().loadWordsForTopic(topic);
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const VocabularyListScreen(),
-      ),
-    ).then((_) {
-      if (context.mounted) {
-        context.read<LearningProvider>().loadWordsForTopic(topic);
-      }
-    });
-    // Load trước khi navigate để data sẵn sàng
-    context.read<LearningProvider>().loadWordsForTopic(topic);
+      MaterialPageRoute(builder: (_) => const VocabularyListScreen()),
+    );
   }
 }

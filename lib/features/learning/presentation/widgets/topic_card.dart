@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/topic_entity.dart';
 
 /// Widget hiển thị một chủ đề trong danh sách.
-/// Layout: Icon container | Tên + số từ | Progress bar | Mũi tên
 class TopicCard extends StatelessWidget {
   final TopicEntity topic;
   final VoidCallback onTap;
-  final bool isHighlighted; // true = "Đang học" card kiểu lớn
+  final bool isHighlighted;
 
   const TopicCard({
     super.key,
@@ -19,17 +19,13 @@ class TopicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isHighlighted) {
-      return _buildHighlightedCard(context);
-    }
+    if (isHighlighted) return _buildHighlightedCard(context);
     return _buildListCard(context);
   }
 
-  // Card lớn dành cho phần "ĐANG HỌC"
   Widget _buildHighlightedCard(BuildContext context) {
-    final progress = topic.totalWords > 0
-        ? topic.learnedWords / topic.totalWords
-        : 0.0;
+    final t = context.appTheme;
+    final progress = topic.totalWords > 0 ? topic.learnedWords / topic.totalWords : 0.0;
 
     return GestureDetector(
       onTap: onTap,
@@ -37,9 +33,12 @@ class TopicCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: t.cardBackground,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: AppColors.cardShadow,
+          border: Border.all(color: t.borderColor),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withAlpha(t.isDark ? 30 : 10), blurRadius: 12, offset: const Offset(0, 4)),
+          ],
         ),
         child: Row(
           children: [
@@ -52,7 +51,10 @@ class TopicCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(topic.name, style: AppTextStyles.headingSmall),
+                      Flexible(
+                        child: Text(topic.name,
+                            style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary)),
+                      ),
                       Text(
                         '${(progress * 100).round()}%',
                         style: AppTextStyles.statsNumber,
@@ -62,7 +64,7 @@ class TopicCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     '${topic.learnedWords}/${topic.totalWords} từ đã học',
-                    style: AppTextStyles.bodySmall,
+                    style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   ClipRRect(
@@ -70,10 +72,8 @@ class TopicCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 8,
-                      backgroundColor: const Color(0xFFD6F6EA),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _progressColor(progress),
-                      ),
+                      backgroundColor: t.progressTrackBackground,
+                      valueColor: AlwaysStoppedAnimation<Color>(_progressColor(progress)),
                     ),
                   ),
                 ],
@@ -85,16 +85,14 @@ class TopicCard extends StatelessWidget {
     );
   }
 
-  // Row item dành cho phần "TẤT CẢ CHỦ ĐỀ"
   Widget _buildListCard(BuildContext context) {
-    final progress = topic.totalWords > 0
-        ? topic.learnedWords / topic.totalWords
-        : 0.0;
+    final t = context.appTheme;
+    final progress = topic.totalWords > 0 ? topic.learnedWords / topic.totalWords : 0.0;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        color: AppColors.background,
+        color: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         child: Row(
           children: [
@@ -104,11 +102,12 @@ class TopicCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(topic.name, style: AppTextStyles.wordItem),
+                  Text(topic.name,
+                      style: AppTextStyles.wordItem.copyWith(color: t.textPrimary)),
                   const SizedBox(height: 2),
                   Text(
                     '${topic.learnedWords}/${topic.totalWords} từ đã học',
-                    style: AppTextStyles.bodySmall,
+                    style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                   ),
                   const SizedBox(height: 6),
                   ClipRRect(
@@ -116,17 +115,15 @@ class TopicCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 6,
-                      backgroundColor: AppColors.surfaceBorder,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _progressColor(progress),
-                      ),
+                      backgroundColor: t.borderColor,
+                      valueColor: AlwaysStoppedAnimation<Color>(_progressColor(progress)),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, color: AppColors.textHint, size: 22),
+            Icon(Icons.chevron_right, color: AppColors.textHint, size: 22),
           ],
         ),
       ),
@@ -147,58 +144,37 @@ class TopicCard extends StatelessWidget {
 
   IconData _topicIcon() {
     switch (topic.name) {
-      case 'Du lịch':
-        return Icons.flight_takeoff;
-      case 'Công việc':
-        return Icons.work_outline;
-      case 'Ẩm thực':
-        return Icons.restaurant;
-      case 'Sức khoẻ':
-        return Icons.health_and_safety_outlined;
-      case 'Công nghệ':
-        return Icons.computer_outlined;
-      case 'Thiên nhiên':
-        return Icons.park_outlined;
-      default:
-        return Icons.book_outlined;
+      case 'Du lịch': return Icons.flight_takeoff;
+      case 'Công việc': return Icons.work_outline;
+      case 'Ẩm thực': return Icons.restaurant;
+      case 'Sức khoẻ': return Icons.health_and_safety_outlined;
+      case 'Công nghệ': return Icons.computer_outlined;
+      case 'Thiên nhiên': return Icons.park_outlined;
+      default: return Icons.book_outlined;
     }
   }
 
   Color _iconBgColor() {
     switch (topic.name) {
-      case 'Du lịch':
-        return const Color(0xFFE8F5F0);
-      case 'Công việc':
-        return const Color(0xFFE8F0FF);
-      case 'Ẩm thực':
-        return const Color(0xFFFFF3E0);
-      case 'Sức khoẻ':
-        return const Color(0xFFFFEBEB);
-      case 'Công nghệ':
-        return const Color(0xFFF3E8FF);
-      case 'Thiên nhiên':
-        return const Color(0xFFE8F5E9);
-      default:
-        return AppColors.backgroundMint;
+      case 'Du lịch': return const Color(0xFFE8F5F0);
+      case 'Công việc': return const Color(0xFFE8F0FF);
+      case 'Ẩm thực': return const Color(0xFFFFF3E0);
+      case 'Sức khoẻ': return const Color(0xFFFFEBEB);
+      case 'Công nghệ': return const Color(0xFFF3E8FF);
+      case 'Thiên nhiên': return const Color(0xFFE8F5E9);
+      default: return AppColors.backgroundMint;
     }
   }
 
   Color _iconColor() {
     switch (topic.name) {
-      case 'Du lịch':
-        return AppColors.primary;
-      case 'Công việc':
-        return const Color(0xFF3B82F6);
-      case 'Ẩm thực':
-        return const Color(0xFFFF9800);
-      case 'Sức khoẻ':
-        return AppColors.error;
-      case 'Công nghệ':
-        return const Color(0xFF9C27B0);
-      case 'Thiên nhiên':
-        return const Color(0xFF4CAF50);
-      default:
-        return AppColors.primary;
+      case 'Du lịch': return AppColors.primary;
+      case 'Công việc': return const Color(0xFF3B82F6);
+      case 'Ẩm thực': return const Color(0xFFFF9800);
+      case 'Sức khoẻ': return AppColors.error;
+      case 'Công nghệ': return const Color(0xFF9C27B0);
+      case 'Thiên nhiên': return const Color(0xFF4CAF50);
+      default: return AppColors.primary;
     }
   }
 

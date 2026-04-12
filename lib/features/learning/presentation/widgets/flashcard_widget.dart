@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../domain/entities/word_entity.dart';
+import 'package:provider/provider.dart';
+import '../providers/learning_provider.dart';
 
 /// Widget thẻ Flashcard với hiệu ứng lật 3D.
 /// Mặt trước: Tiếng Anh + phiên âm + gợi ý chạm.
@@ -90,32 +92,52 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
   // Mặt trước: hiển thị từ tiếng Anh
   Widget _buildFrontFace() {
     return _buildCardContainer(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          Text(
-            widget.word.englishWord,
-            style: AppTextStyles.wordLarge,
-            textAlign: TextAlign.center,
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  widget.word.englishWord,
+                  style: AppTextStyles.wordLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  widget.word.phonetic,
+                  style: AppTextStyles.phonetic,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.touch_app_outlined,
+                        size: 16, color: AppColors.textHint),
+                    SizedBox(width: 6),
+                    Text(
+                      'Chạm để xem nghĩa',
+                      style: AppTextStyles.caption,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            widget.word.phonetic,
-            style: AppTextStyles.phonetic,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 28),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.touch_app_outlined,
-                  size: 16, color: AppColors.textHint),
-              SizedBox(width: 6),
-              Text(
-                'Chạm để xem nghĩa',
-                style: AppTextStyles.caption,
+          Positioned(
+            top: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () {
+                context.read<LearningProvider>().speakWord(widget.word.englishWord);
+              },
+              behavior: HitTestBehavior.opaque,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 28),
               ),
-            ],
+            ),
           ),
         ],
       ),
@@ -126,44 +148,64 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
   Widget _buildBackFace() {
     return _buildCardContainer(
       backgroundColor: AppColors.backgroundMint,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              widget.word.category,
-              style: AppTextStyles.labelMedium
-                  .copyWith(color: Colors.white, fontSize: 11),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    widget.word.level,
+                    style: AppTextStyles.labelMedium
+                        .copyWith(color: Colors.white, fontSize: 11),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.word.vietnameseDefinition,
+                  style: AppTextStyles.headingLarge.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '"${widget.word.exampleSentence}"',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            widget.word.vietnameseDefinition,
-            style: AppTextStyles.headingLarge.copyWith(
-              color: AppColors.textPrimary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              '"${widget.word.exampleSentence}"',
-              style: AppTextStyles.bodyMedium.copyWith(
-                fontStyle: FontStyle.italic,
-                color: AppColors.textSecondary,
+          Positioned(
+            top: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () {
+                context.read<LearningProvider>().speakWord(widget.word.englishWord);
+              },
+              behavior: HitTestBehavior.opaque,
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 28),
               ),
-              textAlign: TextAlign.center,
             ),
           ),
         ],
@@ -177,14 +219,14 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
   }) {
     return Container(
       width: double.infinity,
-      height: 300,
+      height: 340, // Tăng thêm chút không gian do bọc Stack
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: AppColors.cardShadow,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(28.0),
+        padding: const EdgeInsets.all(24.0),
         child: child,
       ),
     );

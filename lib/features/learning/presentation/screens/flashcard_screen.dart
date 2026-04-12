@@ -134,7 +134,7 @@ class FlashcardScreen extends StatelessWidget {
   // Màn hình hoàn thành khi đã học hết thẻ
   Widget _buildCompletionScreen(
       BuildContext context, LearningProvider provider) {
-    final learned = provider.currentWords.where((w) => w.isMemorized).length;
+    final learned = provider.learnedWordsInCurrentTopic;
     final total = provider.currentWords.length;
 
     return Scaffold(
