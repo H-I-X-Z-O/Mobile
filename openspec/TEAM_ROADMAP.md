@@ -29,10 +29,10 @@ Dự án được triển khai theo mô hình **Feature-First Clean Architecture
 ## 🟡 3. Vũ Lâm Minh (@MinhVu)
 **Trách nhiệm:** Auth, App Shell & Notification (Hệ thống khung & Thông báo)
 
-- [ ] **Giai đoạn 2 (Domain):** Định nghĩa `UserEntity` và `AuthRepository` interface.
-- [ ] **Giai đoạn 3 (Data):** Triển khai `AuthRepositoryImpl` sử dụng Firebase Auth.
-- [ ] **Giai đoạn 4 (Auth UI):** Màn hình Đăng nhập (Login) & Đăng ký (Register).
-- [ ] **Giai đoạn 4.2 (App Shell):** Xây dựng `MainShell` với `BottomNavigationBar`.
+- [x] **Giai đoạn 2 (Domain):** Định nghĩa `UserEntity` và `AuthRepository` interface.
+- [x] **Giai đoạn 3 (Data):** Triển khai `AuthRepositoryImpl` sử dụng Mock.
+- [x] **Giai đoạn 4 (Auth UI):** Màn hình Đăng nhập (Login) & Đăng ký (Register).
+- [x] **Giai đoạn 4.2 (App Shell):** Xây dựng `MainShell` với `BottomNavigationBar`.
 - [ ] **Giai đoạn 6 (Optimization):** Cấu hình Firebase Cloud Messaging cho nhắc nhở học tập.
 
 ---
