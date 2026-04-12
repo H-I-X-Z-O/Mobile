@@ -2,10 +2,11 @@ import 'package:equatable/equatable.dart';
 
 /// Các loại câu hỏi dựa trên đặc tả exercise.md
 enum QuestionType {
-  multipleChoice, // Trắc nghiệm 4 đáp án
-  fillInTheBlank, // Điền vào chỗ trống
-  listening,      // Nghe và chọn đáp án
-  matching        // Nối từ (mở rộng sau này)
+  multipleChoice,        // Trắc nghiệm: Anh → Việt
+  reverseMultipleChoice, // Trắc nghiệm ngược: Việt → Anh
+  fillInTheBlank,        // Điền từ tiếng Anh
+  listening,             // Nghe và chọn đáp án
+  matching               // Nối từ (mở rộng sau này)
 }
 
 /// Đại diện cho một câu hỏi trong bài tập hoặc bài kiểm tra

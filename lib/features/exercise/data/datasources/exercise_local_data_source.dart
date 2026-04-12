@@ -31,9 +31,13 @@ abstract class ExerciseLocalDataSource {
 // ─── Implementation ──────────────────────────────────────────────────────────
 
 class ExerciseLocalDataSourceImpl implements ExerciseLocalDataSource {
-  final SharedPreferences sharedPreferences;
+  SharedPreferences? _prefs;
 
-  ExerciseLocalDataSourceImpl({required this.sharedPreferences});
+  ExerciseLocalDataSourceImpl();
+
+  Future<SharedPreferences> get _sharedPreferences async {
+    return _prefs ??= await SharedPreferences.getInstance();
+  }
 
   // ── Cache keys ──────────────────────────────────────────────────────────
   static const String _cachedQuestionsPrefix = 'CACHED_QUESTIONS_';
@@ -43,8 +47,8 @@ class ExerciseLocalDataSourceImpl implements ExerciseLocalDataSource {
   @override
   Future<List<QuestionModel>> getCachedQuestions(String topicId) async {
     try {
-      final jsonString =
-          sharedPreferences.getString('$_cachedQuestionsPrefix$topicId');
+      final prefs = await _sharedPreferences;
+      final jsonString = prefs.getString('$_cachedQuestionsPrefix$topicId');
 
       if (jsonString == null) {
         return [];
@@ -66,7 +70,8 @@ class ExerciseLocalDataSourceImpl implements ExerciseLocalDataSource {
     try {
       final jsonList = questions.map((q) => q.toJson()).toList();
       final jsonString = json.encode(jsonList);
-      await sharedPreferences.setString(
+      final prefs = await _sharedPreferences;
+      await prefs.setString(
           '$_cachedQuestionsPrefix$topicId', jsonString);
     } catch (e) {
       throw CacheException('Lỗi khi lưu cache câu hỏi: $e');
@@ -77,7 +82,8 @@ class ExerciseLocalDataSourceImpl implements ExerciseLocalDataSource {
   @override
   Future<List<QuizResultModel>> getCachedQuizHistory() async {
     try {
-      final jsonString = sharedPreferences.getString(_cachedQuizHistory);
+      final prefs = await _sharedPreferences;
+      final jsonString = prefs.getString(_cachedQuizHistory);
 
       if (jsonString == null) {
         return [];
@@ -103,7 +109,8 @@ class ExerciseLocalDataSourceImpl implements ExerciseLocalDataSource {
 
       final jsonList = existing.map((r) => r.toJson()).toList();
       final jsonString = json.encode(jsonList);
-      await sharedPreferences.setString(_cachedQuizHistory, jsonString);
+      final prefs = await _sharedPreferences;
+      await prefs.setString(_cachedQuizHistory, jsonString);
     } catch (e) {
       throw CacheException('Lỗi khi lưu cache kết quả: $e');
     }
@@ -113,7 +120,8 @@ class ExerciseLocalDataSourceImpl implements ExerciseLocalDataSource {
   @override
   Future<void> clearCache() async {
     try {
-      final keys = sharedPreferences
+      final prefs = await _sharedPreferences;
+      final keys = prefs
           .getKeys()
           .where((key) =>
               key.startsWith(_cachedQuestionsPrefix) ||
@@ -121,7 +129,7 @@ class ExerciseLocalDataSourceImpl implements ExerciseLocalDataSource {
           .toList();
 
       for (final key in keys) {
-        await sharedPreferences.remove(key);
+        await prefs.remove(key);
       }
     } catch (e) {
       throw CacheException('Lỗi khi xóa cache: $e');

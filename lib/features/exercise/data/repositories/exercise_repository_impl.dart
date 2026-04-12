@@ -23,29 +23,22 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
   // ── getQuestionsByTopic ─────────────────────────────────────────────────
   /// Luồng:
   /// 1. Thử lấy từ Remote (Firestore).
-  /// 2. Nếu thành công → cache vào Local → trả về [Right].
+  /// 2. Nếu thành công → cache vào Local → trả về.
   /// 3. Nếu lỗi Remote → fallback lấy từ Local cache.
-  /// 4. Nếu Local cũng trống → trả về [Left(Failure)].
   @override
   Future<List<QuestionEntity>> getQuestionsByTopic(String topicId) async {
     try {
-      // Ưu tiên lấy dữ liệu mới nhất từ server
       final remoteQuestions =
           await remoteDataSource.getQuestionsByTopic(topicId);
-
-      // Cache lại để dùng offline lần sau
       await localDataSource.cacheQuestions(topicId, remoteQuestions);
-
       return remoteQuestions;
     } on ServerException {
-      // Fallback: lấy từ cache khi mất mạng hoặc server lỗi
       try {
         final cachedQuestions =
             await localDataSource.getCachedQuestions(topicId);
         if (cachedQuestions.isNotEmpty) {
           return cachedQuestions;
         }
-        // Cache rỗng, ném lại lỗi để UseCase xử lý
         rethrow;
       } on CacheException {
         throw const ServerException(
@@ -57,12 +50,13 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
   // ── saveQuizResult ──────────────────────────────────────────────────────
   /// Luồng:
   /// 1. Chuyển đổi [QuizResultEntity] → [QuizResultModel].
-  /// 2. Đẩy lên Remote (Firestore).
-  /// 3. Đồng thời cache vào Local để hiển thị lịch sử offline.
+  /// 2. Đẩy lên Remote (Firestore) vào đường dẫn user-scoped.
+  /// 3. Đồng thời cache vào Local.
   @override
   Future<void> saveQuizResult(QuizResultEntity result) async {
     final model = QuizResultModel(
       id: result.id,
+      userId: result.userId,        // ← truyền userId thực từ Entity
       topicId: result.topicId,
       correctAnswers: result.correctAnswers,
       totalQuestions: result.totalQuestions,
@@ -72,7 +66,6 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
 
     try {
       await remoteDataSource.saveQuizResult(model);
-      // Cache thêm vào local sau khi lưu remote thành công
       await localDataSource.cacheQuizResult(model);
     } on ServerException {
       // Nếu remote lỗi, vẫn lưu vào local để đồng bộ sau
@@ -82,18 +75,14 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
   }
 
   // ── getQuizHistory ──────────────────────────────────────────────────────
-  /// Luồng:
-  /// 1. Thử lấy lịch sử từ Remote.
-  /// 2. Nếu lỗi → fallback lấy từ Local cache.
+  /// [userId] được truyền vào từ tầng UseCase / Provider sau khi Auth.
   @override
-  Future<List<QuizResultEntity>> getQuizHistory() async {
+  Future<List<QuizResultEntity>> getQuizHistory({required String userId}) async {
     try {
-      // TODO: Thay 'current_user_id' bằng userId thực từ AuthProvider
       final remoteResults =
-          await remoteDataSource.getQuizHistory('current_user_id');
+          await remoteDataSource.getQuizHistory(userId);
       return remoteResults;
     } on ServerException {
-      // Fallback: lấy từ cache khi mất mạng
       try {
         return await localDataSource.getCachedQuizHistory();
       } on CacheException {

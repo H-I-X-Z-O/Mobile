@@ -12,10 +12,10 @@ abstract class ExerciseRemoteDataSource {
   /// Lấy danh sách câu hỏi theo chủ đề [topicId].
   Future<List<QuestionModel>> getQuestionsByTopic(String topicId);
 
-  /// Lưu kết quả bài kiểm tra lên Firestore.
+  /// Lưu kết quả bài kiểm tra lên Firestore theo user-scoped path.
   Future<void> saveQuizResult(QuizResultModel result);
 
-  /// Lấy lịch sử bài kiểm tra của người dùng hiện tại.
+  /// Lấy lịch sử bài kiểm tra của người dùng [userId].
   Future<List<QuizResultModel>> getQuizHistory(String userId);
 }
 
@@ -28,7 +28,7 @@ class ExerciseRemoteDataSourceImpl implements ExerciseRemoteDataSource {
 
   // ── Collection references ───────────────────────────────────────────────
   static const String _questionsCollection = 'questions';
-  static const String _quizResultsCollection = 'quiz_results';
+  static const String _usersCollection = 'users';
 
   // ── getQuestionsByTopic ─────────────────────────────────────────────────
   @override
@@ -39,7 +39,6 @@ class ExerciseRemoteDataSourceImpl implements ExerciseRemoteDataSource {
           .where('related_word_id', isGreaterThanOrEqualTo: topicId)
           .get();
 
-      // Nếu không tìm thấy câu hỏi nào, trả về danh sách rỗng
       if (querySnapshot.docs.isEmpty) {
         return [];
       }
@@ -55,11 +54,15 @@ class ExerciseRemoteDataSourceImpl implements ExerciseRemoteDataSource {
   }
 
   // ── saveQuizResult ──────────────────────────────────────────────────────
+  /// Lưu vào đường dẫn: users/{userId}/quiz_history/{resultId}
+  /// Điều này đảm bảo dữ liệu được phân tách riêng cho từng người dùng.
   @override
   Future<void> saveQuizResult(QuizResultModel result) async {
     try {
       await firestore
-          .collection(_quizResultsCollection)
+          .collection(_usersCollection)
+          .doc(result.userId)
+          .collection('quiz_history')
           .doc(result.id)
           .set(result.toJson());
     } on FirebaseException catch (e) {
@@ -70,12 +73,14 @@ class ExerciseRemoteDataSourceImpl implements ExerciseRemoteDataSource {
   }
 
   // ── getQuizHistory ──────────────────────────────────────────────────────
+  /// Lấy từ: users/{userId}/quiz_history, sắp xếp theo thời gian mới nhất.
   @override
   Future<List<QuizResultModel>> getQuizHistory(String userId) async {
     try {
       final querySnapshot = await firestore
-          .collection(_quizResultsCollection)
-          .where('user_id', isEqualTo: userId)
+          .collection(_usersCollection)
+          .doc(userId)
+          .collection('quiz_history')
           .orderBy('created_at', descending: true)
           .get();
 

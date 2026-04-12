@@ -5,9 +5,9 @@ abstract class ExerciseRepository {
   // Lấy danh sách câu hỏi dựa trên chủ đề (Đức cung cấp topicId)
   Future<List<QuestionEntity>> getQuestionsByTopic(String topicId);
 
-  // Lưu kết quả sau khi làm bài xong
+  // Lưu kết quả sau khi làm bài xong (bao gồm userId trong QuizResultEntity)
   Future<void> saveQuizResult(QuizResultEntity result);
 
-  // (Mở rộng) Lấy lịch sử làm bài tập của người dùng
-  Future<List<QuizResultEntity>> getQuizHistory();
+  // Lấy lịch sử làm bài tập của người dùng theo userId thực
+  Future<List<QuizResultEntity>> getQuizHistory({required String userId});
 }
