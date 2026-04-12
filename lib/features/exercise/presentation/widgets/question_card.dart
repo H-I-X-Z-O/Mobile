@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/question_entity.dart';
 
 class QuestionCard extends StatelessWidget {
@@ -8,31 +9,82 @@ class QuestionCard extends StatelessWidget {
 
   const QuestionCard({super.key, required this.question});
 
+  String get _headerLabel {
+    switch (question.type) {
+      case QuestionType.multipleChoice:
+        return 'Chọn nghĩa đúng của từ:';
+      case QuestionType.reverseMultipleChoice:
+        return 'Chọn từ Tiếng Anh mang nghĩa:';
+      case QuestionType.fillInTheBlank:
+        return 'Nhập từ Tiếng Anh theo nghĩa:';
+      case QuestionType.listening:
+        return 'Nghe và chọn đáp án đúng:';
+      default:
+        return 'Câu hỏi:';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final t = context.appTheme;
+
+    // Với dạng Listening content (từ) sẽ bị ẩn — hiển thị icon mic thay thế
+    final isListening = question.type == QuestionType.listening;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Choose the correct form:',
-            style: AppTextStyles.headingSmall.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+          // Header nhỏ mô tả loại câu hỏi
+          Row(
+            children: [
+              Icon(
+                _questionIcon,
+                size: 16,
+                color: t.textSecondary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _headerLabel,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: t.textSecondary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            question.content.replaceAll('Chọn nghĩa đúng của từ: ', ''), 
-            style: AppTextStyles.headingMedium.copyWith(
-              color: AppColors.progressGreen, // Màu mint green cho phần điền
-              fontSize: 22,
+          const SizedBox(height: 12),
+          // Nội dung câu hỏi — ẩn text với Listening
+          if (!isListening)
+            Text(
+              question.content,
+              style: AppTextStyles.headingMedium.copyWith(
+                color: question.type == QuestionType.reverseMultipleChoice
+                    ? t.textPrimary
+                    : AppColors.primary,
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
         ],
       ),
     );
+  }
+
+  IconData get _questionIcon {
+    switch (question.type) {
+      case QuestionType.multipleChoice:
+        return Icons.quiz_outlined;
+      case QuestionType.reverseMultipleChoice:
+        return Icons.swap_horiz_rounded;
+      case QuestionType.fillInTheBlank:
+        return Icons.edit_note_rounded;
+      case QuestionType.listening:
+        return Icons.volume_up_rounded;
+      default:
+        return Icons.help_outline_rounded;
+    }
   }
 }

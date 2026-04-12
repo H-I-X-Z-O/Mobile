@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 
 enum OptionStatus { normal, selected, correct, wrong }
 
@@ -20,30 +21,37 @@ class OptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = AppColors.surface;
-    Color borderColor = AppColors.inputBorder;
-    Color textColor = AppColors.textPrimary;
-    Widget? icon;
+    final t = context.appTheme;
+
+    // Màu nền, viền, chữ theo trạng thái — tất cả đều theme-aware
+    Color backgroundColor;
+    Color borderColor;
+    Color textColor;
 
     switch (status) {
       case OptionStatus.normal:
-        break;
+        backgroundColor = t.cardBackground;
+        borderColor = t.borderColor;
+        textColor = t.textPrimary;
       case OptionStatus.selected:
-        backgroundColor = AppColors.backgroundMint;
+        backgroundColor = AppColors.primary.withAlpha(t.isDark ? 40 : 25);
         borderColor = AppColors.primary;
-        break;
+        textColor = t.isDark ? AppColors.primaryLight : AppColors.primaryDark;
       case OptionStatus.correct:
-        backgroundColor = const Color(0xFFE8F8F5);
+        backgroundColor = AppColors.success.withAlpha(t.isDark ? 40 : 25);
         borderColor = AppColors.success;
-        textColor = AppColors.success;
-        icon = const Icon(Icons.check_circle, color: AppColors.success, size: 20);
-        break;
+        textColor = t.isDark ? const Color(0xFF4CD9AA) : AppColors.success;
       case OptionStatus.wrong:
-        backgroundColor = const Color(0xFFFDE8E8);
+        backgroundColor = AppColors.error.withAlpha(t.isDark ? 40 : 25);
         borderColor = AppColors.error;
         textColor = AppColors.error;
-        icon = const Icon(Icons.cancel, color: AppColors.error, size: 20);
-        break;
+    }
+
+    Widget? statusIcon;
+    if (status == OptionStatus.correct) {
+      statusIcon = const Icon(Icons.check_circle, color: AppColors.success, size: 20);
+    } else if (status == OptionStatus.wrong) {
+      statusIcon = const Icon(Icons.cancel, color: AppColors.error, size: 20);
     }
 
     return Padding(
@@ -54,15 +62,19 @@ class OptionButton extends StatelessWidget {
           onTap: isAnswered ? null : onTap,
           borderRadius: BorderRadius.circular(20),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 250),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: borderColor, width: status != OptionStatus.normal ? 2 : 1),
+              border: Border.all(
+                color: borderColor,
+                width: status != OptionStatus.normal ? 2 : 1,
+              ),
             ),
             child: Row(
               children: [
+                // Radio indicator
                 Container(
                   width: 20,
                   height: 20,
@@ -71,7 +83,7 @@ class OptionButton extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: status == OptionStatus.normal || status == OptionStatus.selected
-                          ? AppColors.inputBorder
+                          ? t.borderColor
                           : borderColor,
                       width: status == OptionStatus.correct || status == OptionStatus.wrong ? 0 : 1.5,
                     ),
@@ -88,10 +100,13 @@ class OptionButton extends StatelessWidget {
                 Expanded(
                   child: Text(
                     text,
-                    style: AppTextStyles.bodyLarge.copyWith(color: textColor, fontWeight: status != OptionStatus.normal ? FontWeight.w600 : FontWeight.w400),
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      color: textColor,
+                      fontWeight: status != OptionStatus.normal ? FontWeight.w600 : FontWeight.w400,
+                    ),
                   ),
                 ),
-                if (icon != null) icon,
+                if (statusIcon != null) statusIcon,
               ],
             ),
           ),

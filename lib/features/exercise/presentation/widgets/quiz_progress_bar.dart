@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class QuizProgressBar extends StatelessWidget {
   final int currentIndex;
@@ -15,8 +16,7 @@ class QuizProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (totalQuestions == 0) return const SizedBox.shrink();
-    
-    // index hiển thị (base 1)
+    final t = context.appTheme;
     final currentFocus = (currentIndex + 1).clamp(1, totalQuestions);
     final progress = currentFocus / totalQuestions;
 
@@ -29,12 +29,15 @@ class QuizProgressBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Bài tập Ngữ pháp',
-                style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                'Bài tập Từ vựng',
+                style: AppTextStyles.labelLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: t.textPrimary,
+                ),
               ),
               Text(
                 '$currentFocus/$totalQuestions',
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.labelLarge.copyWith(color: t.textSecondary),
               ),
             ],
           ),
@@ -44,8 +47,8 @@ class QuizProgressBar extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 12,
-              backgroundColor: const Color(0xFFD6F6EA), // Lighter mint/green tint
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.progressGreen),
+              backgroundColor: t.progressTrackBackground,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
         ],
