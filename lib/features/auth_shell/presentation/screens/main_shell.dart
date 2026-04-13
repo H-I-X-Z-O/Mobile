@@ -56,10 +56,6 @@ class _MainShellState extends State<MainShell> {
           ],
         ),
         child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor ?? Theme.of(context).cardColor,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textHint,
           currentIndex: _currentIndex,
           onTap: (index) {
             setState(() {

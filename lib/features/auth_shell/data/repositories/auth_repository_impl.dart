@@ -1,12 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   late final FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   final bool _isInitialized;
 
   AuthRepositoryImpl({FirebaseAuth? firebaseAuth}) 
@@ -34,7 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity> login(String email, String password) async {
     if (!_isInitialized) {
-      throw Exception('Firebase chưa được cấu hình cho nền tảng Web. Cần chạy flutterfire configure hoặc test trên máy ảo Android/iOS.');
+      throw Exception('Firebase chưa được cấu hình. Cần chạy flutterfire configure hoặc test trên máy ảo Android/iOS.');
     }
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
@@ -47,9 +50,6 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception('Đăng nhập thất bại: Không tìm thấy thông tin người dùng.');
       }
       
-      if (kDebugMode) {
-        print('Firebase Auth: Login Success: ${user.email}');
-      }
       return UserModel.fromFirebaseUser(user);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -68,10 +68,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity> register(String email, String password, String displayName) async {
     if (!_isInitialized) {
-      throw Exception('Firebase chưa được cấu hình cho nền tảng Web. Cần chạy flutterfire configure hoặc test trên máy ảo Android/iOS.');
+      throw Exception('Firebase chưa được cấu hình.');
     }
     try {
-      // 1. Tạo user bằng Firebase
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -79,32 +78,87 @@ class AuthRepositoryImpl implements AuthRepository {
       
       final user = userCredential.user;
       if (user == null) {
-        throw Exception('Đăng ký thất bại: Không tìm thấy thông tin người dùng sau khi tạo.');
+        throw Exception('Đăng ký thất bại.');
       }
 
-      // 2. Cập nhật Display Name cho user trên Firebase Profile
       await user.updateDisplayName(displayName);
-
-      // Cần phải tải lại user để lấy thông tin mới (tránh bị cache field displayName = null)
       await user.reload();
       final updatedUser = _firebaseAuth.currentUser;
-
-      if (kDebugMode) {
-        print('Firebase Auth: Register Success: ${updatedUser?.email}');
-      }
       
       return UserModel.fromFirebaseUser(updatedUser ?? user);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        throw Exception('Mật khẩu quá yếu, vui lòng chọn mật khẩu mạnh hơn.');
+        throw Exception('Mật khẩu quá yếu.');
       } else if (e.code == 'email-already-in-use') {
-        throw Exception('Tài khoản đã tồn tại cho email này.');
-      } else if (e.code == 'invalid-email') {
-        throw Exception('Email không hợp lệ.');
+        throw Exception('Tài khoản đã tồn tại.');
       }
       throw Exception('Lỗi đăng ký: ${e.message}');
     } catch (e) {
-      throw Exception('Đã xảy ra lỗi không xác định trong quá trình đăng ký.');
+      throw Exception('Đã xảy ra lỗi không xác định.');
+    }
+  }
+
+  @override
+  Future<UserEntity> signInWithGoogle() async {
+    if (!_isInitialized) throw Exception('Firebase chưa initialized');
+    
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) throw Exception('Đã hủy đăng nhập Google.');
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final user = userCredential.user;
+      
+      if (user == null) throw Exception('Đăng nhập Google thất bại.');
+      
+      return UserModel.fromFirebaseUser(user);
+    } catch (e) {
+      throw Exception('Lỗi đăng nhập Google: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<UserEntity> signInWithFacebook() async {
+    if (!_isInitialized) throw Exception('Firebase chưa initialized');
+
+    try {
+      final LoginResult result = await FacebookAuth.instance.login();
+      
+      if (result.status == LoginStatus.success) {
+        final OAuthCredential credential = FacebookAuthProvider.credential(result.accessToken!.tokenString);
+        final userCredential = await _firebaseAuth.signInWithCredential(credential);
+        final user = userCredential.user;
+
+        if (user == null) throw Exception('Đăng nhập Facebook thất bại.');
+        return UserModel.fromFirebaseUser(user);
+      } else if (result.status == LoginStatus.cancelled) {
+        throw Exception('Đã hủy đăng nhập Facebook.');
+      } else {
+        throw Exception('Lỗi đăng nhập Facebook: ${result.message}');
+      }
+    } catch (e) {
+      throw Exception('Lỗi đăng nhập Facebook: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    if (!_isInitialized) throw Exception('Firebase chưa initialized');
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw Exception('Không tìm thấy tài khoản với email này.');
+      }
+      throw Exception('Lỗi gửi email reset: ${e.message}');
+    } catch (e) {
+      throw Exception('Đã xảy ra lỗi.');
     }
   }
 
@@ -112,9 +166,20 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     if (!_isInitialized) return;
     try {
+      // Đăng xuất Firebase
       await _firebaseAuth.signOut();
-      if (kDebugMode) {
-        print('Firebase Auth: Logout Success');
+      
+      // Thử đăng xuất Google và Facebook, nhưng không để lỗi của chúng chặn luồng đăng xuất chính
+      try {
+        await _googleSignIn.signOut();
+      } catch (e) {
+        debugPrint('Lỗi đăng xuất Google (có thể qua bỏ): $e');
+      }
+      
+      try {
+        await FacebookAuth.instance.logOut();
+      } catch (e) {
+        debugPrint('Lỗi đăng xuất Facebook (có thể qua bỏ): $e');
       }
     } catch (e) {
       throw Exception('Không thể đăng xuất: ${e.toString()}');

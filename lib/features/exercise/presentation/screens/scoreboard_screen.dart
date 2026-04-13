@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/exercise_provider.dart';
 import 'review_wrong_screen.dart';
@@ -18,15 +18,15 @@ class ScoreboardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kết Quả', style: AppTextStyles.headingMedium),
+        title: const Text('Kết Quả'),
         automaticallyImplyLeading: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(AppDimensions.p24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icon kết quả - nền tròn nổi bật rõ hơn
+            // Icon kết quả
             Container(
               width: 120,
               height: 120,
@@ -42,66 +42,71 @@ class ScoreboardScreen extends StatelessWidget {
                 color: isPass ? AppColors.primary : AppColors.warning,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.p24),
             Text(
               isPass ? 'Tuyệt vời!' : 'Cố gắng lên nhé!',
-              style: AppTextStyles.displayMedium.copyWith(color: t.textPrimary),
+              style: Theme.of(context).textTheme.displaySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.p8),
             Text(
               'Bạn đã trả lời đúng ${provider.correctCount} / ${provider.totalQuestions} câu.',
-              style: AppTextStyles.bodyLarge.copyWith(color: t.textSecondary),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: t.textSecondary),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.p32),
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppDimensions.p24),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: t.cardBackground,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.r16),
                 border: Border.all(color: t.borderColor),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withAlpha(t.isDark ? 40 : 10), blurRadius: 12, offset: const Offset(0, 4)),
+                  BoxShadow(
+                    color: Colors.black.withAlpha(t.isDark ? 40 : 10),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
               child: Column(
                 children: [
-                  Text('Điểm số', style: AppTextStyles.labelMedium.copyWith(color: t.textSecondary)),
-                  const SizedBox(height: 8),
+                  Text('Điểm số', style: Theme.of(context).textTheme.labelMedium),
+                  const SizedBox(height: AppDimensions.p8),
                   Text(
                     score.toStringAsFixed(1),
-                    style: AppTextStyles.displayLarge.copyWith(
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
                       color: isPass ? AppColors.primary : AppColors.error,
                       fontSize: 52,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     '/ 10',
-                    style: AppTextStyles.bodyMedium.copyWith(color: t.textSecondary),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                   ),
                 ],
               ),
             ),
             const Spacer(),
             if (provider.correctCount < provider.totalQuestions)
-              ElevatedButton.icon(
+              OutlinedButton.icon(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ReviewWrongScreen()),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: t.cardBackground,
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r24)),
                 ),
                 icon: const Icon(Icons.remove_red_eye_outlined),
-                label: Text('Xem lại câu sai',
-                    style: AppTextStyles.buttonLarge.copyWith(color: AppColors.primary)),
+                label: const Text('Xem lại câu sai'),
               ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.p12),
             ElevatedButton.icon(
               onPressed: () {
                 context.read<ExerciseProvider>().restartQuiz();
@@ -110,15 +115,17 @@ class ScoreboardScreen extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Làm lại'),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.p12),
             TextButton(
-              onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+              onPressed: () {
+                context.read<ExerciseProvider>().resetToInitial();
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
               style: TextButton.styleFrom(
-                minimumSize: const Size(double.infinity, 52),
+                minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
                 foregroundColor: t.textSecondary,
               ),
-              child: Text('Về trang chủ',
-                  style: TextStyle(fontSize: 16, color: t.textSecondary)),
+              child: const Text('Về trang chủ'),
             ),
           ],
         ),

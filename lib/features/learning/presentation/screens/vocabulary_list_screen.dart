@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/learning_provider.dart';
 import '../widgets/word_list_item.dart';
 import 'flashcard_screen.dart';
 import '../../../exercise/presentation/screens/exercise_screen.dart';
 
-/// Màn hình danh sách từ vựng trong 1 chủ đề.
-/// Header: Tên chủ đề + progress bar
-/// Body: ListView các từ vựng
-/// Footer: Nút "Bắt đầu học bằng Flashcard"
 class VocabularyListScreen extends StatelessWidget {
   const VocabularyListScreen({super.key});
 
@@ -27,7 +23,6 @@ class VocabularyListScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text(
               topic != null ? 'Chủ đề: ${topic.name}' : 'Từ vựng',
-              style: AppTextStyles.headingMedium,
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios, size: 20),
@@ -39,25 +34,25 @@ class VocabularyListScreen extends StatelessWidget {
               // ── Progress header ───────────────────────────────────────
               if (topic != null)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+                  padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p12, AppDimensions.p20, AppDimensions.p8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Tiến độ hoàn thành',
-                              style: AppTextStyles.labelLarge),
+                          Text('Tiến độ hoàn thành',
+                              style: Theme.of(context).textTheme.labelLarge),
                           Text(
                             '${topic.learnedWords}/${topic.totalWords} từ',
-                            style: AppTextStyles.labelLarge
-                                .copyWith(color: AppColors.primary),
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppDimensions.p8),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppDimensions.r8),
                         child: LinearProgressIndicator(
                           value: topic.totalWords > 0
                               ? topic.learnedWords / topic.totalWords
@@ -70,15 +65,10 @@ class VocabularyListScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              const SizedBox(height: 8),
-              const Divider(
-                  height: 1,
-                  thickness: 1,
-                  indent: 20,
-                  endIndent: 20),
+              const Divider(height: 1),
+              
               // ── Word list ─────────────────────────────────────────────
               Expanded(
-                // ĐÃ SỬA: Thay provider.state thành provider.wordState
                 child: provider.wordState == LearningState.loading
                     ? const Center(
                     child: CircularProgressIndicator(
@@ -86,18 +76,18 @@ class VocabularyListScreen extends StatelessWidget {
                     : provider.wordState == LearningState.error
                     ? Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppDimensions.p20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.error_outline, color: AppColors.error, size: 48),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.p16),
                         Text(
                           provider.errorMessage ?? 'Đã xảy ra lỗi không xác định.',
                           textAlign: TextAlign.center,
-                          style: AppTextStyles.bodyMedium,
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppDimensions.p20),
                         ElevatedButton(
                           onPressed: () => provider.loadWordsForTopic(topic!),
                           child: const Text('Thử lại'),
@@ -107,20 +97,20 @@ class VocabularyListScreen extends StatelessWidget {
                   ),
                 )
                     : words.isEmpty
-                    ? const Center(
+                    ? Center(
                   child: Text(
                     'Chưa có từ vựng trong chủ đề này.',
-                    style: AppTextStyles.bodyMedium,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                   ),
                 )
                     : ListView.separated(
                   itemCount: words.length,
+                  padding: const EdgeInsets.symmetric(vertical: AppDimensions.p8),
                   separatorBuilder: (_, __) => Divider(
                       height: 1,
-                      thickness: 1,
                       color: t.dividerColor,
                       indent: 78,
-                      endIndent: 20),
+                      endIndent: AppDimensions.p20),
                   itemBuilder: (context, index) {
                     return WordListItem(word: words[index]);
                   },
@@ -128,10 +118,10 @@ class VocabularyListScreen extends StatelessWidget {
               ),
             ],
           ),
-          // ── Start Flashcard Button ──────────────────────────────────────
+          // ── Bottom Action Buttons ──────────────────────────────────────
           bottomNavigationBar: words.isNotEmpty
               ? Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p12, AppDimensions.p20, AppDimensions.p32),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -145,13 +135,9 @@ class VocabularyListScreen extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.style_outlined, size: 20),
-                        label: const Text('Học thẻ ghi nhớ', style: TextStyle(fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                        label: const Text('Học thẻ ghi nhớ'),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppDimensions.p12),
                       OutlinedButton.icon(
                         onPressed: () {
                           Navigator.push(
@@ -160,18 +146,19 @@ class VocabularyListScreen extends StatelessWidget {
                                 builder: (_) => ExerciseScreen(words: words)),
                           );
                         },
-                        icon: const Icon(Icons.quiz_outlined, size: 20, color: AppColors.primary),
-                        label: const Text('Luyện tập trắc nghiệm', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+                        icon: const Icon(Icons.quiz_outlined, size: 20),
+                        label: const Text('Luyện tập trắc nghiệm'),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
+                          foregroundColor: AppColors.primary,
                           side: const BorderSide(color: AppColors.primary),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r24)),
                         ),
                       ),
                     ],
                   ),
                 )
-              : const SizedBox.shrink(), // Thêm SizedBox.shrink() thay vì null để tránh lỗi layout ở một số phiên bản Flutter mới
+              : const SizedBox.shrink(),
         );
       },
     );

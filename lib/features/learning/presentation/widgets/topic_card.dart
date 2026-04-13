@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/topic_entity.dart';
@@ -30,14 +31,21 @@ class TopicCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.screenPadding,
+          vertical: AppDimensions.p8,
+        ),
+        padding: const EdgeInsets.all(AppDimensions.p16),
         decoration: BoxDecoration(
           color: t.cardBackground,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.r16),
           border: Border.all(color: t.borderColor),
           boxShadow: [
-            BoxShadow(color: Colors.black.withAlpha(t.isDark ? 30 : 10), blurRadius: 12, offset: const Offset(0, 4)),
+            BoxShadow(
+              color: Colors.black.withAlpha(t.isDark ? 30 : 10),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
         child: Row(
@@ -52,8 +60,10 @@ class TopicCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Flexible(
-                        child: Text(topic.name,
-                            style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary)),
+                        child: Text(
+                          topic.name,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                       ),
                       Text(
                         '${(progress * 100).round()}%',
@@ -109,9 +119,9 @@ class TopicCard extends StatelessWidget {
                     '${topic.learnedWords}/${topic.totalWords} từ đã học',
                     style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppDimensions.p8),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(AppDimensions.r8),
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 6,
@@ -136,7 +146,7 @@ class TopicCard extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: _iconBgColor(),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.r12),
       ),
       child: Icon(_topicIcon(), color: _iconColor(), size: size * 0.5),
     );
@@ -156,31 +166,31 @@ class TopicCard extends StatelessWidget {
 
   Color _iconBgColor() {
     switch (topic.name) {
-      case 'Du lịch': return const Color(0xFFE8F5F0);
-      case 'Công việc': return const Color(0xFFE8F0FF);
-      case 'Ẩm thực': return const Color(0xFFFFF3E0);
-      case 'Sức khoẻ': return const Color(0xFFFFEBEB);
-      case 'Công nghệ': return const Color(0xFFF3E8FF);
-      case 'Thiên nhiên': return const Color(0xFFE8F5E9);
+      case 'Du lịch': return AppColors.catTravelBg;
+      case 'Công việc': return AppColors.catWorkBg;
+      case 'Ẩm thực': return AppColors.catFoodBg;
+      case 'Sức khoẻ': return AppColors.catHealthBg;
+      case 'Công nghệ': return AppColors.catTechBg;
+      case 'Thiên nhiên': return AppColors.catNatureBg;
       default: return AppColors.backgroundMint;
     }
   }
 
   Color _iconColor() {
     switch (topic.name) {
-      case 'Du lịch': return AppColors.primary;
-      case 'Công việc': return const Color(0xFF3B82F6);
-      case 'Ẩm thực': return const Color(0xFFFF9800);
-      case 'Sức khoẻ': return AppColors.error;
-      case 'Công nghệ': return const Color(0xFF9C27B0);
-      case 'Thiên nhiên': return const Color(0xFF4CAF50);
+      case 'Du lịch': return AppColors.catTravel;
+      case 'Công việc': return AppColors.catWork;
+      case 'Ẩm thực': return AppColors.catFood;
+      case 'Sức khoẻ': return AppColors.catHealth;
+      case 'Công nghệ': return AppColors.catTech;
+      case 'Thiên nhiên': return AppColors.catNature;
       default: return AppColors.primary;
     }
   }
 
   Color _progressColor(double progress) {
     if (progress >= 0.7) return AppColors.primary;
-    if (progress >= 0.3) return const Color(0xFF3B82F6);
+    if (progress >= 0.3) return AppColors.info;
     return AppColors.error;
   }
 }

@@ -35,7 +35,6 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
   }
 
   void _nextMonth() {
-    final now = DateTime.now();
     // Ngăn người dùng lướt tới các tháng trong tương lai nếu muốn, nhưng ở đây cứ cho tự do
     setState(() {
       _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 1);

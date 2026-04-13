@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../providers/learning_provider.dart';
 import '../widgets/flashcard_widget.dart';
 
@@ -34,7 +36,7 @@ class FlashcardScreen extends StatelessWidget {
             ),
           ),
           body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.screenPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -58,7 +60,7 @@ class FlashcardScreen extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 8,
-                    backgroundColor: const Color(0xFFD6F6EA),
+                    backgroundColor: context.appTheme.progressTrackBackground,
                     valueColor: const AlwaysStoppedAnimation<Color>(
                         AppColors.primary),
                   ),
@@ -90,11 +92,11 @@ class FlashcardScreen extends StatelessWidget {
                               .copyWith(color: AppColors.warning),
                         ),
                         style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(0, 52),
+                          minimumSize: const Size(0, AppDimensions.buttonHeight),
                           side: const BorderSide(
                               color: AppColors.warning, width: 1.5),
                           shape: const StadiumBorder(),
-                          backgroundColor: const Color(0xFFFFF0F0),
+                          backgroundColor: AppColors.warning.withAlpha(20),
                         ),
                       ),
                     ),
@@ -139,8 +141,7 @@ class FlashcardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Học từ vựng',
-            style: AppTextStyles.headingMedium),
+        title: const Text('Học từ vựng'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),

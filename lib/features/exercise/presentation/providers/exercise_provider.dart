@@ -212,6 +212,17 @@ class ExerciseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── resetToInitial ────────────────────────────────────────────────────────
+  /// Đưa toàn bộ trạng thái về mặc định, dùng khi thoát bài tập hoặc bắt đầu bài mới.
+  void resetToInitial() {
+    _state = QuizState.initial;
+    _currentIndex = 0;
+    _questions = [];
+    _userAnswers.clear();
+    _currentlySelectedOption = null;
+    notifyListeners();
+  }
+
   // ── selectAnswer ──────────────────────────────────────────────────────────
   /// Hỗ trợ cả dạng chọn (option) và dạng nhập liệu (fill-in)
   void selectAnswer(String answer) {

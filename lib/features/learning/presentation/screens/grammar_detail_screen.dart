@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/grammar_lesson_entity.dart';
 
@@ -26,11 +26,11 @@ class GrammarDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lesson.title, style: AppTextStyles.headingMedium),
+        title: Text(lesson.title),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppDimensions.p20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -41,7 +41,7 @@ class GrammarDetailScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: _levelColor.withAlpha(30),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppDimensions.r20),
                     border: Border.all(color: _levelColor.withAlpha(80)),
                   ),
                   child: Text(
@@ -55,17 +55,17 @@ class GrammarDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.p8),
             Text(
               lesson.subtitle,
-              style: AppTextStyles.bodyMedium.copyWith(color: t.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.p24),
 
             // ── Nội dung bài học (Rendered Markdown-like) ─────────────
             _MarkdownCard(content: lesson.content, themeData: t),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.p24),
 
             // ── Ví dụ ─────────────────────────────────────────────────
             if (lesson.examples.isNotEmpty) ...[
@@ -73,20 +73,20 @@ class GrammarDetailScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.lightbulb_outline_rounded,
                       color: Colors.amber, size: 20),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppDimensions.p8),
                   Text(
                     'Ví dụ thực tế',
-                    style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary),
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppDimensions.p12),
               ...lesson.examples.map(
                 (ex) => _ExampleTile(example: ex),
               ),
             ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: AppDimensions.p32),
           ],
         ),
       ),
@@ -94,8 +94,6 @@ class GrammarDetailScreen extends StatelessWidget {
   }
 }
 
-/// Hiển thị nội dung Markdown đơn giản không cần package bên ngoài.
-/// Hỗ trợ: tiêu đề ##/###, bảng |col|col|, chữ **bold**, quote >.
 class _MarkdownCard extends StatelessWidget {
   final String content;
   final AppThemeData themeData;
@@ -108,20 +106,20 @@ class _MarkdownCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.p20),
       decoration: BoxDecoration(
         color: t.cardBackground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.r16),
         border: Border.all(color: t.borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _parseMarkdown(content, t),
+        children: _parseMarkdown(content, t, context),
       ),
     );
   }
 
-  List<Widget> _parseMarkdown(String text, AppThemeData t) {
+  List<Widget> _parseMarkdown(String text, AppThemeData t, BuildContext context) {
     final lines = text.trim().split('\n');
     final widgets = <Widget>[];
 
@@ -133,15 +131,14 @@ class _MarkdownCard extends StatelessWidget {
 
       if (line.isEmpty) {
         if (inTable) {
-          widgets.add(_buildTable(tableRows, t));
+          widgets.add(_buildTable(tableRows, t, context));
           tableRows = [];
           inTable = false;
         }
-        widgets.add(const SizedBox(height: 8));
+        widgets.add(const SizedBox(height: AppDimensions.p8));
         continue;
       }
 
-      // Bảng
       if (line.startsWith('|')) {
         inTable = true;
         tableRows.add(line);
@@ -149,57 +146,51 @@ class _MarkdownCard extends StatelessWidget {
       }
 
       if (inTable) {
-        widgets.add(_buildTable(tableRows, t));
+        widgets.add(_buildTable(tableRows, t, context));
         tableRows = [];
         inTable = false;
       }
 
-      // H2
       if (line.startsWith('## ')) {
         widgets.add(Padding(
-          padding: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.only(bottom: AppDimensions.p8),
           child: Text(
             line.substring(3),
-            style: AppTextStyles.headingSmall.copyWith(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.primary,
-              fontSize: 18,
             ),
           ),
         ));
       }
-      // H3
       else if (line.startsWith('### ')) {
         widgets.add(Padding(
-          padding: const EdgeInsets.only(top: 12, bottom: 4),
+          padding: const EdgeInsets.only(top: AppDimensions.p12, bottom: 4),
           child: Text(
             line.substring(4),
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: t.textPrimary,
-              fontWeight: FontWeight.w700,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
             ),
           ),
         ));
       }
-      // Blockquote
       else if (line.startsWith('> ')) {
         widgets.add(Container(
           margin: const EdgeInsets.symmetric(vertical: 4),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.primary.withAlpha(t.isDark ? 35 : 20),
-            borderRadius: BorderRadius.circular(8),
-            border: Border(left: BorderSide(color: AppColors.primary, width: 3)),
+            borderRadius: BorderRadius.circular(AppDimensions.r8),
+            border: const Border(left: BorderSide(color: AppColors.primary, width: 3)),
           ),
           child: Text(
             line.substring(2),
-            style: AppTextStyles.bodySmall.copyWith(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.primary,
               fontStyle: FontStyle.italic,
             ),
           ),
         ));
       }
-      // Bullet list
       else if (line.startsWith('- ')) {
         widgets.add(Padding(
           padding: const EdgeInsets.only(left: 8, bottom: 4),
@@ -207,29 +198,27 @@ class _MarkdownCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('• ', style: TextStyle(color: t.textSecondary)),
-              Expanded(child: _buildRichText(line.substring(2), t)),
+              Expanded(child: _buildRichText(line.substring(2), t, context)),
             ],
           ),
         ));
       }
-      // Văn bản thường
       else {
         widgets.add(Padding(
           padding: const EdgeInsets.only(bottom: 4),
-          child: _buildRichText(line, t),
+          child: _buildRichText(line, t, context),
         ));
       }
     }
 
     if (inTable && tableRows.isNotEmpty) {
-      widgets.add(_buildTable(tableRows, t));
+      widgets.add(_buildTable(tableRows, t, context));
     }
 
     return widgets;
   }
 
-  Widget _buildRichText(String line, AppThemeData t) {
-    // Xử lý **bold**
+  Widget _buildRichText(String line, AppThemeData t, BuildContext context) {
     final spans = <TextSpan>[];
     final regex = RegExp(r'\*\*(.+?)\*\*');
     int last = 0;
@@ -238,14 +227,13 @@ class _MarkdownCard extends StatelessWidget {
       if (match.start > last) {
         spans.add(TextSpan(
           text: line.substring(last, match.start),
-          style: AppTextStyles.bodyMedium.copyWith(color: t.textPrimary),
+          style: Theme.of(context).textTheme.bodyMedium,
         ));
       }
       spans.add(TextSpan(
         text: match.group(1),
-        style: AppTextStyles.bodyMedium.copyWith(
-          color: t.textPrimary,
-          fontWeight: FontWeight.w700,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.bold,
         ),
       ));
       last = match.end;
@@ -254,14 +242,14 @@ class _MarkdownCard extends StatelessWidget {
     if (last < line.length) {
       spans.add(TextSpan(
         text: line.substring(last),
-        style: AppTextStyles.bodyMedium.copyWith(color: t.textPrimary),
+        style: Theme.of(context).textTheme.bodyMedium,
       ));
     }
 
     return RichText(text: TextSpan(children: spans));
   }
 
-  Widget _buildTable(List<String> rows, AppThemeData t) {
+  Widget _buildTable(List<String> rows, AppThemeData t, BuildContext context) {
     final dataRows = rows.where((r) => !r.contains('---')).toList();
     if (dataRows.isEmpty) return const SizedBox.shrink();
 
@@ -273,7 +261,7 @@ class _MarkdownCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppDimensions.r10),
         border: Border.all(color: t.borderColor),
       ),
       child: Table(
@@ -296,9 +284,8 @@ class _MarkdownCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 child: Text(
                   cell,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: t.textPrimary,
-                    fontWeight: isHeader ? FontWeight.w700 : FontWeight.w400,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               );
@@ -320,23 +307,22 @@ class _ExampleTile extends StatelessWidget {
     final t = context.appTheme;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: AppDimensions.p8),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16, vertical: AppDimensions.p12),
       decoration: BoxDecoration(
         color: t.cardBackground,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.r12),
         border: Border.all(color: t.borderColor),
       ),
       child: Row(
         children: [
           const Icon(Icons.format_quote_rounded,
               size: 18, color: AppColors.primary),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppDimensions.p10),
           Expanded(
             child: Text(
               example,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: t.textPrimary,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontStyle: FontStyle.italic,
               ),
             ),

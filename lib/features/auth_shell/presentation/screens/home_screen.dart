@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 import '../../../learning/presentation/providers/learning_provider.dart';
 import '../../../learning/presentation/widgets/topic_card.dart';
 import '../../../learning/presentation/screens/vocabulary_list_screen.dart';
 import '../../../profile_progress/presentation/screens/learning_statistics_screen.dart';
-
+import '../../../../core/constants/app_text_styles.dart';
 class HomeScreen extends StatelessWidget {
   final Function(int)? onNavigate;
   const HomeScreen({super.key, this.onNavigate});
@@ -19,7 +19,10 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.screenPadding,
+            vertical: AppDimensions.p24,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -33,11 +36,11 @@ class HomeScreen extends StatelessWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Trang chủ', style: AppTextStyles.headingLarge),
-                          const SizedBox(height: 4),
+                          Text('Trang chủ', style: Theme.of(context).textTheme.headlineLarge),
+                          const SizedBox(height: AppDimensions.p4),
                           Text(
                             _getGreeting(user?.displayName ?? 'bạn'),
-                            style: AppTextStyles.bodyMedium.copyWith(color: t.textSecondary),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                           ),
                         ],
                       );
@@ -83,7 +86,7 @@ class HomeScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withAlpha(t.isDark ? 50 : 40),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppDimensions.r20),
                           ),
                           child: Text('Từ vựng của ngày',
                               style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary)),
@@ -101,8 +104,9 @@ class HomeScreen extends StatelessWidget {
                         if (word != null && word.phonetic.isNotEmpty) ...[
                           Text(
                             word.phonetic.startsWith('/') ? word.phonetic : '/${word.phonetic}/',
-                            style: AppTextStyles.phonetic.copyWith(
-                              color: t.isDark ? const Color(0xFF6EE7B7) : AppColors.primary,
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: AppColors.primary,
+                              fontStyle: FontStyle.italic,
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -165,7 +169,7 @@ class HomeScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: t.cardBackground,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppDimensions.r20),
                         border: Border.all(color: t.borderColor),
                       ),
                       child: Row(

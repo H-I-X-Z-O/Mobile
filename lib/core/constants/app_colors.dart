@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// App Color Palette - Derived from Figma designs (VocabUp)
-/// Primary theme: Modern Mint Green on White
+/// Centralized management for consistency across all widgets and themes.
 class AppColors {
   AppColors._();
 
@@ -15,18 +15,28 @@ class AppColors {
   /// Màu xanh lá nhạt – gradient nút, icon background
   static const Color primaryLight = Color(0xFF4CD9AA);
 
-  // ─── Background Colors ────────────────────────────────────────────────────
-  /// Nền trắng chính của app
+  // ─── Neutral / Background Colors ──────────────────────────────────────────
+  /// Nền trắng chính
   static const Color background = Color(0xFFFFFFFF);
 
-  /// Nền xám nhạt – dùng cho card và section phụ
+  /// Nền xám nhạt (Light) / Nền xám rất đậm (Dark)
   static const Color backgroundSecondary = Color(0xFFF5F5F5);
 
-  /// Nền mint cực nhạt – icon containers, progress background
+  /// Nền mint cực nhạt – icon containers
   static const Color backgroundMint = Color(0xFFE8F5F0);
 
+  // ─── Dark Mode Specific Colors ────────────────────────────────────────────
+  /// Scout background dark
+  static const Color backgroundDark = Color(0xFF121212);
+
+  /// Surface background dark (Cards)
+  static const Color backgroundDarkSecondary = Color(0xFF1E1E1E);
+
+  /// Input / Element background dark
+  static const Color backgroundDarkElevated = Color(0xFF2A2A2A);
+
   // ─── Surface / Card Colors ────────────────────────────────────────────────
-  /// Màu nền card (trắng với bóng nhẹ)
+  /// Màu nền card (trắng)
   static const Color surface = Color(0xFFFFFFFF);
 
   /// Màu viền card nhạt
@@ -36,60 +46,68 @@ class AppColors {
   /// Màu chữ tiêu đề (gần đen)
   static const Color textPrimary = Color(0xFF1A1A2E);
 
-  /// Màu chữ phụ (xám trung bình)
+  /// Màu chữ phụ (xám)
   static const Color textSecondary = Color(0xFF6B7280);
 
   /// Màu chữ gợi ý / placeholder
   static const Color textHint = Color(0xFFADB5BD);
 
-  /// Màu chữ trên nút màu xanh lá (trắng)
+  /// Màu chữ trên nền primary (trắng)
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
-  // ─── Accent / Semantic Colors ─────────────────────────────────────────────
-  /// Xanh lá progress bar
-  static const Color progressGreen = Color(0xFF4CAF6E);
-
-  /// Màu link và text highlight xanh lá
-  static const Color link = Color(0xFF00C48C);
-
-  /// Màu thành công
+  // ─── Semantic Colors ─────────────────────────────────────────────────────
+  /// Thành công
   static const Color success = Color(0xFF00C48C);
 
-  /// Màu cảnh báo / chưa biết từ
+  /// Cảnh báo
   static const Color warning = Color(0xFFFF6B6B);
 
-  /// Màu lỗi
+  /// Lỗi
   static const Color error = Color(0xFFE53E3E);
 
-  /// Màu thông tin
+  /// Thông tin / Link
   static const Color info = Color(0xFF3B82F6);
+  static const Color link = Color(0xFF00C48C);
+
+  // ─── Social Colors ────────────────────────────────────────────────────────
+  static const Color google = Color(0xFFDB4437);
+  static const Color facebook = Color(0xFF1877F2);
+
+  // ─── Category / Topic Colors ──────────────────────────────────────────────
+  static const Color catTravel = Color(0xFF00C48C);
+  static const Color catTravelBg = Color(0xFFE8F5F0);
+
+  static const Color catWork = Color(0xFF3B82F6);
+  static const Color catWorkBg = Color(0xFFE8F0FF);
+
+  static const Color catFood = Color(0xFFFF9800);
+  static const Color catFoodBg = Color(0xFFFFF3E0);
+
+  static const Color catHealth = Color(0xFFE53E3E);
+  static const Color catHealthBg = Color(0xFFFFEBEB);
+
+  static const Color catTech = Color(0xFF9C27B0);
+  static const Color catTechBg = Color(0xFFF3E8FF);
+
+  static const Color catNature = Color(0xFF4CAF50);
+  static const Color catNatureBg = Color(0xFFE8F5E9);
 
   // ─── Bottom Navigation Bar ────────────────────────────────────────────────
-  /// Icon active (xanh lá)
   static const Color navActive = Color(0xFF00C48C);
-
-  /// Icon inactive (xám)
   static const Color navInactive = Color(0xFFADB5BD);
 
   // ─── Input Field ─────────────────────────────────────────────────────────
-  /// Viền input mặc định
   static const Color inputBorder = Color(0xFFE0E0E0);
-
-  /// Viền input khi focus
   static const Color inputBorderFocused = Color(0xFF00C48C);
-
-  /// Nền input
   static const Color inputBackground = Color(0xFFF9FAFB);
 
   // ─── Gradients ────────────────────────────────────────────────────────────
-  /// Gradient chính (xanh lá sang xanh lá nhạt)
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFF00C48C), Color(0xFF4CD9AA)],
   );
 
-  /// Gradient nền mint nhạt (cho card từ vựng ngày)
   static const LinearGradient mintGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -97,7 +115,6 @@ class AppColors {
   );
 
   // ─── Shadow ───────────────────────────────────────────────────────────────
-  /// Shadow nhẹ dùng cho card
   static List<BoxShadow> cardShadow = [
     BoxShadow(
       color: Colors.black.withAlpha(15),
@@ -106,7 +123,6 @@ class AppColors {
     ),
   ];
 
-  /// Shadow nhỏ hơn dùng cho button
   static List<BoxShadow> buttonShadow = [
     BoxShadow(
       color: const Color(0xFF00C48C).withAlpha(77),

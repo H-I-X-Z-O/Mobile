@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 import 'main_shell.dart';
 import 'register_screen.dart';
@@ -41,8 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (success) {
       if (!mounted) return;
-      // Dùng Future.microtask để tránh lỗi !_debugDuringDeviceUpdate trong Flutter
-      // khi thực hiện chuyển trang ngay lập tức sau 1 callback từ Provider thay đổi state layout
       Future.microtask(() {
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(provider.errorMessage ?? 'Có lỗi xảy ra', style: const TextStyle(color: Colors.white)),
+            content: Text(provider.errorMessage ?? 'Có lỗi xảy ra', style: const TextStyle(color: AppColors.textOnPrimary)),
             backgroundColor: AppColors.error,
           ),
         );
@@ -61,8 +61,114 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _handleSocialLogin(Future<bool> Function() loginMethod) async {
+    final success = await loginMethod();
+    if (success) {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainShell()),
+      );
+    } else {
+      if (!mounted) return;
+      final provider = context.read<AuthProvider>();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(provider.errorMessage ?? 'Có lỗi xảy ra', style: const TextStyle(color: AppColors.textOnPrimary)),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  void _handleForgotPassword() {
+    final resetEmailController = TextEditingController(text: _emailController.text);
+    final t = context.appTheme;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: t.cardBackground,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r24)),
+        title: Text('Quên mật khẩu', 
+          style: Theme.of(context).textTheme.headlineSmall),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
+            ),
+            const SizedBox(height: AppDimensions.p24),
+            TextField(
+              controller: resetEmailController,
+              decoration: InputDecoration(
+                hintText: 'Email',
+                prefixIcon: Icon(Icons.email_outlined, color: t.textHint),
+                filled: true,
+                fillColor: t.inputFill,
+              ),
+            ),
+          ],
+        ),
+        actionsPadding: EdgeInsets.fromLTRB(AppDimensions.p24, 0, AppDimensions.p24, AppDimensions.p24),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.p12),
+                    side: BorderSide(color: t.borderColor),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r12)),
+                  ),
+                  child: Text('Hủy', style: TextStyle(color: t.textSecondary)),
+                ),
+              ),
+              const SizedBox(width: AppDimensions.p12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final email = resetEmailController.text.trim();
+                    if (email.isEmpty) return;
+                    
+                    final provider = context.read<AuthProvider>();
+                    final success = await provider.resetPassword(email);
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(success ? 'Email đặt lại mật khẩu đã được gửi.' : (provider.errorMessage ?? 'Lỗi')),
+                        backgroundColor: success ? Colors.green : AppColors.error,
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.p12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r12)),
+                    minimumSize: const Size(0, AppDimensions.buttonHeight - 4),
+                  ),
+                  child: const Text('Gửi'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final t = context.appTheme;
+
+    // Auto fill email if not already touched
+    if (_emailController.text.isEmpty && authProvider.savedEmail.isNotEmpty) {
+      _emailController.text = authProvider.savedEmail;
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Consumer<AuthProvider>(
@@ -70,35 +176,34 @@ class _LoginScreenState extends State<LoginScreen> {
             final isLoading = provider.authState == AuthState.loading;
             
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p24, vertical: AppDimensions.p32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Lùi xuống một chút và hiển thị icon mock
-                  const SizedBox(height: 48),
+                   const SizedBox(height: AppDimensions.p48),
                   Center(
                     child: Container(
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
                         color: AppColors.primary.withAlpha(30),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppDimensions.r20),
                       ),
                       child: const Icon(Icons.menu_book, color: AppColors.primary, size: 40),
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  const Text('Chào mừng trở lại!',
-                      style: AppTextStyles.displayMedium, textAlign: TextAlign.center),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.p32),
+                  Text('Chào mừng trở lại!',
+                      style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
+                  const SizedBox(height: AppDimensions.p8),
                   Text('Tiếp tục hành trình chinh phục từ vựng\ncủa bạn',
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                       textAlign: TextAlign.center),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: AppDimensions.p40),
 
                   // Email
                   const Text('Email', style: AppTextStyles.inputLabel),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.p8),
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -107,20 +212,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppDimensions.p20),
 
-                  // Padding giữa label và input có "Quên mật khẩu?"
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Mật khẩu', style: AppTextStyles.inputLabel),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: _handleForgotPassword,
                         child: Text('Quên mật khẩu?', style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary)),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.p8),
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -140,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.p16),
 
                   // Remember me
                   Row(
@@ -149,18 +253,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 24,
                         height: 24,
                         child: Checkbox(
-                          value: false,
-                          onChanged: (val) {},
+                          value: provider.rememberMe,
+                          onChanged: (val) => provider.setRememberMe(val ?? false),
                           shape: const CircleBorder(),
                           side: const BorderSide(color: AppColors.inputBorder),
                           activeColor: AppColors.primary,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.p8),
                       Text('Ghi nhớ đăng nhập', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.p24),
 
                   // Login button
                   ElevatedButton(
@@ -169,51 +273,53 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                         : const Text('Đăng nhập'),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.p32),
 
                   // Social Login
                   Row(
                     children: [
                       const Expanded(child: Divider(color: AppColors.surfaceBorder)),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16),
                         child: Text('HOẶC ĐĂNG NHẬP BẰNG', style: AppTextStyles.caption.copyWith(letterSpacing: 0.5)),
                       ),
                       const Expanded(child: Divider(color: AppColors.surfaceBorder)),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.p24),
 
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: isLoading ? null : () => _handleSocialLogin(provider.signInWithGoogle),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: AppColors.surfaceBorder),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: AppDimensions.p12),
+                            side: BorderSide(color: context.appTheme.borderColor),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r12)),
+                            backgroundColor: context.appTheme.cardBackground,
                           ),
                           icon: const Icon(Icons.g_mobiledata, color: Colors.blue, size: 28),
-                          label: Text('Google', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.textPrimary)),
+                          label: Text('Google', style: Theme.of(context).textTheme.labelLarge),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppDimensions.p16),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: isLoading ? null : () => _handleSocialLogin(provider.signInWithFacebook),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            side: const BorderSide(color: AppColors.surfaceBorder),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: AppDimensions.p12),
+                            side: BorderSide(color: context.appTheme.borderColor),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r12)),
+                            backgroundColor: context.appTheme.cardBackground,
                           ),
-                          icon: const Icon(Icons.facebook, color: Color(0xFF1877F2)),
-                          label: Text('Facebook', style: AppTextStyles.buttonMedium.copyWith(color: AppColors.textPrimary)),
+                          icon: const Icon(Icons.facebook, color: AppColors.facebook),
+                          label: Text('Facebook', style: Theme.of(context).textTheme.labelLarge),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: AppDimensions.p48),
 
                   // Register link
                   Row(
@@ -225,7 +331,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen()));
                         },
                         child: Text('Đăng ký ngay',
-                            style: AppTextStyles.buttonMedium.copyWith(color: AppColors.primary)),
+                            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.primary)),
                       ),
                     ],
                   ),

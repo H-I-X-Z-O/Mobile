@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/exercise_provider.dart';
 import '../../../learning/domain/entities/word_entity.dart';
@@ -31,7 +31,11 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
   @override
   void initState() {
     super.initState();
+    // Reset state ngay lập tức để tránh Ghost State của bài cũ
+    context.read<ExerciseProvider>().resetToInitial();
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<ExerciseProvider>().generateQuiz(
             widget.words,
             typeFilter: widget.initialType,
@@ -45,18 +49,12 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Luyện tập Từ vựng', style: AppTextStyles.headingMedium),
+        title: const Text('Luyện tập'),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.close, color: t.appBarForeground),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.bolt, color: t.textSecondary),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Consumer<ExerciseProvider>(
         builder: (context, provider, child) {
@@ -69,10 +67,12 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
 
           if (provider.state == QuizState.finished) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const ScoreboardScreen()),
-              );
+              if (mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ScoreboardScreen()),
+                );
+              }
             });
             return const SizedBox.shrink();
           }
@@ -133,7 +133,6 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     dynamic savedAnswer,
   }) {
     switch (question.type) {
-      // Trắc nghiệm thường + Trắc nghiệm ngược: dùng chung OptionButton
       case QuestionType.multipleChoice:
       case QuestionType.reverseMultipleChoice:
         return _buildOptionsListView(
@@ -144,9 +143,9 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           savedAnswer: savedAnswer,
         );
 
-      // Điền từ: TextField + nút gửi
       case QuestionType.fillInTheBlank:
         return SingleChildScrollView(
+          padding: const EdgeInsets.all(AppDimensions.p20),
           child: FillBlankInputWidget(
             isAnswered: hasAnswered,
             correctAnswer: question.correctAnswer,
@@ -154,7 +153,6 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           ),
         );
 
-      // Luyện nghe: nút loa + options bên dưới
       case QuestionType.listening:
         return Column(
           children: [
@@ -188,6 +186,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     dynamic savedAnswer,
   }) {
     return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.screenPadding, vertical: AppDimensions.p8),
       itemCount: question.options?.length ?? 0,
       itemBuilder: (context, index) {
         final option = question.options![index];
@@ -205,11 +204,14 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           status = OptionStatus.selected;
         }
 
-        return OptionButton(
-          text: option,
-          status: status,
-          isAnswered: hasAnswered || provider.state == QuizState.showingAnswer,
-          onTap: () => provider.selectAnswer(option),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppDimensions.p12),
+          child: OptionButton(
+            text: option,
+            status: status,
+            isAnswered: hasAnswered || provider.state == QuizState.showingAnswer,
+            onTap: () => provider.selectAnswer(option),
+          ),
         );
       },
     );
@@ -222,7 +224,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     required bool isLastQuestion,
   }) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p12, AppDimensions.p20, AppDimensions.p32),
       child: ElevatedButton(
         onPressed: () {
           if (isLastQuestion) {
@@ -233,16 +235,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
             provider.nextQuestion();
           }
         },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 56),
-          shape: const StadiumBorder(),
-          elevation: 0,
-        ),
         child: Text(
           isLastQuestion ? 'Nộp bài' : 'Câu hỏi tiếp theo',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
     );

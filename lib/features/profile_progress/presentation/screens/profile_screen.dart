@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../auth_shell/presentation/providers/auth_provider.dart';
 import '../../../learning/presentation/providers/learning_provider.dart';
+import '../../../learning/presentation/screens/vocabulary_list_screen.dart';
+import '../../../exercise/presentation/screens/exercise_screen.dart';
+import '../providers/progress_provider.dart';
+import '../widgets/activity_calendar_graph.dart';
 import 'settings_screen.dart';
 import 'learning_goal_screen.dart';
-import '../providers/progress_provider.dart';
-import '../providers/theme_provider.dart';
-import '../widgets/activity_calendar_graph.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../exercise/presentation/screens/exercise_screen.dart';
-import '../../../learning/presentation/screens/vocabulary_list_screen.dart';
 import 'learning_statistics_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -19,38 +19,41 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<ThemeProvider>().isDarkMode;
+    final t = context.appTheme;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.screenPadding,
+            vertical: AppDimensions.p16,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ─── Header: Avatar + Name + Streak + Settings ───────────────
               _buildHeader(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.p24),
 
               // ─── Card: Thiết lập lộ trình học ───────────────────────────
               _buildRoadmapCard(context),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppDimensions.p28),
 
               // ─── Section: Kế hoạch hôm nay ─────────────────────────────
               _buildTodayPlanSection(context),
-              const SizedBox(height: 28),
-
+              const SizedBox(height: AppDimensions.p28),
 
               // ─── Section: Tiến độ kỹ năng ──────────────────────────────
               _buildSkillProgressSection(context),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppDimensions.p28),
 
               // ─── Link sang trang thống kê chi tiết ─────────────────────
               _buildStatisticsLink(context),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppDimensions.p28),
 
               // ─── Section: Lịch theo tháng ──────────────────────────────
               _buildCalendarSection(context),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppDimensions.p32),
             ],
           ),
         ),
@@ -62,6 +65,7 @@ class ProfileScreen extends StatelessWidget {
   // Header
   // ══════════════════════════════════════════════════════════════════════════
   Widget _buildHeader(BuildContext context) {
+    final t = context.appTheme;
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         final user = authProvider.user;
@@ -73,7 +77,7 @@ class ProfileScreen extends StatelessWidget {
               height: 56,
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.r16),
               ),
               child: Center(
                 child: Text(
@@ -86,7 +90,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppDimensions.p14),
 
             // Name + subtitle
             Expanded(
@@ -95,12 +99,12 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Text(
                     user?.displayName ?? 'Người dùng',
-                    style: AppTextStyles.headingMedium,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     user?.email ?? 'B22DCAT308',
-                    style: AppTextStyles.bodySmall,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                   ),
                 ],
               ),
@@ -109,7 +113,7 @@ class ProfileScreen extends StatelessWidget {
             // Streak Badge
             _buildStreakBadge(context),
 
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.p8),
 
             // Settings button
             GestureDetector(
@@ -123,10 +127,10 @@ class ProfileScreen extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: context.appTheme.secondaryBackground,
-                  borderRadius: BorderRadius.circular(12),
+                  color: t.secondaryBackground,
+                  borderRadius: BorderRadius.circular(AppDimensions.r12),
                 ),
-                child: Icon(Icons.settings_outlined, color: context.appTheme.textSecondary, size: 22),
+                child: Icon(Icons.settings_outlined, color: t.textSecondary, size: 22),
               ),
             ),
           ],
@@ -135,9 +139,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  /// Streak badge — hiển thị ước tính chuỗi ngày hoạt động của người dùng.
-  /// Tạm thời tính dựa theo số ngày kể từ khi tạo tài khoản.
-  /// Sẽ được thay bằng logic streak thực tế khi có bảng login_log trên Firestore.
   Widget _buildStreakBadge(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final progressProvider = context.watch<ProgressProvider>();
@@ -149,7 +150,6 @@ class ProfileScreen extends StatelessWidget {
       final activeDays = progressProvider.userStats!.activeDays;
       final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
       
-      // Tính streak: đếm lùi từ hôm nay hoặc hôm qua
       DateTime checkDate = activeDays.contains(today) ? today : today.subtract(const Duration(days: 1));
       
       while (activeDays.contains(checkDate)) {
@@ -157,7 +157,6 @@ class ProfileScreen extends StatelessWidget {
         checkDate = checkDate.subtract(const Duration(days: 1));
       }
     } else if (createdAt != null) {
-      // Fallback nếu chưa có dữ liệu activeDays
       streakDays = DateTime.now().difference(createdAt).inDays.clamp(0, 9999);
     }
 
@@ -165,7 +164,7 @@ class ProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primary.withAlpha(20),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppDimensions.r20),
         border: Border.all(color: AppColors.primary.withAlpha(60)),
       ),
       child: Row(
@@ -198,13 +197,12 @@ class ProfileScreen extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.p16),
         decoration: BoxDecoration(
-          // Nền xanh nhạt khi sáng, tối hơn khi dark
           color: t.isDark
               ? AppColors.primary.withAlpha(30)
               : AppColors.backgroundMint,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.r16),
           border: Border.all(color: AppColors.primary.withAlpha(t.isDark ? 60 : 40)),
         ),
         child: Row(
@@ -214,21 +212,21 @@ class ProfileScreen extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: AppColors.primary.withAlpha(t.isDark ? 50 : 40),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.r12),
               ),
               child: const Icon(Icons.edit_calendar_outlined, color: AppColors.primary, size: 22),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppDimensions.p14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Thiết lập lộ trình học',
-                      style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary)),
+                      style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 2),
                   Text(
                     'Cập nhật mục tiêu & lịch học',
-                    style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                   ),
                 ],
               ),
@@ -241,7 +239,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   // ══════════════════════════════════════════════════════════════════════════
-  // Section: Kế hoạch hôm nay (Today's Plan)
+  // Section: Kế hoạch hôm nay
   // ══════════════════════════════════════════════════════════════════════════
   Widget _buildTodayPlanSection(BuildContext context) {
     return Consumer<LearningProvider>(
@@ -249,7 +247,7 @@ class ProfileScreen extends StatelessWidget {
         if (lp.topics.isEmpty) {
           return const Center(
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
+              padding: EdgeInsets.symmetric(vertical: AppDimensions.p20),
               child: Text(
                 'Chưa có dữ liệu chủ đề học tập.',
                 style: TextStyle(color: Colors.grey),
@@ -258,7 +256,6 @@ class ProfileScreen extends StatelessWidget {
           );
         }
 
-        // Tìm chủ đề đầu tiên chưa hoàn thành (an toàn với kiểu dữ liệu runtime)
         final incompleteTopics = lp.topics.where((t) => !t.isCompleted).toList();
         final remainingTopic = incompleteTopics.isNotEmpty 
             ? incompleteTopics.first 
@@ -294,13 +291,8 @@ class ProfileScreen extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Kế hoạch hôm nay', style: AppTextStyles.headingMedium),
-              ],
-            ),
-            const SizedBox(height: 14),
+            Text('Kế hoạch hôm nay', style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: AppDimensions.p14),
             ...todayPlan.map((item) => _buildPlanTile(context, item)),
           ],
         );
@@ -313,12 +305,12 @@ class ProfileScreen extends StatelessWidget {
     return GestureDetector(
       onTap: item.onTap,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.only(bottom: AppDimensions.p10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16, vertical: AppDimensions.p14),
           decoration: BoxDecoration(
             color: t.cardBackground,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(AppDimensions.r14),
             border: Border.all(color: t.borderColor),
           ),
           child: Row(
@@ -338,21 +330,21 @@ class ProfileScreen extends StatelessWidget {
                     ? const Icon(Icons.check, color: Colors.white, size: 16)
                     : null,
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: AppDimensions.p14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       item.title,
-                      style: AppTextStyles.bodyLarge.copyWith(
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         decoration: item.isDone ? TextDecoration.lineThrough : null,
                         color: item.isDone ? t.textHint : t.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(item.duration,
-                        style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary)),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary)),
                   ],
                 ),
               ),
@@ -371,8 +363,8 @@ class ProfileScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Tiến độ kỹ năng', style: AppTextStyles.headingMedium),
-        const SizedBox(height: 14),
+        Text('Tiến độ kỹ năng', style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: AppDimensions.p14),
         Row(
           children: [
             Expanded(
@@ -390,7 +382,7 @@ class ProfileScreen extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppDimensions.p14),
             Expanded(
               child: GestureDetector(
                 onTap: () => ScaffoldMessenger.of(context).showSnackBar(
@@ -419,10 +411,10 @@ class ProfileScreen extends StatelessWidget {
   }) {
     final t = context.appTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.p16),
       decoration: BoxDecoration(
         color: t.cardBackground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.r16),
         border: Border.all(color: t.borderColor),
         boxShadow: [
           BoxShadow(color: Colors.black.withAlpha(t.isDark ? 40 : 8), blurRadius: 8, offset: const Offset(0, 3)),
@@ -438,17 +430,17 @@ class ProfileScreen extends StatelessWidget {
               Icon(Icons.edit, color: color, size: 16),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.p12),
           Row(
             children: [
-              Text(label, style: AppTextStyles.bodyMedium.copyWith(color: t.textPrimary)),
+              Text(label, style: Theme.of(context).textTheme.bodyMedium),
               const Spacer(),
-              Text('$percent%', style: AppTextStyles.headingSmall.copyWith(color: color)),
+              Text('$percent%', style: Theme.of(context).textTheme.titleSmall?.copyWith(color: color)),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.p8),
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(AppDimensions.r8),
             child: LinearProgressIndicator(
               value: percent / 100,
               minHeight: 6,
@@ -470,12 +462,12 @@ class ProfileScreen extends StatelessWidget {
         MaterialPageRoute(builder: (_) => const LearningStatisticsScreen()),
       ),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppDimensions.p16),
         decoration: BoxDecoration(
           color: t.isDark
               ? AppColors.primary.withAlpha(30)
               : AppColors.backgroundMint,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.r16),
           border: Border.all(color: AppColors.primary.withAlpha(t.isDark ? 60 : 40)),
         ),
         child: Row(
@@ -485,21 +477,21 @@ class ProfileScreen extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: AppColors.primary.withAlpha(t.isDark ? 50 : 40),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.r12),
               ),
               child: const Icon(Icons.bar_chart_rounded, color: AppColors.primary, size: 22),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppDimensions.p14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Xem thống kê chi tiết',
-                      style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary)),
+                      style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 2),
                   Text(
                     'Biểu đồ, lịch học & các chỉ số tiến bộ',
-                    style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                   ),
                 ],
               ),
@@ -511,9 +503,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // Section: Lịch học tháng (Activity Graph)
-  // ══════════════════════════════════════════════════════════════════════════
   Widget _buildCalendarSection(BuildContext context) {
     final progressProvider = context.watch<ProgressProvider>();
     final activeDays = <String>{};

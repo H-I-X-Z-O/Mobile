@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/learning_provider.dart';
 import '../widgets/topic_card.dart';
 import '../widgets/word_list_item.dart';
 import 'vocabulary_list_screen.dart';
 
-/// Màn hình trung tâm Từ vựng với 2 tab:
-///   - Tab 1: Theo chủ đề (giữ nguyên TopicListScreen logic)
-///   - Tab 2: Theo bảng chữ cái A-Z
 class VocabularyHubScreen extends StatefulWidget {
   final Function(int)? onNavigate;
   const VocabularyHubScreen({super.key, this.onNavigate});
@@ -33,7 +30,6 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
       context.read<LearningProvider>().loadTopics();
     });
     _tabController.addListener(() {
-      // Xóa search khi chuyển tab
       if (_tabController.indexIsChanging) {
         _searchController.clear();
         setState(() => _searchQuery = '');
@@ -54,7 +50,7 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Từ vựng', style: AppTextStyles.headingMedium),
+        title: const Text('Từ vựng'),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
@@ -72,16 +68,15 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
         children: [
           // ── Search bar chung ─────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            padding: const EdgeInsets.fromLTRB(AppDimensions.p16, AppDimensions.p12, AppDimensions.p16, 0),
             child: TextField(
               controller: _searchController,
-              style: TextStyle(color: t.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Tìm chủ đề hoặc từ vựng...',
-                prefixIcon: Icon(Icons.search, color: t.textHint, size: 20),
+                prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.clear, color: t.textHint, size: 18),
+                        icon: const Icon(Icons.clear, size: 18),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _searchQuery = '');
@@ -96,7 +91,7 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
               },
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.p8),
 
           // ── Tab pages ───────────────────────────────────────────────
           Expanded(
@@ -114,9 +109,6 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tab 1: Theo chủ đề
-// ─────────────────────────────────────────────────────────────────────────────
 class _TopicTabView extends StatelessWidget {
   final Function(int)? onNavigate;
 
@@ -140,7 +132,7 @@ class _TopicTabView extends StatelessWidget {
           return Center(
             child: Text(
               'Không tìm thấy chủ đề nào.',
-              style: AppTextStyles.bodyMedium.copyWith(color: t.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
             ),
           );
         }
@@ -162,7 +154,7 @@ class _TopicTabView extends StatelessWidget {
             ],
             SliverToBoxAdapter(child: _sectionHeader(context, 'TẤT CẢ CHỦ ĐỀ')),
             SliverToBoxAdapter(
-              child: Divider(indent: 20, endIndent: 20, height: 1, color: t.dividerColor),
+              child: Divider(indent: AppDimensions.p20, endIndent: AppDimensions.p20, height: 1, color: t.dividerColor),
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
@@ -175,14 +167,14 @@ class _TopicTabView extends StatelessWidget {
                         onTap: () => _navigateToTopic(context, provider, topic),
                       ),
                       if (index < allTopics.length - 1)
-                        Divider(indent: 78, endIndent: 20, color: t.dividerColor),
+                        Divider(indent: 78, endIndent: AppDimensions.p20, color: t.dividerColor),
                     ],
                   );
                 },
                 childCount: allTopics.length,
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
+            const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.p20)),
           ],
         );
       },
@@ -192,12 +184,12 @@ class _TopicTabView extends StatelessWidget {
   Widget _sectionHeader(BuildContext context, String title) {
     final t = context.appTheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p16, AppDimensions.p20, AppDimensions.p8),
       child: Text(
         title,
-        style: AppTextStyles.labelMedium.copyWith(
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
           letterSpacing: 0.8,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.bold,
           color: t.textSecondary,
         ),
       ),
@@ -213,9 +205,6 @@ class _TopicTabView extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tab 2: Theo bảng chữ cái A-Z
-// ─────────────────────────────────────────────────────────────────────────────
 class _AlphabeticalTabView extends StatelessWidget {
   final String searchQuery;
 
@@ -243,12 +232,12 @@ class _AlphabeticalTabView extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.search_off_rounded, size: 56, color: t.textHint),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.p12),
                 Text(
                   searchQuery.isNotEmpty
                       ? 'Không tìm thấy từ phù hợp'
                       : 'Chưa có từ vựng nào',
-                  style: AppTextStyles.bodyMedium.copyWith(color: t.textSecondary),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                 ),
               ],
             ),
@@ -286,7 +275,7 @@ class _AlphabeticalTabView extends StatelessWidget {
                             thickness: 1,
                             color: context.appTheme.dividerColor,
                             indent: 78,
-                            endIndent: 20,
+                            endIndent: AppDimensions.p20,
                           ),
                       ],
                     );
@@ -295,7 +284,7 @@ class _AlphabeticalTabView extends StatelessWidget {
                 ),
               ),
             ],
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.p24)),
           ],
         );
       },
@@ -312,11 +301,11 @@ class _LetterHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.appTheme;
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 6),
+      margin: const EdgeInsets.fromLTRB(AppDimensions.p16, AppDimensions.p16, AppDimensions.p16, AppDimensions.p8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primary.withAlpha(t.isDark ? 45 : 25),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppDimensions.r10),
       ),
       child: Text(
         letter,
@@ -330,4 +319,3 @@ class _LetterHeader extends StatelessWidget {
     );
   }
 }
-

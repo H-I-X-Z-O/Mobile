@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/grammar_lesson_entity.dart';
 import 'grammar_detail_screen.dart';
 
-/// Màn hình danh sách bài học ngữ pháp, phân cấp độ.
-/// Dữ liệu tạm thời dùng hardcode; khi Firebase được cấu hình
-/// sẽ chuyển sang load từ Firestore (chỉ đổi nguồn dữ liệu).
 class GrammarListScreen extends StatelessWidget {
   const GrammarListScreen({super.key});
 
-  // Dữ liệu mẫu — thay bằng Firestore sau
   static final _lessons = [
     const GrammarLessonEntity(
       id: 'g1',
@@ -196,7 +192,7 @@ Diễn tả điều kiện **có thể xảy ra** trong tương lai và kết qu
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ngữ pháp', style: AppTextStyles.headingMedium),
+        title: const Text('Ngữ pháp'),
         centerTitle: true,
       ),
       body: CustomScrollView(
@@ -204,10 +200,10 @@ Diễn tả điều kiện **có thể xảy ra** trong tương lai và kết qu
           // Mô tả
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p16, AppDimensions.p20, AppDimensions.p24),
               child: Text(
                 'Học ngữ pháp tiếng Anh từ cơ bản đến nâng cao với các ví dụ thực tế.',
-                style: AppTextStyles.bodyMedium.copyWith(color: t.textSecondary),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
               ),
             ),
           ),
@@ -225,7 +221,7 @@ Diễn tả điều kiện **có thể xảy ra** trong tương lai và kết qu
             _SliverLessonList(lessons: advancedLessons),
           ],
 
-          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.p32)),
         ],
       ),
     );
@@ -264,7 +260,7 @@ class _SliverLevelHeader extends StatelessWidget {
     final t = context.appTheme;
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
+        padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p8, AppDimensions.p20, AppDimensions.p10),
         child: Row(
           children: [
             Container(
@@ -272,15 +268,15 @@ class _SliverLevelHeader extends StatelessWidget {
               height: 18,
               decoration: BoxDecoration(
                 color: _color,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimensions.r4),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppDimensions.p10),
             Text(
               _label,
-              style: AppTextStyles.labelMedium.copyWith(
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: t.textSecondary,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.bold,
                 fontSize: 13,
                 letterSpacing: 0.5,
               ),
@@ -300,7 +296,7 @@ class _SliverLessonList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
           (context, index) => _GrammarLessonCard(lesson: lessons[index]),
@@ -337,11 +333,11 @@ class _GrammarLessonCard extends StatelessWidget {
         MaterialPageRoute(builder: (_) => GrammarDetailScreen(lesson: lesson)),
       ),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: AppDimensions.p12),
+        padding: const EdgeInsets.all(AppDimensions.p16),
         decoration: BoxDecoration(
           color: t.cardBackground,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.r16),
           border: Border.all(color: t.borderColor),
           boxShadow: [
             BoxShadow(
@@ -371,22 +367,21 @@ class _GrammarLessonCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppDimensions.p14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     lesson.title,
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: t.textPrimary,
-                      fontWeight: FontWeight.w700,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     lesson.subtitle,
-                    style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                   ),
                 ],
               ),

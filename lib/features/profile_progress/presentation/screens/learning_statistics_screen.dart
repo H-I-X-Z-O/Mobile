@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../learning/presentation/providers/learning_provider.dart';
 import '../providers/progress_provider.dart';
@@ -17,7 +17,7 @@ class LearningStatisticsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thống kê học tập', style: AppTextStyles.headingMedium),
+        title: const Text('Thống kê học tập'),
         centerTitle: true,
       ),
       body: Consumer2<LearningProvider, ProgressProvider>(
@@ -46,7 +46,7 @@ class LearningStatisticsScreen extends StatelessWidget {
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppDimensions.p20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -57,7 +57,7 @@ class LearningStatisticsScreen extends StatelessWidget {
                   totalScore: totalScore,
                   quizzesTaken: quizzesTaken,
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: AppDimensions.p28),
 
                 // ── Overall progress bar ────────────────────────────────
                 _ProgressSection(
@@ -65,20 +65,20 @@ class LearningStatisticsScreen extends StatelessWidget {
                   learned: totalLearned,
                   total: totalWords,
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: AppDimensions.p28),
 
                 // ── Streak summary ─────────────────────────────────────
                 _StreakSummary(activeDays: activeDays),
-                const SizedBox(height: 28),
+                const SizedBox(height: AppDimensions.p28),
 
                 // ── Progress chart ─────────────────────────────────────
-                Text('Từ vựng học theo ngày', style: AppTextStyles.headingMedium),
-                const SizedBox(height: 14),
+                Text('Từ vựng học theo ngày', style: Theme.of(context).textTheme.headlineSmall),
+                const SizedBox(height: AppDimensions.p14),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16, vertical: AppDimensions.p20),
                   decoration: BoxDecoration(
                     color: t.cardBackground,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppDimensions.r16),
                     border: Border.all(color: t.borderColor),
                     boxShadow: [
                       BoxShadow(
@@ -97,7 +97,7 @@ class LearningStatisticsScreen extends StatelessWidget {
                         )
                       : LearningProgressChart(data: stats?.learnedWordsPerDay ?? {}),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: AppDimensions.p28),
 
                 // ── Activity Calendar ──────────────────────────────────
                 ActivityCalendarGraph(
@@ -105,7 +105,7 @@ class LearningStatisticsScreen extends StatelessWidget {
                   learnedWordsMap: learnedWordsMap,
                   maxWords: maxWords,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppDimensions.p32),
               ],
             ),
           );
@@ -142,7 +142,7 @@ class _OverviewCards extends StatelessWidget {
             color: AppColors.primary,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.p12),
         Expanded(
           child: _MetricCard(
             icon: Icons.emoji_events_rounded,
@@ -152,7 +152,7 @@ class _OverviewCards extends StatelessWidget {
             color: Colors.amber,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.p12),
         Expanded(
           child: _MetricCard(
             icon: Icons.quiz_rounded,
@@ -189,7 +189,7 @@ class _MetricCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
         color: t.cardBackground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.r16),
         border: Border.all(color: t.borderColor),
         boxShadow: [
           BoxShadow(
@@ -206,11 +206,11 @@ class _MetricCard extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withAlpha(t.isDark ? 45 : 28),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppDimensions.r10),
             ),
             child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppDimensions.p10),
           Text(
             value,
             style: TextStyle(
@@ -222,13 +222,13 @@ class _MetricCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             sub,
-            style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary, fontSize: 11),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary, fontSize: 11),
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: AppTextStyles.bodySmall.copyWith(
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: t.textHint,
               fontSize: 10,
               fontWeight: FontWeight.w600,
@@ -258,7 +258,7 @@ class _ProgressSection extends StatelessWidget {
     final pct = (progress * 100).toInt();
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.p20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -268,8 +268,8 @@ class _ProgressSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withAlpha(80)),
+        borderRadius: BorderRadius.circular(AppDimensions.r20),
+        border: Border.all(color: AppColors.primary.withAlpha(120), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,10 +277,10 @@ class _ProgressSection extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.bar_chart_rounded, color: AppColors.primary),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.p8),
               Text(
                 'Tiến độ từ vựng tổng thể',
-                style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               const Spacer(),
               Text(
@@ -293,20 +293,23 @@ class _ProgressSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.p12),
           ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppDimensions.r10),
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 12,
-              backgroundColor: t.borderColor,
+              backgroundColor: AppColors.primary.withAlpha(40),
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.p8),
           Text(
             '$learned / $total từ đã thuộc',
-            style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: t.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -349,7 +352,6 @@ class _StreakSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.appTheme;
     final streak = _calcStreak();
     final totalActive = activeDays.length;
 
@@ -364,7 +366,7 @@ class _StreakSummary extends StatelessWidget {
             color: Colors.orange,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppDimensions.p12),
         Expanded(
           child: _StreakCard(
             icon: Icons.calendar_month_rounded,
@@ -398,16 +400,16 @@ class _StreakCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.appTheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.p16),
       decoration: BoxDecoration(
         color: t.cardBackground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.r16),
         border: Border.all(color: t.borderColor),
       ),
       child: Row(
         children: [
           Icon(icon, color: color, size: 32),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppDimensions.p12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -422,12 +424,12 @@ class _StreakCard extends StatelessWidget {
                 ),
                 Text(
                   unit,
-                  style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary, fontSize: 11),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary, fontSize: 11),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   label,
-                  style: AppTextStyles.bodySmall.copyWith(color: t.textHint, fontSize: 10),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(color: t.textHint, fontSize: 10),
                 ),
               ],
             ),
