@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/study_plan_provider.dart';
+import '../../domain/entities/study_plan_entity.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 
 class LearningGoalScreen extends StatefulWidget {
   const LearningGoalScreen({super.key});
@@ -20,22 +24,32 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
     '400+', '500+', '600+', '650+', '700+', '750+', '800+', '850+', '900+', '950+',
   ];
 
-  final List<_GoalOption> _goals = [
-    _GoalOption(
-      icon: Icons.gps_fixed,
-      title: 'Luyện thi TOEIC',
-      color: AppColors.primary,
-    ),
-    _GoalOption(
-      icon: Icons.record_voice_over_outlined,
-      title: 'Giao tiếp cơ bản',
-      color: AppColors.textSecondary,
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
+    final List<_GoalOption> goals = [
+      _GoalOption(
+        icon: Icons.gps_fixed,
+        title: 'TOEIC',
+        color: AppColors.primary,
+      ),
+      _GoalOption(
+        icon: Icons.record_voice_over_outlined,
+        title: context.l10n.communication,
+        color: AppColors.textSecondary,
+      ),
+    ];
+
+    final examDate = DateTime.now().add(const Duration(days: 180));
+    final monthKeys = [
+      context.l10n.month_1, context.l10n.month_2, context.l10n.month_3,
+      context.l10n.month_4, context.l10n.month_5, context.l10n.month_6,
+      context.l10n.month_7, context.l10n.month_8, context.l10n.month_9,
+      context.l10n.month_10, context.l10n.month_11, context.l10n.month_12,
+    ];
+    final monthName = monthKeys[examDate.month - 1];
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -46,7 +60,7 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
           icon: Icon(Icons.arrow_back_ios_new, color: t.appBarForeground, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Mục tiêu học tập', style: AppTextStyles.headingMedium),
+        title: Text(context.l10n.learning_goal, style: AppTextStyles.headingMedium),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -56,11 +70,11 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
             const SizedBox(height: 16),
 
             // ─── Chọn mục tiêu chính ─────────────────────────────────
-            const Text('Bạn muốn đạt được điều gì?', style: AppTextStyles.headingSmall),
+            Text(context.l10n.goal_question, style: AppTextStyles.headingSmall),
             const SizedBox(height: 14),
             Row(
-              children: List.generate(_goals.length, (index) {
-                final goal = _goals[index];
+              children: List.generate(goals.length, (index) {
+                final goal = goals[index];
                 final isSelected = _selectedGoalIndex == index;
                 return Expanded(
                   child: Padding(
@@ -116,7 +130,7 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
             const SizedBox(height: 28),
 
             // ─── Điểm mục tiêu (scrollable chips) ───────────────────
-            const Text('Điểm mục tiêu của bạn', style: AppTextStyles.headingSmall),
+            Text(context.l10n.target_score, style: AppTextStyles.headingSmall),
             const SizedBox(height: 14),
             SizedBox(
               height: 44,
@@ -158,7 +172,7 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
             const SizedBox(height: 28),
 
             // ─── Thời gian dự kiến ──────────────────────────────────
-            const Text('Thời gian dự kiến hoàn thành', style: AppTextStyles.headingSmall),
+            Text(context.l10n.expected_completion, style: AppTextStyles.headingSmall),
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(16),
@@ -183,10 +197,10 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Kỳ thi dự kiến', style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w500)),
+                        Text(context.l10n.expected_exam, style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w500)),
                         const SizedBox(height: 2),
                         Text(
-                          'Tháng ${DateTime.now().add(const Duration(days: 180)).month}, ${DateTime.now().add(const Duration(days: 180)).year}',
+                          '$monthName, ${examDate.year}',
                           style: AppTextStyles.bodySmall,
                         ),
                       ],
@@ -199,7 +213,7 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      'Còn 6 tháng',
+                      context.l10n.months_remaining(6),
                       style: AppTextStyles.labelMedium.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
@@ -218,11 +232,15 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
               margin: const EdgeInsets.only(bottom: 32),
               child: ElevatedButton(
                 onPressed: () {
+                  final provider = context.read<StudyPlanProvider>();
+                  final plan = provider.studyPlan ?? StudyPlanEntity(userId: '');
+                  final selectedGoal = '${goals[_selectedGoalIndex].title} — ${_scoreOptions[_selectedScoreIndex]}';
+                  
+                  provider.updatePlan(plan.copyWith(currentRoadmapGoal: selectedGoal));
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        'Đã lưu: ${_goals[_selectedGoalIndex].title} — ${_scoreOptions[_selectedScoreIndex]}',
-                      ),
+                      content: Text(context.l10n.roadmap_saved(selectedGoal)),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -234,8 +252,8 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   elevation: 2,
                 ),
-                child: const Text(
-                  'Lưu Kế Hoạch & Tính Toán Lộ Trình',
+                child: Text(
+                  context.l10n.save_and_calculate,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,

@@ -3,10 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth_shell/presentation/providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/locale_provider.dart';
+import 'edit_profile_screen.dart';
+import 'change_password_screen.dart';
+import '../../../../core/extensions/context_extension.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -43,7 +46,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
-    final t = context.appTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Cài đặt'),
+        title: Text(context.l10n.settings),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
@@ -63,34 +65,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ─── TÀI KHOẢN ──────────────────────────────────────────────
-            _buildSectionLabel('TÀI KHOẢN'),
+            _buildSectionLabel(context.l10n.account),
             const SizedBox(height: AppDimensions.p10),
             _buildSettingsGroup(context, [
               _SettingsTile(
                 icon: Icons.person_outline,
                 iconColor: AppColors.primary,
-                title: 'Thông tin cá nhân',
-                subtitle: 'Tên, email, số điện thoại',
-                onTap: () => _showComingSoon(context),
+                title: context.l10n.personal_info,
+                subtitle: context.l10n.contact_info_subtitle,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                ),
               ),
               _SettingsTile(
                 icon: Icons.lock_outline,
                 iconColor: AppColors.primary,
-                title: 'Đổi mật khẩu',
-                onTap: () => _showComingSoon(context),
+                title: context.l10n.change_password,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+                ),
               ),
             ]),
             const SizedBox(height: AppDimensions.p24),
 
             // ─── THÔNG BÁO ──────────────────────────────────────────────
-            _buildSectionLabel('THÔNG BÁO'),
+            _buildSectionLabel(context.l10n.notifications),
             const SizedBox(height: AppDimensions.p10),
             _buildSettingsGroup(context, [
               _SettingsTile(
                 icon: Icons.notifications_outlined,
                 iconColor: AppColors.primary,
-                title: 'Thông báo đẩy',
-                subtitle: 'Nhận lời nhắc học tập hàng ngày',
+                title: context.l10n.push_notifications,
+                subtitle: context.l10n.daily_reminder_subtitle,
                 trailing: Switch(
                   value: _notificationsEnabled,
                   onChanged: _toggleNotifications,
@@ -101,20 +109,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: AppDimensions.p24),
 
             // ─── ỨNG DỤNG ───────────────────────────────────────────────
-            _buildSectionLabel('ỨNG DỤNG'),
+            _buildSectionLabel(context.l10n.app_settings),
             const SizedBox(height: AppDimensions.p10),
             _buildSettingsGroup(context, [
               _SettingsTile(
                 icon: Icons.language,
                 iconColor: AppColors.primary,
-                title: 'Ngôn ngữ hiển thị',
-                subtitle: 'Tiếng Việt',
-                onTap: () => _showComingSoon(context),
+                title: context.l10n.display_language,
+                subtitle: context.watch<LocaleProvider>().locale.languageCode == 'vi' ? context.l10n.vietnamese : context.l10n.english,
+                onTap: () => _showLanguagePicker(context),
               ),
               _SettingsTile(
                 icon: Icons.dark_mode_outlined,
                 iconColor: AppColors.primary,
-                title: 'Chế độ tối',
+                title: context.l10n.dark_mode,
                 trailing: Switch(
                   value: isDark,
                   onChanged: (val) => themeProvider.toggleTheme(),
@@ -125,13 +133,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: AppDimensions.p24),
 
             // ─── HỖ TRỢ ─────────────────────────────────────────────────
-            _buildSectionLabel('HỖ TRỢ'),
+            _buildSectionLabel(context.l10n.support),
             const SizedBox(height: AppDimensions.p10),
             _buildSettingsGroup(context, [
               _SettingsTile(
                 icon: Icons.help_outline,
                 iconColor: AppColors.primary,
-                title: 'Trung tâm trợ giúp',
+                title: context.l10n.help_center,
                 trailing: const Icon(Icons.open_in_new, size: 18, color: AppColors.textHint),
                 onTap: () => _showComingSoon(context),
               ),
@@ -144,8 +152,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _handleLogout(context),
                 icon: const Icon(Icons.logout, color: Colors.red, size: 20),
-                label: const Text(
-                  'Đăng xuất',
+                label: Text(
+                  context.l10n.logout,
                   style: TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.w600,
@@ -240,9 +248,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // ── Actions ───────────────────────────────────────────────────────────
   void _showComingSoon(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Tính năng sắp ra mắt'),
+      SnackBar(
+        content: Text(context.l10n.coming_soon),
         behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context) {
+    final localeProvider = context.read<LocaleProvider>();
+    final t = context.appTheme;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: t.cardBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.r20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppDimensions.p16),
+            Text(context.l10n.display_language, style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: AppDimensions.p16),
+            ListTile(
+              leading: const Text('🇻🇳', style: TextStyle(fontSize: 24)),
+              title: Text(context.l10n.vietnamese),
+              trailing: localeProvider.locale.languageCode == 'vi' ? const Icon(Icons.check, color: AppColors.primary) : null,
+              onTap: () {
+                localeProvider.setLocale(const Locale('vi'));
+                Navigator.pop(ctx);
+              },
+            ),
+            ListTile(
+              leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
+              title: Text(context.l10n.english),
+              trailing: localeProvider.locale.languageCode == 'en' ? const Icon(Icons.check, color: AppColors.primary) : null,
+              onTap: () {
+                localeProvider.setLocale(const Locale('en'));
+                Navigator.pop(ctx);
+              },
+            ),
+            const SizedBox(height: AppDimensions.p16),
+          ],
+        ),
       ),
     );
   }
@@ -254,12 +304,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: t.cardBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r20)),
-        title: const Text('Đăng xuất'),
+        title: Text(context.l10n.logout),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Bạn có chắc muốn đăng xuất khỏi ứng dụng?', 
+            Text(context.l10n.logout_confirm, 
               style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: AppDimensions.p24),
             Row(
@@ -272,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       side: BorderSide(color: t.borderColor),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r12)),
                     ),
-                    child: Text('Huỷ', style: TextStyle(color: t.textPrimary)),
+                    child: Text(context.l10n.cancel, style: TextStyle(color: t.textPrimary)),
                   ),
                 ),
                 const SizedBox(width: AppDimensions.p12),
@@ -285,7 +335,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r12)),
                       elevation: 0,
                     ),
-                    child: const Text('Đăng xuất'),
+                    child: Text(context.l10n.logout),
                   ),
                 ),
               ],

@@ -4,7 +4,9 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/learning_provider.dart';
+import '../../../../features/profile_progress/presentation/providers/progress_provider.dart';
 import '../widgets/flashcard_widget.dart';
 
 /// Màn hình học từ vựng bằng Flashcard.
@@ -28,7 +30,7 @@ class FlashcardScreen extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Học từ vựng',
+            title: Text(context.l10n.learn_flashcards,
                 style: AppTextStyles.headingMedium),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios, size: 20),
@@ -45,7 +47,7 @@ class FlashcardScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Tiến độ hôm nay',
+                    Text(context.l10n.today_progress_label,
                         style: AppTextStyles.labelLarge),
                     Text(
                       '$current / $total',
@@ -87,7 +89,7 @@ class FlashcardScreen extends StatelessWidget {
                         icon: const Icon(Icons.close,
                             color: AppColors.warning, size: 20),
                         label: Text(
-                          'Chưa biết',
+                          context.l10n.unknown_action,
                           style: AppTextStyles.buttonOutlined
                               .copyWith(color: AppColors.warning),
                         ),
@@ -112,7 +114,7 @@ class FlashcardScreen extends StatelessWidget {
                           }
                         },
                         icon: const Icon(Icons.check, size: 20),
-                        label: const Text('Đã biết'),
+                        label: Text(context.l10n.known_action),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(0, 52),
                           backgroundColor: AppColors.primary,
@@ -141,7 +143,7 @@ class FlashcardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Học từ vựng'),
+        title: Text(context.l10n.learn_flashcards),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
@@ -156,11 +158,11 @@ class FlashcardScreen extends StatelessWidget {
               const Icon(Icons.emoji_events,
                   size: 80, color: AppColors.primary),
               const SizedBox(height: 20),
-              const Text('Hoàn thành!',
+              Text(context.l10n.congrats_completed,
                   style: AppTextStyles.displayMedium),
               const SizedBox(height: 12),
               Text(
-                'Bạn đã ghi nhớ $learned / $total từ trong phiên này.',
+                context.l10n.learned_session_msg(learned, total),
                 style: AppTextStyles.bodyLarge
                     .copyWith(color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
@@ -169,12 +171,15 @@ class FlashcardScreen extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () => provider.resetFlashcard(),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Học lại từ đầu'),
+                label: Text(context.l10n.learn_again_action),
               ),
               const SizedBox(height: 12),
               TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Về danh sách từ',
+                onPressed: () {
+                  context.read<ProgressProvider>().fetchUserStats();
+                  Navigator.pop(context);
+                },
+                child: Text(context.l10n.back_to_list_action,
                     style: AppTextStyles.bodyMedium
                         .copyWith(color: AppColors.textSecondary)),
               ),

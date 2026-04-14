@@ -7,6 +7,7 @@ import '../../../learning/presentation/providers/learning_provider.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/learning_progress_chart.dart';
 import '../widgets/activity_calendar_graph.dart';
+import '../../../../core/extensions/context_extension.dart';
 
 class LearningStatisticsScreen extends StatelessWidget {
   const LearningStatisticsScreen({super.key});
@@ -17,7 +18,7 @@ class LearningStatisticsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thống kê học tập'),
+        title: Text(context.l10n.study_stats),
         centerTitle: true,
       ),
       body: Consumer2<LearningProvider, ProgressProvider>(
@@ -72,7 +73,7 @@ class LearningStatisticsScreen extends StatelessWidget {
                 const SizedBox(height: AppDimensions.p28),
 
                 // ── Progress chart ─────────────────────────────────────
-                Text('Từ vựng học theo ngày', style: Theme.of(context).textTheme.headlineSmall),
+                Text(context.l10n.words_per_day, style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: AppDimensions.p14),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16, vertical: AppDimensions.p20),
@@ -136,9 +137,9 @@ class _OverviewCards extends StatelessWidget {
         Expanded(
           child: _MetricCard(
             icon: Icons.translate_rounded,
-            label: 'Từ đã học',
+            label: context.l10n.vocabulary, // Using vocabulary as label for words card
             value: '$totalLearned',
-            sub: 'trên $totalWords từ',
+            sub: '${context.l10n.more} $totalWords ${context.l10n.words}', // Adjusting to use keys
             color: AppColors.primary,
           ),
         ),
@@ -146,9 +147,9 @@ class _OverviewCards extends StatelessWidget {
         Expanded(
           child: _MetricCard(
             icon: Icons.emoji_events_rounded,
-            label: 'Điểm tích lũy',
+            label: context.l10n.points,
             value: '$totalScore',
-            sub: 'điểm',
+            sub: context.l10n.points,
             color: Colors.amber,
           ),
         ),
@@ -156,9 +157,9 @@ class _OverviewCards extends StatelessWidget {
         Expanded(
           child: _MetricCard(
             icon: Icons.quiz_rounded,
-            label: 'Bài luyện tập',
+            label: context.l10n.sessions,
             value: '$quizzesTaken',
-            sub: 'bài đã làm',
+            sub: context.l10n.sessions,
             color: Colors.deepPurple,
           ),
         ),
@@ -279,7 +280,7 @@ class _ProgressSection extends StatelessWidget {
               const Icon(Icons.bar_chart_rounded, color: AppColors.primary),
               const SizedBox(width: AppDimensions.p8),
               Text(
-                'Tiến độ từ vựng tổng thể',
+                context.l10n.overall_progress,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const Spacer(),
@@ -305,7 +306,7 @@ class _ProgressSection extends StatelessWidget {
           ),
           const SizedBox(height: AppDimensions.p8),
           Text(
-            '$learned / $total từ đã thuộc',
+            '$learned / $total ${context.l10n.words} ${context.l10n.mastered}',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: t.textSecondary,
               fontWeight: FontWeight.w600,
@@ -360,9 +361,9 @@ class _StreakSummary extends StatelessWidget {
         Expanded(
           child: _StreakCard(
             icon: Icons.local_fire_department_rounded,
-            label: 'Chuỗi ngày học',
+            label: context.l10n.streak,
             value: '$streak',
-            unit: 'ngày liên tiếp',
+            unit: context.l10n.day,
             color: Colors.orange,
           ),
         ),
@@ -370,9 +371,9 @@ class _StreakSummary extends StatelessWidget {
         Expanded(
           child: _StreakCard(
             icon: Icons.calendar_month_rounded,
-            label: 'Tổng ngày học',
+            label: context.l10n.total_days,
             value: '$totalActive',
-            unit: 'ngày đã học',
+            unit: context.l10n.day,
             color: Colors.teal,
           ),
         ),

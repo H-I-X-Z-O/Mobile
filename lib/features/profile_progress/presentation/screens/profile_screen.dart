@@ -1,25 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth_shell/presentation/providers/auth_provider.dart';
 import '../../../learning/presentation/providers/learning_provider.dart';
-import '../../../learning/presentation/screens/vocabulary_list_screen.dart';
+import '../../../learning/presentation/screens/vocabulary_hub_screen.dart';
 import '../../../exercise/presentation/screens/exercise_screen.dart';
 import '../providers/progress_provider.dart';
+import '../providers/study_plan_provider.dart';
 import '../widgets/activity_calendar_graph.dart';
 import 'settings_screen.dart';
 import 'learning_goal_screen.dart';
 import 'learning_statistics_screen.dart';
+import 'weekly_study_plan_screen.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/extensions/context_extension.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _taskController = TextEditingController();
+
+  @override
+  void dispose() {
+    _taskController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final t = context.appTheme;
 
     return Scaffold(
       body: SafeArea(
@@ -98,7 +113,7 @@ class ProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user?.displayName ?? 'Người dùng',
+                    user?.displayName ?? context.l10n.user,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 2),
@@ -173,7 +188,7 @@ class ProfileScreen extends StatelessWidget {
           const Icon(Icons.local_fire_department, color: Colors.orange, size: 16),
           const SizedBox(width: 4),
           Text(
-            '$streakDays Ngày',
+            '$streakDays ${context.l10n.day}',
             style: AppTextStyles.labelMedium.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
@@ -189,6 +204,9 @@ class ProfileScreen extends StatelessWidget {
   // ══════════════════════════════════════════════════════════════════════════
   Widget _buildRoadmapCard(BuildContext context) {
     final t = context.appTheme;
+    final planProvider = context.watch<StudyPlanProvider>();
+    final goal = planProvider.studyPlan?.currentRoadmapGoal;
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -221,11 +239,11 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Thiết lập lộ trình học',
+                  Text(goal ?? context.l10n.learning_roadmap,
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 2),
                   Text(
-                    'Cập nhật mục tiêu & lịch học',
+                    goal != null ? context.l10n.mastered : context.l10n.edit, // Example mapping
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                   ),
                 ],
@@ -242,82 +260,179 @@ class ProfileScreen extends StatelessWidget {
   // Section: Kế hoạch hôm nay
   // ══════════════════════════════════════════════════════════════════════════
   Widget _buildTodayPlanSection(BuildContext context) {
-    return Consumer<LearningProvider>(
-      builder: (context, lp, _) {
-        if (lp.topics.isEmpty) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: AppDimensions.p20),
+    final t = context.appTheme;
+    final planProvider = context.watch<StudyPlanProvider>();
+    final lp = context.watch<LearningProvider>();
+    
+    final plan = planProvider.studyPlan;
+    final tasks = plan?.todayTasks ?? {};
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(context.l10n.today_plan, style: Theme.of(context).textTheme.headlineSmall),
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const WeeklyStudyPlanScreen()),
+              ),
               child: Text(
-                'Chưa có dữ liệu chủ đề học tập.',
-                style: TextStyle(color: Colors.grey),
+                context.l10n.weekly_schedule, 
+                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13),
               ),
             ),
-          );
-        }
-
-        final incompleteTopics = lp.topics.where((t) => !t.isCompleted).toList();
-        final remainingTopic = incompleteTopics.isNotEmpty 
-            ? incompleteTopics.first 
-            : lp.topics.first;
-
-        final List<_PlanItem> todayPlan = [
-          _PlanItem(
-            title: 'Học từ vựng "${remainingTopic.name}"',
-            duration: '15-20 phút',
-            isDone: false,
-            onTap: () {
-              lp.loadWordsForTopic(remainingTopic);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const VocabularyListScreen()));
-            },
-          ),
-          _PlanItem(
-            title: 'Làm bài trắc nghiệm ôn tập',
-            duration: '10 phút',
-            isDone: false,
-            onTap: () {
-              final allWords = lp.allWords;
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => ExerciseScreen(words: allWords)));
-            },
-          ),
-        ];
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Kế hoạch hôm nay', style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: AppDimensions.p14),
-            ...todayPlan.map((item) => _buildPlanTile(context, item)),
           ],
-        );
-      },
+        ),
+        const SizedBox(height: AppDimensions.p12),
+        
+        // Ô nhập nhiệm vụ mới
+        Container(
+          decoration: BoxDecoration(
+            color: t.secondaryBackground,
+            borderRadius: BorderRadius.circular(AppDimensions.r12),
+            border: Border.all(color: t.borderColor.withAlpha(50)),
+          ),
+          child: TextField(
+            controller: _taskController,
+            style: AppTextStyles.bodyMedium,
+            decoration: InputDecoration(
+              hintText: context.l10n.add_task_hint,
+              hintStyle: TextStyle(color: t.textHint, fontSize: 13),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              isDense: true,
+              suffixIcon: IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.add_circle, color: AppColors.primary, size: 22),
+                onPressed: () {
+                  if (_taskController.text.isNotEmpty) {
+                    planProvider.addTask(_taskController.text.trim());
+                    _taskController.clear();
+                    FocusScope.of(context).unfocus();
+                  }
+                },
+              ),
+            ),
+            onSubmitted: (val) {
+              if (val.isNotEmpty) {
+                planProvider.addTask(val.trim());
+                _taskController.clear();
+              }
+            },
+          ),
+        ),
+        const SizedBox(height: AppDimensions.p16),
+
+        if (tasks.isEmpty)
+          _buildEmptyTasksState(context, planProvider, lp)
+        else
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: SingleChildScrollView(
+              child: Column(
+                children: _buildSortedTaskList(context, planProvider, lp, tasks),
+              ),
+            ),
+          ),
+      ],
     );
+  }
+
+  Widget _buildEmptyTasksState(BuildContext context, StudyPlanProvider provider, LearningProvider lp) {
+    return GestureDetector(
+      onTap: () {
+        // Tự khởi tạo nhiệm vụ mặc định khi chưa có gì
+        final incompleteTopics = lp.topics.where((t) => !t.isCompleted).toList();
+        final topic = incompleteTopics.isNotEmpty ? incompleteTopics.first : (lp.topics.isNotEmpty ? lp.topics.first : null);
+        
+        if (topic != null) {
+          provider.addTask(context.l10n.learn_topic(topic.name));
+        }
+        provider.addTask(context.l10n.do_quiz);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppDimensions.p24),
+        decoration: BoxDecoration(
+          color: context.appTheme.cardBackground,
+          borderRadius: BorderRadius.circular(AppDimensions.r16),
+          border: Border.all(color: context.appTheme.borderColor.withAlpha(100), style: BorderStyle.solid),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.assignment_add, color: AppColors.textHint.withAlpha(80), size: 40),
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.no_plan_msg_tap,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.textHint),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildSortedTaskList(BuildContext context, StudyPlanProvider provider, LearningProvider lp, Map<String, bool> tasks) {
+    // Chuyển sang danh sách để sắp xếp
+    final list = tasks.entries.toList();
+    // Nhiệm vụ chưa xong lên đầu
+    list.sort((a, b) => (a.value == b.value) ? 0 : (a.value ? 1 : -1));
+
+    return list.map((entry) {
+      final taskName = entry.key;
+      final isDone = entry.value;
+      
+      // Xác định loại nhiệm vụ: 
+      // Nhiệm vụ hệ thống là những chuỗi trùng với l10n.do_quiz hoặc chứa từ khóa Learn/Học
+      bool isSystemTask = taskName == context.l10n.do_quiz || 
+                          taskName.startsWith(context.l10n.learn_topic('').split('{').first);
+      
+      return _buildPlanTile(
+        context,
+        _PlanItem(
+          title: taskName,
+          duration: isSystemTask ? context.l10n.duration_range : context.l10n.task_type_personal,
+          isDone: isDone,
+          isSystem: isSystemTask,
+          onTap: () {
+            if (taskName == context.l10n.do_quiz) {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => ExerciseScreen(words: lp.allWords)));
+            } else if (taskName.startsWith(context.l10n.learn_topic('').split('{').first)) {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const VocabularyHubScreen()));
+            } else {
+              provider.toggleTask(taskName);
+            }
+          },
+          onToggle: () => provider.toggleTask(taskName),
+          onDelete: isSystemTask ? null : () => provider.deleteTask(taskName),
+        ),
+      );
+    }).toList();
   }
 
   Widget _buildPlanTile(BuildContext context, _PlanItem item) {
     final t = context.appTheme;
-    return GestureDetector(
-      onTap: item.onTap,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: AppDimensions.p10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16, vertical: AppDimensions.p14),
-          decoration: BoxDecoration(
-            color: t.cardBackground,
-            borderRadius: BorderRadius.circular(AppDimensions.r14),
-            border: Border.all(color: t.borderColor),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 28,
-                height: 28,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppDimensions.p10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.p16, vertical: AppDimensions.p14),
+        decoration: BoxDecoration(
+          color: item.isDone ? t.secondaryBackground : t.cardBackground,
+          borderRadius: BorderRadius.circular(AppDimensions.r14),
+          border: Border.all(color: item.isDone ? Colors.transparent : t.borderColor),
+        ),
+        child: Row(
+          children: [
+            // Checkbox Circle
+            GestureDetector(
+              onTap: item.onToggle,
+              child: Container(
+                width: 26,
+                height: 26,
                 decoration: BoxDecoration(
                   color: item.isDone ? AppColors.primary : Colors.transparent,
                   shape: BoxShape.circle,
@@ -330,8 +445,11 @@ class ProfileScreen extends StatelessWidget {
                     ? const Icon(Icons.check, color: Colors.white, size: 16)
                     : null,
               ),
-              const SizedBox(width: AppDimensions.p14),
-              Expanded(
+            ),
+            const SizedBox(width: AppDimensions.p14),
+            Expanded(
+              child: GestureDetector(
+                onTap: item.onTap,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -340,6 +458,7 @@ class ProfileScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         decoration: item.isDone ? TextDecoration.lineThrough : null,
                         color: item.isDone ? t.textHint : t.textPrimary,
+                        fontWeight: item.isDone ? FontWeight.normal : FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -348,9 +467,15 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+            if (item.onDelete != null)
+              IconButton(
+                icon: Icon(Icons.delete_outline, color: t.textHint, size: 20),
+                onPressed: item.onDelete,
+              )
+            else if (item.isSystem)
               const Icon(Icons.play_arrow_rounded, color: AppColors.primary, size: 24),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -363,7 +488,7 @@ class ProfileScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Tiến độ kỹ năng', style: Theme.of(context).textTheme.headlineSmall),
+        Text(context.l10n.skill_progress, style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: AppDimensions.p14),
         Row(
           children: [
@@ -375,7 +500,7 @@ class ProfileScreen extends StatelessWidget {
                   return _buildSkillCard(
                     context,
                     icon: Icons.article_outlined,
-                    label: 'Từ vựng',
+                    label: context.l10n.vocabulary,
                     percent: percent,
                     color: AppColors.primary,
                   );
@@ -386,12 +511,12 @@ class ProfileScreen extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Module Ngữ pháp đang được phát triển. Bạn hãy học từ vựng trước nhé!')),
+                  SnackBar(content: Text(context.l10n.grammar_coming_soon)),
                 ),
                 child: _buildSkillCard(
                   context,
                   icon: Icons.edit_note,
-                  label: 'Ngữ pháp',
+                  label: context.l10n.grammar,
                   percent: 0, 
                   color: AppColors.info,
                 ),
@@ -486,11 +611,11 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Xem thống kê chi tiết',
+                  Text('${context.l10n.statistics} ${context.l10n.detail}',
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 2),
                   Text(
-                    'Biểu đồ, lịch học & các chỉ số tiến bộ',
+                    context.l10n.study_stats,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textSecondary),
                   ),
                 ],
@@ -532,7 +657,18 @@ class _PlanItem {
   final String title;
   final String duration;
   final bool isDone;
+  final bool isSystem;
   final VoidCallback? onTap;
+  final VoidCallback? onToggle;
+  final VoidCallback? onDelete;
 
-  _PlanItem({required this.title, required this.duration, this.isDone = false, this.onTap});
+  _PlanItem({
+    required this.title,
+    required this.duration,
+    this.isDone = false,
+    this.isSystem = false,
+    this.onTap,
+    this.onToggle,
+    this.onDelete,
+  });
 }
