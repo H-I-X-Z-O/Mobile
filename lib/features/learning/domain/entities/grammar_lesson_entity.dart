@@ -6,18 +6,26 @@ enum GrammarLevel { beginner, intermediate, advanced }
 /// Nội dung [content] hỗ trợ định dạng Markdown.
 class GrammarLessonEntity extends Equatable {
   final String id;
+  final String? lessonId;
   final String title;
-  final String subtitle; // Ví dụ: "Diễn tả hành động thường xuyên"
-  final String content; // Markdown string
+  final String? titleEn;
+  final String subtitle;
+  final String? subtitleEn;
+  final String content;
+  final String? contentEn;
   final GrammarLevel level;
-  final List<String> examples; // Danh sách câu ví dụ
-  final int order; // Thứ tự sắp xếp trong danh sách
+  final List<String> examples;
+  final int order;
 
   const GrammarLessonEntity({
     required this.id,
+    this.lessonId,
     required this.title,
+    this.titleEn,
     required this.subtitle,
+    this.subtitleEn,
     required this.content,
+    this.contentEn,
     required this.level,
     required this.examples,
     required this.order,
@@ -35,5 +43,5 @@ class GrammarLessonEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, title, level, order];
+  List<Object?> get props => [id, lessonId, title, titleEn, level, order];
 }

@@ -3,6 +3,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/grammar_lesson_entity.dart';
+import '../../../../core/extensions/context_extension.dart';
+import 'grammar_practice_screen.dart';
 
 class GrammarDetailScreen extends StatelessWidget {
   final GrammarLessonEntity lesson;
@@ -26,9 +28,10 @@ class GrammarDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lesson.title),
+        title: Text(context.l10n.localeName == 'en' ? (lesson.titleEn ?? lesson.title) : lesson.title),
         centerTitle: true,
       ),
+      floatingActionButton: _buildFloatingActionButton(context, t),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppDimensions.p20),
         child: Column(
@@ -57,13 +60,16 @@ class GrammarDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppDimensions.p8),
             Text(
-              lesson.subtitle,
+              context.l10n.localeName == 'en' ? (lesson.subtitleEn ?? lesson.subtitle) : lesson.subtitle,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
             ),
             const SizedBox(height: AppDimensions.p24),
 
             // ── Nội dung bài học (Rendered Markdown-like) ─────────────
-            _MarkdownCard(content: lesson.content, themeData: t),
+            _MarkdownCard(
+              content: context.l10n.localeName == 'en' ? (lesson.contentEn ?? lesson.content) : lesson.content,
+              themeData: t,
+            ),
 
             const SizedBox(height: AppDimensions.p24),
 
@@ -75,7 +81,7 @@ class GrammarDetailScreen extends StatelessWidget {
                       color: Colors.amber, size: 20),
                   const SizedBox(width: AppDimensions.p8),
                   Text(
-                    'Ví dụ thực tế',
+                    context.l10n.practical_examples,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ],
@@ -90,6 +96,19 @@ class GrammarDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget? _buildFloatingActionButton(BuildContext context, AppThemeData t) {
+    return FloatingActionButton.extended(
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => GrammarPracticeScreen(lesson: lesson)),
+      ),
+      backgroundColor: t.primaryColor,
+      foregroundColor: Colors.white,
+      icon: const Icon(Icons.edit_note_rounded),
+      label: Text(context.l10n.practice_now),
     );
   }
 }

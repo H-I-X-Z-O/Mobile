@@ -4,6 +4,8 @@ import '../../../../core/errors/exceptions.dart';
 import '../models/topic_model.dart';
 import '../models/word_model.dart';
 import '../models/user_vocab_status_model.dart';
+import '../models/grammar_lesson_model.dart';
+import '../models/grammar_question_model.dart';
 
 abstract class LearningRemoteDataSource {
   Future<List<TopicModel>> getTopics(String? userId);
@@ -12,6 +14,9 @@ abstract class LearningRemoteDataSource {
   Future<List<UserVocabStatusModel>> getUserVocabStatus(String userId);
   /// Đánh dấu từ [wordId] thuộc chủ đề [topicId] đã học cho người dùng [userId] trên Firestore.
   Future<void> markWordAsLearned(String userId, String wordId, String topicId);
+  
+  Future<List<GrammarLessonModel>> getGrammarLessons();
+  Future<List<GrammarQuestionModel>> getGrammarQuestions(String lessonId);
 }
 
 class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
@@ -22,6 +27,8 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
   static const String _topicsCollection = 'topics';
   static const String _wordsCollection = 'vocabularies';
   static const String _vocabStatusCollection = 'user_vocab_status';
+  static const String _grammarCollection = 'grammar_lessons';
+  static const String _grammarQuestionsCollection = 'grammar_questions';
 
   @override
   Future<List<TopicModel>> getTopics(String? userId) async {
@@ -182,6 +189,57 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
     } catch (e) {
       if (e is ServerException) rethrow;
       throw ServerException('Không thể đánh dấu từ đã học trên server: $e');
+    }
+  }
+
+  @override
+  Future<List<GrammarLessonModel>> getGrammarLessons() async {
+    try {
+      final querySnapshot = await firestore
+          .collection(_grammarCollection)
+          .orderBy('order')
+          .get();
+      
+      return querySnapshot.docs
+          .map((doc) => GrammarLessonModel.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      throw ServerException('Lỗi khi lấy danh sách bài học ngữ pháp: $e');
+    }
+  }
+
+  @override
+  Future<List<GrammarQuestionModel>> getGrammarQuestions(String lessonId) async {
+    try {
+      // 1. First, try fetching from root collection 'grammar_questions' (User's current structure)
+      // This collection uses 'exerciseId' to link to the lesson
+      final rootQuery = await firestore
+          .collection(_grammarQuestionsCollection)
+          .where('exerciseId', isEqualTo: lessonId)
+          .get();
+
+      if (rootQuery.docs.isNotEmpty) {
+        final questions = rootQuery.docs
+            .map((doc) => GrammarQuestionModel.fromJson({'id': doc.id, ...doc.data()}))
+            .toList();
+        
+        // Sort locally in-memory to avoid Firestore index requirement
+        questions.sort((a, b) => a.order.compareTo(b.order));
+        return questions;
+      }
+
+      // 2. Fallback: try sub-collection 'exercises' under Lesson document (Legacy/Initial suggestion)
+      final subQuery = await firestore
+          .collection(_grammarCollection)
+          .doc(lessonId)
+          .collection('exercises')
+          .get();
+      
+      return subQuery.docs
+          .map((doc) => GrammarQuestionModel.fromJson({'id': doc.id, ...doc.data()}))
+          .toList();
+    } catch (e) {
+      throw ServerException('Lỗi khi lấy câu hỏi luyện tập ngữ pháp: $e');
     }
   }
 }
