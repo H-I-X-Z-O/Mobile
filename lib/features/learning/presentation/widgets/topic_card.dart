@@ -3,6 +3,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../../domain/entities/topic_entity.dart';
 
 /// Widget hiển thị một chủ đề trong danh sách.
@@ -61,7 +62,7 @@ class TopicCard extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          topic.name,
+                          context.l10n.localeName == 'en' ? (topic.nameEn ?? topic.name) : topic.name,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ),
@@ -73,7 +74,7 @@ class TopicCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${topic.learnedWords}/${topic.totalWords} từ đã học',
+                    '${topic.learnedWords}/${topic.totalWords} ${context.l10n.words}',
                     style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                   ),
                   const SizedBox(height: 8),
@@ -112,11 +113,11 @@ class TopicCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(topic.name,
+                  Text(context.l10n.localeName == 'en' ? (topic.nameEn ?? topic.name) : topic.name,
                       style: AppTextStyles.wordItem.copyWith(color: t.textPrimary)),
                   const SizedBox(height: 2),
                   Text(
-                    '${topic.learnedWords}/${topic.totalWords} từ đã học',
+                    '${topic.learnedWords}/${topic.totalWords} ${context.l10n.words}',
                     style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                   ),
                   const SizedBox(height: AppDimensions.p8),
@@ -153,37 +154,37 @@ class TopicCard extends StatelessWidget {
   }
 
   IconData _topicIcon() {
-    switch (topic.name) {
-      case 'Du lịch': return Icons.flight_takeoff;
-      case 'Công việc': return Icons.work_outline;
-      case 'Ẩm thực': return Icons.restaurant;
-      case 'Sức khoẻ': return Icons.health_and_safety_outlined;
-      case 'Công nghệ': return Icons.computer_outlined;
-      case 'Thiên nhiên': return Icons.park_outlined;
+    switch (topic.id) {
+      case 't1': return Icons.flight_takeoff;
+      case 't2': return Icons.work_outline;
+      case 't3': return Icons.restaurant;
+      case 't4': return Icons.health_and_safety_outlined;
+      case 't5': return Icons.computer_outlined;
+      case 't6': return Icons.park_outlined;
       default: return Icons.book_outlined;
     }
   }
 
   Color _iconBgColor() {
-    switch (topic.name) {
-      case 'Du lịch': return AppColors.catTravelBg;
-      case 'Công việc': return AppColors.catWorkBg;
-      case 'Ẩm thực': return AppColors.catFoodBg;
-      case 'Sức khoẻ': return AppColors.catHealthBg;
-      case 'Công nghệ': return AppColors.catTechBg;
-      case 'Thiên nhiên': return AppColors.catNatureBg;
+    switch (topic.id) {
+      case 't1': return AppColors.catTravelBg;
+      case 't2': return AppColors.catWorkBg;
+      case 't3': return AppColors.catFoodBg;
+      case 't4': return AppColors.catHealthBg;
+      case 't5': return AppColors.catTechBg;
+      case 't6': return AppColors.catNatureBg;
       default: return AppColors.backgroundMint;
     }
   }
 
   Color _iconColor() {
-    switch (topic.name) {
-      case 'Du lịch': return AppColors.catTravel;
-      case 'Công việc': return AppColors.catWork;
-      case 'Ẩm thực': return AppColors.catFood;
-      case 'Sức khoẻ': return AppColors.catHealth;
-      case 'Công nghệ': return AppColors.catTech;
-      case 'Thiên nhiên': return AppColors.catNature;
+    switch (topic.id) {
+      case 't1': return AppColors.catTravel;
+      case 't2': return AppColors.catWork;
+      case 't3': return AppColors.catFood;
+      case 't4': return AppColors.catHealth;
+      case 't5': return AppColors.catTech;
+      case 't6': return AppColors.catNature;
       default: return AppColors.primary;
     }
   }

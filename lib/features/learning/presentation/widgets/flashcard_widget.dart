@@ -100,7 +100,7 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
               children: [
                 Text(
                   widget.word.englishWord,
-                  style: AppTextStyles.wordLarge,
+                  style: AppTextStyles.wordLarge.copyWith(color: AppColors.textPrimary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),

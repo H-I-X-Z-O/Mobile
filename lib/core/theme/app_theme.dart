@@ -79,6 +79,11 @@ class AppThemeData {
 
   Color get appBarForeground =>
       isDark ? Colors.white : AppColors.textPrimary;
+
+  // ── Theme Colors ───────────────────────────────────────────────────────────
+  Color get primaryColor => AppColors.primary;
+  Color get infoColor => AppColors.info;
+  Color get errorColor => AppColors.error;
 }
 
 /// Extension để truy cập dễ dàng từ bất kỳ widget nào.

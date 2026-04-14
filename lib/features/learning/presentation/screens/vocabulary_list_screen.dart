@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/learning_provider.dart';
 import '../widgets/word_list_item.dart';
 import 'flashcard_screen.dart';
@@ -22,7 +23,13 @@ class VocabularyListScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              topic != null ? 'Chủ đề: ${topic.name}' : 'Từ vựng',
+              topic != null
+                  ? context.l10n.topic_title(
+                      context.l10n.localeName == 'en' &&
+                              (topic.nameEn?.isNotEmpty ?? false)
+                          ? topic.nameEn!
+                          : topic.name)
+                  : context.l10n.vocabulary,
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios, size: 20),
@@ -41,10 +48,10 @@ class VocabularyListScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Tiến độ hoàn thành',
+                          Text(context.l10n.completion_progress,
                               style: Theme.of(context).textTheme.labelLarge),
                           Text(
-                            '${topic.learnedWords}/${topic.totalWords} từ',
+                            context.l10n.words_count(topic.learnedWords, topic.totalWords),
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                           ),
@@ -83,14 +90,14 @@ class VocabularyListScreen extends StatelessWidget {
                         const Icon(Icons.error_outline, color: AppColors.error, size: 48),
                         const SizedBox(height: AppDimensions.p16),
                         Text(
-                          provider.errorMessage ?? 'Đã xảy ra lỗi không xác định.',
+                          provider.errorMessage ?? context.l10n.unknown_error,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: AppDimensions.p20),
                         ElevatedButton(
                           onPressed: () => provider.loadWordsForTopic(topic!),
-                          child: const Text('Thử lại'),
+                          child: Text(context.l10n.retry_action),
                         ),
                       ],
                     ),
@@ -99,7 +106,7 @@ class VocabularyListScreen extends StatelessWidget {
                     : words.isEmpty
                     ? Center(
                   child: Text(
-                    'Chưa có từ vựng trong chủ đề này.',
+                    context.l10n.no_words_in_topic,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                   ),
                 )
@@ -135,7 +142,7 @@ class VocabularyListScreen extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.style_outlined, size: 20),
-                        label: const Text('Học thẻ ghi nhớ'),
+                        label: Text(context.l10n.learn_flashcards),
                       ),
                       const SizedBox(height: AppDimensions.p12),
                       OutlinedButton.icon(
@@ -147,7 +154,7 @@ class VocabularyListScreen extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.quiz_outlined, size: 20),
-                        label: const Text('Luyện tập trắc nghiệm'),
+                        label: Text(context.l10n.practice_quiz),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
                           foregroundColor: AppColors.primary,
