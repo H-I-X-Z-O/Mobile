@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../../domain/entities/question_entity.dart';
 
 class QuestionCard extends StatelessWidget {
@@ -9,18 +10,18 @@ class QuestionCard extends StatelessWidget {
 
   const QuestionCard({super.key, required this.question});
 
-  String get _headerLabel {
+  String _headerLabel(BuildContext context) {
     switch (question.type) {
       case QuestionType.multipleChoice:
-        return 'Chọn nghĩa đúng của từ:';
+        return context.l10n.instruction_multiple_choice;
       case QuestionType.reverseMultipleChoice:
-        return 'Chọn từ Tiếng Anh mang nghĩa:';
+        return context.l10n.instruction_reverse_choice;
       case QuestionType.fillInTheBlank:
-        return 'Nhập từ Tiếng Anh theo nghĩa:';
+        return context.l10n.instruction_fill_blank;
       case QuestionType.listening:
-        return 'Nghe và chọn đáp án đúng:';
+        return context.l10n.instruction_listening;
       default:
-        return 'Câu hỏi:';
+        return context.l10n.question_label_default;
     }
   }
 
@@ -46,7 +47,7 @@ class QuestionCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                _headerLabel,
+                _headerLabel(context),
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: t.textSecondary,
                   fontWeight: FontWeight.w500,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 
 class QuizProgressBar extends StatelessWidget {
   final int currentIndex;
@@ -29,7 +30,7 @@ class QuizProgressBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Bài tập Từ vựng',
+                context.l10n.vocabulary_exercise,
                 style: AppTextStyles.labelLarge.copyWith(
                   fontWeight: FontWeight.w600,
                   color: t.textPrimary,

@@ -3,22 +3,31 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/exercise_provider.dart';
+import '../../../profile_progress/presentation/providers/progress_provider.dart';
 import 'review_wrong_screen.dart';
 
 class ScoreboardScreen extends StatelessWidget {
-  const ScoreboardScreen({super.key});
+  final int correctCount;
+  final int totalQuestions;
+  final double score;
+
+  const ScoreboardScreen({
+    super.key,
+    required this.correctCount,
+    required this.totalQuestions,
+    required this.score,
+  });
 
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
-    final provider = context.watch<ExerciseProvider>();
-    final score = provider.score;
     final isPass = score >= 5.0;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kết Quả'),
+        title: Text(context.l10n.result_title),
         automaticallyImplyLeading: false,
       ),
       body: Padding(
@@ -44,12 +53,12 @@ class ScoreboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppDimensions.p24),
             Text(
-              isPass ? 'Tuyệt vời!' : 'Cố gắng lên nhé!',
+              isPass ? context.l10n.great_job : context.l10n.try_harder,
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SizedBox(height: AppDimensions.p8),
             Text(
-              'Bạn đã trả lời đúng ${provider.correctCount} / ${provider.totalQuestions} câu.',
+              context.l10n.correct_answers_msg(correctCount, totalQuestions),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: t.textSecondary),
               textAlign: TextAlign.center,
             ),
@@ -71,7 +80,7 @@ class ScoreboardScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text('Điểm số', style: Theme.of(context).textTheme.labelMedium),
+                  Text(context.l10n.score_label, style: Theme.of(context).textTheme.labelMedium),
                   const SizedBox(height: AppDimensions.p8),
                   Text(
                     score.toStringAsFixed(1),
@@ -89,7 +98,7 @@ class ScoreboardScreen extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            if (provider.correctCount < provider.totalQuestions)
+            if (correctCount < totalQuestions)
               OutlinedButton.icon(
                 onPressed: () {
                   Navigator.push(
@@ -104,7 +113,7 @@ class ScoreboardScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.r24)),
                 ),
                 icon: const Icon(Icons.remove_red_eye_outlined),
-                label: const Text('Xem lại câu sai'),
+                label: Text(context.l10n.review_wrong_action),
               ),
             const SizedBox(height: AppDimensions.p12),
             ElevatedButton.icon(
@@ -113,19 +122,21 @@ class ScoreboardScreen extends StatelessWidget {
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Làm lại'),
+              label: Text(context.l10n.restart_action),
             ),
             const SizedBox(height: AppDimensions.p12),
             TextButton(
               onPressed: () {
                 context.read<ExerciseProvider>().resetToInitial();
+                // Refresh stats to show new progress on home dashboard
+                context.read<ProgressProvider>().fetchUserStats();
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
               style: TextButton.styleFrom(
                 minimumSize: const Size(double.infinity, AppDimensions.buttonHeight),
                 foregroundColor: t.textSecondary,
               ),
-              child: const Text('Về trang chủ'),
+              child: Text(context.l10n.back_to_home_action),
             ),
           ],
         ),

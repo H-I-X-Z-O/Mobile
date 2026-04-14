@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/exercise_provider.dart';
 import '../../../learning/domain/entities/word_entity.dart';
 import '../../domain/entities/question_entity.dart';
@@ -49,7 +50,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Luyện tập'),
+        title: Text(context.l10n.review),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.close, color: t.appBarForeground),
@@ -68,9 +69,15 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           if (provider.state == QuizState.finished) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ScoreboardScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => ScoreboardScreen(
+                      correctCount: provider.correctCount,
+                      totalQuestions: provider.totalQuestions,
+                      score: provider.score,
+                    ),
+                  ),
                 );
               }
             });
@@ -79,7 +86,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
 
           final question = provider.currentQuestion;
           if (question == null) {
-            return const Center(child: Text('Lỗi tải dữ liệu.'));
+            return Center(child: Text(context.l10n.data_load_error));
           }
 
           final hasAnswered = provider.userAnswers.containsKey(question.id);
@@ -236,7 +243,7 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
           }
         },
         child: Text(
-          isLastQuestion ? 'Nộp bài' : 'Câu hỏi tiếp theo',
+          isLastQuestion ? context.l10n.submit : context.l10n.next_question,
         ),
       ),
     );
