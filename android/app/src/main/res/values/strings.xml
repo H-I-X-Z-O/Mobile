@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- TODO: Thay thế bằng Facebook App ID thật của bạn -->
-    <string name="facebook_app_id">0000000000000000</string>
-    <!-- TODO: Thay thế bằng Facebook Client Token thật của bạn -->
-    <string name="facebook_client_token">your_client_token_here</string>
-    <string name="fb_login_protocol_scheme">fb0000000000000000</string>
+    <!-- Facebook App ID -->
+    <string name="facebook_app_id">1405628027919162</string>
+    <!-- Facebook Client Token -->
+    <string name="facebook_client_token">dbfcb4096325d6dbfaf4ab0cbef09c68</string>
+    <string name="fb_login_protocol_scheme">fb1405628027919162</string>
 </resources>

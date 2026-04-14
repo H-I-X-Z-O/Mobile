@@ -7,5 +7,7 @@ abstract class AuthRepository {
   Future<UserEntity> signInWithGoogle();
   Future<UserEntity> signInWithFacebook();
   Future<void> sendPasswordResetEmail(String email);
+  Future<void> updateProfile({String? displayName, String? photoUrl});
+  Future<void> updatePassword(String newPassword);
   Future<void> logout();
 }

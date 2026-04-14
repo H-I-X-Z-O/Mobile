@@ -6,6 +6,7 @@ import '../../../learning/presentation/screens/learning_dashboard_screen.dart';
 import 'home_screen.dart';
 import 'review_screen.dart';
 import '../../../profile_progress/presentation/screens/profile_screen.dart';
+import '../../../../core/extensions/context_extension.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -63,26 +64,26 @@ class _MainShellState extends State<MainShell> {
               _visitedPages.add(index);
             });
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
               activeIcon: Icon(Icons.home_rounded),
-              label: 'Trang chủ',
+              label: context.l10n.home,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.school_outlined),
               activeIcon: Icon(Icons.school_rounded),
-              label: 'Học tập',
+              label: context.l10n.topics,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.history_outlined),
               activeIcon: Icon(Icons.history_rounded),
-              label: 'Ôn tập',
+              label: context.l10n.review,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person_rounded),
-              label: 'Cá nhân',
+              label: context.l10n.profile,
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/extensions/context_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../auth_shell/presentation/screens/register_screen.dart';
 
@@ -16,9 +17,6 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
   String? _selectedLevel;
   String? _selectedTime;
 
-  final List<String> _goals = ['Công việc', 'Học tập', 'Du lịch', 'Giao tiếp', 'Khác'];
-  final List<String> _levels = ['Mới bắt đầu', 'Cơ bản', 'Trung cấp', 'Nâng cao'];
-  final List<String> _times = ['5 phút', '15 phút', '30 phút', '60 phút'];
 
   Future<void> _completeOnboarding() async {
     // Optionally: save personalization choices to local database or memory to be synced later
@@ -40,9 +38,29 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final goals = [
+      context.l10n.goal_work,
+      context.l10n.goal_study,
+      context.l10n.goal_travel,
+      context.l10n.goal_social,
+      context.l10n.goal_other
+    ];
+    final levels = [
+      context.l10n.level_beginner,
+      context.l10n.level_basic,
+      context.l10n.level_intermediate,
+      context.l10n.level_advanced
+    ];
+    final times = [
+      context.l10n.min_5,
+      context.l10n.min_15,
+      context.l10n.min_30,
+      context.l10n.min_60
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cá nhân hóa', style: AppTextStyles.headingMedium),
+        title: Text(context.l10n.personalization_title, style: AppTextStyles.headingMedium),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -54,30 +72,30 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Mục tiêu học tập của bạn là gì?', style: AppTextStyles.headingSmall),
+                    Text(context.l10n.goal_q, style: AppTextStyles.headingSmall),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _goals.map((g) => _buildChoiceChip(g, _selectedGoal, (v) => setState(() => _selectedGoal = v))).toList(),
+                      children: goals.map((g) => _buildChoiceChip(g, _selectedGoal, (v) => setState(() => _selectedGoal = v))).toList(),
                     ),
                     const SizedBox(height: 32),
 
-                    const Text('Trình độ hiện tại của bạn?', style: AppTextStyles.headingSmall),
+                    Text(context.l10n.level_q, style: AppTextStyles.headingSmall),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _levels.map((l) => _buildChoiceChip(l, _selectedLevel, (v) => setState(() => _selectedLevel = v))).toList(),
+                      children: levels.map((l) => _buildChoiceChip(l, _selectedLevel, (v) => setState(() => _selectedLevel = v))).toList(),
                     ),
                     const SizedBox(height: 32),
 
-                    const Text('Mục tiêu thời gian mỗi ngày?', style: AppTextStyles.headingSmall),
+                    Text(context.l10n.time_q, style: AppTextStyles.headingSmall),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _times.map((t) => _buildChoiceChip(t, _selectedTime, (v) => setState(() => _selectedTime = v))).toList(),
+                      children: times.map((t) => _buildChoiceChip(t, _selectedTime, (v) => setState(() => _selectedTime = v))).toList(),
                     ),
                     const SizedBox(height: 48),
                   ],
@@ -92,7 +110,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 style: ElevatedButton.styleFrom(
                   disabledBackgroundColor: AppColors.surfaceBorder,
                 ),
-                child: const Text('Hoàn tất và tạo tài khoản', style: AppTextStyles.buttonLarge),
+                child: Text(context.l10n.onboarding_finish_action, style: AppTextStyles.buttonLarge),
               ),
             ),
           ],

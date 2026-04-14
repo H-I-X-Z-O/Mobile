@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/exercise_provider.dart';
 
 /// Màn hình xem lại các câu trả lời sai sau khi hoàn thành quiz.
@@ -25,7 +26,7 @@ class ReviewWrongScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Xem lại câu sai (${wrongAnswers.length})',
+          context.l10n.review_wrong_title(wrongAnswers.length),
           style: AppTextStyles.headingMedium.copyWith(color: t.appBarForeground),
         ),
         leading: IconButton(
@@ -40,7 +41,7 @@ class ReviewWrongScreen extends StatelessWidget {
                 children: [
                   Icon(Icons.check_circle_rounded, size: 80, color: AppColors.primary),
                   const SizedBox(height: 16),
-                  Text('Bạn không có câu nào sai!',
+                  Text(context.l10n.no_wrong_answers,
                       style: AppTextStyles.headingMedium.copyWith(color: t.textPrimary)),
                 ],
               ),
@@ -66,7 +67,7 @@ class ReviewWrongScreen extends StatelessWidget {
                     children: [
                       // Câu hỏi
                       Text(
-                        'Câu ${index + 1}: ${question.content}',
+                        '${context.l10n.question_label(index + 1)}: ${question.content}',
                         style: AppTextStyles.bodyLarge.copyWith(
                           fontWeight: FontWeight.w600,
                           color: t.textPrimary,
@@ -76,7 +77,7 @@ class ReviewWrongScreen extends StatelessWidget {
                       // Đáp án của bạn (sai)
                       _buildAnswerRow(
                         context,
-                        label: 'Bạn chọn:',
+                        label: context.l10n.your_choice_label,
                         text: answer.selectedOption,
                         isCorrect: false,
                         t: t,
@@ -85,7 +86,7 @@ class ReviewWrongScreen extends StatelessWidget {
                       // Đáp án đúng
                       _buildAnswerRow(
                         context,
-                        label: 'Đáp án đúng:',
+                        label: context.l10n.correct_answer_label,
                         text: question.correctAnswer,
                         isCorrect: true,
                         t: t,

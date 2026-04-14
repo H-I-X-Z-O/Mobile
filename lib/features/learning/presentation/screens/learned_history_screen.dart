@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/learning_provider.dart';
 import '../../domain/entities/word_entity.dart';
 
@@ -15,7 +16,7 @@ class LearnedHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lịch sử học tập', style: AppTextStyles.headingMedium),
+        title: Text(context.l10n.review, style: AppTextStyles.headingMedium),
         centerTitle: true,
       ),
       body: Consumer<LearningProvider>(
@@ -31,12 +32,12 @@ class LearnedHistoryScreen extends StatelessWidget {
                       size: 64, color: t.textSecondary),
                   const SizedBox(height: 16),
                   Text(
-                    'Chưa có từ nào được học',
+                    context.l10n.no_words_learned,
                     style: AppTextStyles.headingSmall.copyWith(color: t.textSecondary),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Bắt đầu học từ vựng để theo dõi tiến độ của bạn!',
+                    context.l10n.start_learning_desc,
                     style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                     textAlign: TextAlign.center,
                   ),
@@ -142,7 +143,7 @@ class _WeeklySummaryBanner extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '7 ngày qua',
+                context.l10n.last_7_days,
                 style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
               ),
               Row(
@@ -159,7 +160,7 @@ class _WeeklySummaryBanner extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4, left: 4),
                     child: Text(
-                      ' từ đã học',
+                      ' ${context.l10n.words} ${context.l10n.mastered}',
                       style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                     ),
                   ),
@@ -172,11 +173,11 @@ class _WeeklySummaryBanner extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                'Tổng cộng',
+                context.l10n.total_learned,
                 style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary, fontSize: 11),
               ),
               Text(
-                '${provider.totalLearnedWords} từ',
+                '${provider.totalLearnedWords} ${context.l10n.words}',
                 style: AppTextStyles.headingSmall.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w800,
@@ -204,14 +205,15 @@ class _SectionHeader extends StatelessWidget {
     required this.isYesterday,
   });
 
-  String get _displayDate {
-    if (isToday) return 'Hôm nay';
-    if (isYesterday) return 'Hôm qua';
-    if (dateKey == 'unknown') return 'Trước đây';
-    // Parse yyyy-MM-dd
+  String _displayDate(BuildContext context) {
+    if (isToday) return context.l10n.today;
+    if (isYesterday) return context.l10n.yesterday;
+    if (dateKey == 'unknown') return context.l10n.before;
+    
     final parts = dateKey.split('-');
     if (parts.length == 3) {
-      return 'Ngày ${parts[2]} tháng ${parts[1]}';
+      // We could use intl DateFormat here, but to keep it simple and consistent:
+      return '${parts[2]}/${parts[1]}/${parts[0]}';
     }
     return dateKey;
   }
@@ -224,7 +226,7 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            _displayDate,
+            _displayDate(context),
             style: AppTextStyles.labelMedium.copyWith(
               color: isToday ? AppColors.primary : t.textSecondary,
               fontWeight: FontWeight.w700,
@@ -239,7 +241,7 @@ class _SectionHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              '+$count từ',
+              '+$count ${context.l10n.words}',
               style: TextStyle(
                 color: isToday ? AppColors.primary : t.textSecondary,
                 fontSize: 11,

@@ -163,6 +163,40 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> updateProfile({String? displayName, String? photoUrl}) async {
+    if (!_isInitialized) throw Exception('Firebase chưa initialized');
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) throw Exception('Không tìm thấy phiên đăng nhập.');
+      
+      if (displayName != null) await user.updateDisplayName(displayName);
+      if (photoUrl != null) await user.updatePhotoURL(photoUrl);
+      
+      await user.reload();
+    } catch (e) {
+      throw Exception('Lỗi cập nhật hồ sơ: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    if (!_isInitialized) throw Exception('Firebase chưa initialized');
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) throw Exception('Không tìm thấy phiên đăng nhập.');
+      
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        throw Exception('Tính năng này yêu cầu bạn phải đăng nhập lại gần đây để xác minh bảo mật.');
+      }
+      throw Exception('Lỗi đổi mật khẩu: ${e.message}');
+    } catch (e) {
+      throw Exception('Đã xảy ra lỗi.');
+    }
+  }
+
+  @override
   Future<void> logout() async {
     if (!_isInitialized) return;
     try {

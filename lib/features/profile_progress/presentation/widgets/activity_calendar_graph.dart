@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/extensions/context_extension.dart';
 
 class ActivityCalendarGraph extends StatefulWidget {
   final Set<String> activeDays;
@@ -41,12 +42,22 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
     });
   }
 
-  String _getMonthName(int month) {
-    const names = [
-      '', 'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-      'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
-    ];
-    return names[month];
+  String _getMonthName(BuildContext context, int month) {
+    switch (month) {
+      case 1: return context.l10n.month_1;
+      case 2: return context.l10n.month_2;
+      case 3: return context.l10n.month_3;
+      case 4: return context.l10n.month_4;
+      case 5: return context.l10n.month_5;
+      case 6: return context.l10n.month_6;
+      case 7: return context.l10n.month_7;
+      case 8: return context.l10n.month_8;
+      case 9: return context.l10n.month_9;
+      case 10: return context.l10n.month_10;
+      case 11: return context.l10n.month_11;
+      case 12: return context.l10n.month_12;
+      default: return '';
+    }
   }
 
   Widget _buildIntensityBox(Color color) {
@@ -83,7 +94,7 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
         Row(
            mainAxisAlignment: MainAxisAlignment.spaceBetween,
            children: [
-             Text('Lịch học', style: AppTextStyles.headingMedium),
+             Text(context.l10n.weekly_schedule, style: AppTextStyles.headingMedium),
              Row(
                children: [
                  IconButton(
@@ -94,7 +105,7 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
                  ),
                  const SizedBox(width: 8),
                  Text(
-                   '${_getMonthName(_focusedMonth.month)}, ${_focusedMonth.year}', 
+                   '${_getMonthName(context, _focusedMonth.month)}, ${_focusedMonth.year}', 
                    style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)
                  ),
                  const SizedBox(width: 8),
@@ -217,7 +228,7 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text('Ít', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+                  Text(context.l10n.less, style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
                   const SizedBox(width: 8),
                   _buildIntensityBox(isDark ? Colors.white10 : AppColors.backgroundSecondary),
                   const SizedBox(width: 4),
@@ -227,7 +238,7 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
                   const SizedBox(width: 4),
                   _buildIntensityBox(AppColors.primary),
                   const SizedBox(width: 8),
-                  const Text('Nhiều', style: TextStyle(fontSize: 12, color: AppColors.textHint)),
+                  Text(context.l10n.more, style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
                 ],
               )
             ],

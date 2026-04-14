@@ -4,6 +4,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../domain/entities/topic_entity.dart';
 import '../../domain/entities/word_entity.dart';
 import '../../domain/entities/user_vocab_status_entity.dart';
+import '../../domain/entities/grammar_lesson_entity.dart';
+import '../../domain/entities/grammar_question_entity.dart';
 import '../../data/datasources/learning_local_data_source.dart';
 import '../../data/datasources/learning_remote_data_source.dart';
 import '../../data/repositories/vocabulary_repository_impl.dart';
@@ -18,7 +20,10 @@ class LearningProvider extends ChangeNotifier {
   List<TopicEntity> _topics = [];
   List<WordEntity> _currentWords = [];
   List<WordEntity> _allWordsCache = [];
+  List<GrammarLessonEntity> _grammarLessons = [];
+  List<GrammarQuestionEntity> _currentGrammarQuestions = [];
   TopicEntity? _selectedTopic;
+  GrammarLessonEntity? _selectedGrammarLesson;
   int _flashcardIndex = 0;
   bool _isCardFlipped = false;
   String? _errorMessage;
@@ -72,7 +77,10 @@ class LearningProvider extends ChangeNotifier {
   LearningState get wordState => _wordState;
   List<TopicEntity> get topics => _topics;
   List<WordEntity> get currentWords => _currentWords;
+  List<GrammarLessonEntity> get grammarLessons => _grammarLessons;
+  List<GrammarQuestionEntity> get currentGrammarQuestions => _currentGrammarQuestions;
   TopicEntity? get selectedTopic => _selectedTopic;
+  GrammarLessonEntity? get selectedGrammarLesson => _selectedGrammarLesson;
   int get flashcardIndex => _flashcardIndex;
   bool get isCardFlipped => _isCardFlipped;
   String? get errorMessage => _errorMessage;
@@ -87,7 +95,12 @@ class LearningProvider extends ChangeNotifier {
   List<TopicEntity> get filteredTopics {
     if (_searchQuery.isEmpty) return _topics;
     final lowerQuery = _searchQuery.toLowerCase();
-    return _topics.where((t) => t.name.toLowerCase().contains(lowerQuery)).toList();
+    return _topics.where((t) {
+      // Tìm kiếm cả tiếng Việt và tiếng Anh
+      final nameMatches = t.name.toLowerCase().contains(lowerQuery) ||
+          (t.nameEn?.toLowerCase().contains(lowerQuery) ?? false);
+      return nameMatches;
+    }).toList();
   }
 
   List<TopicEntity> get topicsInProgress =>
@@ -216,6 +229,36 @@ class LearningProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString();
       _topicState = LearningState.error;
+    }
+    notifyListeners();
+  }
+
+  Future<void> loadGrammarLessons() async {
+    _topicState = LearningState.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _grammarLessons = await _repository.getGrammarLessons();
+      _topicState = LearningState.loaded;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _topicState = LearningState.error;
+    }
+    notifyListeners();
+  }
+
+  Future<void> loadGrammarQuestions(String lessonId) async {
+    _wordState = LearningState.loading;
+    _currentGrammarQuestions = [];
+    notifyListeners();
+
+    try {
+      _currentGrammarQuestions = await _repository.getGrammarQuestions(lessonId);
+      _wordState = LearningState.loaded;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _wordState = LearningState.error;
     }
     notifyListeners();
   }

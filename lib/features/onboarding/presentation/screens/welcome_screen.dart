@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/extensions/context_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../auth_shell/presentation/screens/login_screen.dart';
 import 'personalization_screen.dart';
@@ -45,14 +46,14 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 48),
 
               // Text
-              const Text(
-                'Làm chủ từ vựng,\nvươn tầm thế giới!',
+              Text(
+                context.l10n.onboarding_title,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.displayMedium,
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Nền tảng học từ vựng cá nhân hóa\ngiúp bạn nắm bắt kiến thức mỗi ngày.',
+              Text(
+                context.l10n.onboarding_subtitle,
                 textAlign: TextAlign.center,
                 style: AppTextStyles.bodyMedium,
               ),
@@ -67,7 +68,7 @@ class WelcomeScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const PersonalizationScreen()),
                   );
                 },
-                child: const Text('Bắt đầu ngay', style: AppTextStyles.buttonLarge),
+                child: Text(context.l10n.start_now_action, style: AppTextStyles.buttonLarge),
               ),
               const SizedBox(height: 16),
               TextButton(
@@ -76,7 +77,7 @@ class WelcomeScreen extends StatelessWidget {
                   minimumSize: const Size(double.infinity, 52),
                   shape: const StadiumBorder(),
                 ),
-                child: const Text('Tôi đã có tài khoản', style: AppTextStyles.buttonOutlined),
+                child: Text(context.l10n.already_have_account_action, style: AppTextStyles.buttonOutlined),
               ),
             ],
           ),

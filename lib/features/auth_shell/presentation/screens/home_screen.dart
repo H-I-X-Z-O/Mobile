@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/auth_provider.dart';
 import '../../../learning/presentation/providers/learning_provider.dart';
 import '../../../learning/presentation/widgets/topic_card.dart';
@@ -36,10 +37,10 @@ class HomeScreen extends StatelessWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Trang chủ', style: Theme.of(context).textTheme.headlineLarge),
+                          Text(context.l10n.home, style: Theme.of(context).textTheme.headlineLarge),
                           const SizedBox(height: AppDimensions.p4),
                           Text(
-                            _getGreeting(user?.displayName ?? 'bạn'),
+                            _getGreeting(context, user?.displayName ?? context.l10n.someone),
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                           ),
                         ],
@@ -88,12 +89,12 @@ class HomeScreen extends StatelessWidget {
                             color: AppColors.primary.withAlpha(t.isDark ? 50 : 40),
                             borderRadius: BorderRadius.circular(AppDimensions.r20),
                           ),
-                          child: Text('Từ vựng của ngày',
+                          child: Text(context.l10n.word_of_day,
                               style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary)),
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          word?.englishWord ?? 'Loading...',
+                          word?.englishWord ?? context.l10n.loading,
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -149,7 +150,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.bar_chart, color: AppColors.primary),
                   const SizedBox(width: 8),
-                  Text('Tiến độ hôm nay',
+                  Text(context.l10n.today_progress_label,
                       style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary)),
                 ],
               ),
@@ -208,7 +209,7 @@ class HomeScreen extends StatelessWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Số từ đã học',
+                                    Text(context.l10n.words_learned_label,
                                         style: AppTextStyles.bodyMedium.copyWith(color: t.textSecondary)),
                                     Text('$learned/$total',
                                         style: const TextStyle(
@@ -230,8 +231,8 @@ class HomeScreen extends StatelessWidget {
                                 const SizedBox(height: 8),
                                 Text(
                                   progress >= 1.0
-                                      ? 'Tuyệt vời! Bạn đã hoàn thành mục tiêu!'
-                                      : 'Cố gắng lên, bạn sắp đạt mục tiêu rồi!',
+                                      ? context.l10n.goal_reached
+                                      : context.l10n.goal_not_reached,
                                   style: AppTextStyles.bodySmall.copyWith(color: t.textHint),
                                 ),
                               ],
@@ -253,13 +254,13 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       const Icon(Icons.play_circle_fill, color: AppColors.primary),
                       const SizedBox(width: 8),
-                      Text('Tiếp tục học',
+                      Text(context.l10n.continue_learning,
                           style: AppTextStyles.headingSmall.copyWith(color: t.textPrimary)),
                     ],
                   ),
                   GestureDetector(
                     onTap: () => onNavigate?.call(1),
-                    child: Text('Xem tất cả',
+                    child: Text(context.l10n.view_all,
                         style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary)),
                   ),
                 ],
@@ -269,7 +270,7 @@ class HomeScreen extends StatelessWidget {
                 builder: (context, provider, child) {
                   if (provider.topics.isEmpty) {
                     return Center(
-                      child: Text('Chưa có dữ liệu chủ đề.',
+                      child: Text(context.l10n.no_topics_data,
                           style: AppTextStyles.bodySmall.copyWith(color: t.textHint)),
                     );
                   }
@@ -299,11 +300,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  String _getGreeting(String name) {
+  String _getGreeting(BuildContext context, String name) {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Chào buổi sáng, $name!';
-    if (hour < 18) return 'Chào buổi chiều, $name!';
-    return 'Chào buổi tối, $name!';
+    if (hour < 12) return context.l10n.greeting_morning(name);
+    if (hour < 18) return context.l10n.greeting_afternoon(name);
+    return context.l10n.greeting_evening(name);
   }
 
   void _navigateToTopic(BuildContext context, LearningProvider provider, dynamic topic) {

@@ -7,7 +7,9 @@ class TopicModel extends TopicEntity {
   const TopicModel({
     required super.id,
     required super.name,
+    super.nameEn,
     required super.description,
+    super.descriptionEn,
     super.imageUrl,
     super.order = 0,
     required super.totalWords,
@@ -19,7 +21,9 @@ class TopicModel extends TopicEntity {
     return TopicModel(
       id: json['id'] as String,
       name: json['name'] as String,
+      nameEn: json['name_en'] as String?,
       description: json['description'] as String,
+      descriptionEn: json['description_en'] as String?,
       imageUrl: json['image_url'] as String?,
       order: json['order'] as int? ?? 0,
       totalWords: json['total_words'] as int? ?? 0,
@@ -33,8 +37,10 @@ class TopicModel extends TopicEntity {
     return TopicModel(
       // Ưu tiên dùng topicId (t1, t2...) từ field để mapping với collection vocabularies
       id: data['topicId'] as String? ?? doc.id,
-      name: data['name'] as String,
-      description: data['description'] as String,
+      name: data['name'] as String? ?? 'No Name',
+      nameEn: data['name_en'] as String?,
+      description: data['description'] as String? ?? '',
+      descriptionEn: data['description_en'] as String?,
       imageUrl: data['image_url'] as String?,
       order: data['order'] as int? ?? 0,
       totalWords: data['total_words'] as int? ?? 0,
@@ -46,7 +52,9 @@ class TopicModel extends TopicEntity {
   TopicModel copyWith({
     String? id,
     String? name,
+    String? nameEn,
     String? description,
+    String? descriptionEn,
     String? imageUrl,
     int? order,
     int? totalWords,
@@ -55,7 +63,9 @@ class TopicModel extends TopicEntity {
     return TopicModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      nameEn: nameEn ?? this.nameEn,
       description: description ?? this.description,
+      descriptionEn: descriptionEn ?? this.descriptionEn,
       imageUrl: imageUrl ?? this.imageUrl,
       order: order ?? this.order,
       totalWords: totalWords ?? this.totalWords,
@@ -68,7 +78,9 @@ class TopicModel extends TopicEntity {
     return {
       'id': id,
       'name': name,
+      'name_en': nameEn,
       'description': description,
+      'description_en': descriptionEn,
       'image_url': imageUrl,
       'order': order,
       'total_words': totalWords,

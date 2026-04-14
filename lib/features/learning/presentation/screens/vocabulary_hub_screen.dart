@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/learning_provider.dart';
 import '../widgets/topic_card.dart';
 import '../widgets/word_list_item.dart';
@@ -50,7 +51,7 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Từ vựng'),
+        title: Text(context.l10n.vocabulary),
         centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
@@ -58,9 +59,9 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
           labelColor: AppColors.primary,
           unselectedLabelColor: t.textSecondary,
           labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-          tabs: const [
-            Tab(icon: Icon(Icons.folder_special_rounded, size: 18), text: 'Chủ đề'),
-            Tab(icon: Icon(Icons.sort_by_alpha_rounded, size: 18), text: 'A-Z'),
+          tabs: [
+            Tab(icon: const Icon(Icons.folder_special_rounded, size: 18), text: context.l10n.topics),
+            Tab(icon: const Icon(Icons.sort_by_alpha_rounded, size: 18), text: 'A-Z'),
           ],
         ),
       ),
@@ -72,7 +73,7 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Tìm chủ đề hoặc từ vựng...',
+                hintText: context.l10n.search_vocab_hint,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -131,7 +132,7 @@ class _TopicTabView extends StatelessWidget {
         if (allTopics.isEmpty) {
           return Center(
             child: Text(
-              'Không tìm thấy chủ đề nào.',
+              context.l10n.no_topics_found,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
             ),
           );
@@ -140,7 +141,7 @@ class _TopicTabView extends StatelessWidget {
         return CustomScrollView(
           slivers: [
             if (inProgress.isNotEmpty) ...[
-              SliverToBoxAdapter(child: _sectionHeader(context, 'ĐANG HỌC')),
+              SliverToBoxAdapter(child: _sectionHeader(context, context.l10n.learning_label)),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => TopicCard(
@@ -152,7 +153,7 @@ class _TopicTabView extends StatelessWidget {
                 ),
               ),
             ],
-            SliverToBoxAdapter(child: _sectionHeader(context, 'TẤT CẢ CHỦ ĐỀ')),
+            SliverToBoxAdapter(child: _sectionHeader(context, context.l10n.all_topics_label)),
             SliverToBoxAdapter(
               child: Divider(indent: AppDimensions.p20, endIndent: AppDimensions.p20, height: 1, color: t.dividerColor),
             ),
@@ -234,9 +235,9 @@ class _AlphabeticalTabView extends StatelessWidget {
                 Icon(Icons.search_off_rounded, size: 56, color: t.textHint),
                 const SizedBox(height: AppDimensions.p12),
                 Text(
-                  searchQuery.isNotEmpty
-                      ? 'Không tìm thấy từ phù hợp'
-                      : 'Chưa có từ vựng nào',
+                      searchQuery.isNotEmpty
+                          ? context.l10n.no_words_found
+                          : context.l10n.no_data,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: t.textSecondary),
                 ),
               ],

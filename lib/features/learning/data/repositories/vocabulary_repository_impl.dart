@@ -1,6 +1,8 @@
 import '../../../../core/errors/exceptions.dart';
-import '../../domain/entities/topic_entity.dart';
 import '../../domain/entities/word_entity.dart';
+import '../../domain/entities/topic_entity.dart';
+import '../../domain/entities/grammar_lesson_entity.dart';
+import '../../domain/entities/grammar_question_entity.dart';
 import '../../domain/repositories/vocabulary_repository.dart';
 import '../datasources/learning_local_data_source.dart';
 import '../datasources/learning_remote_data_source.dart';
@@ -73,6 +75,25 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
     } on ServerException {
       await localDataSource.markWordAsLearnedLocally(wordId);
       rethrow;
+    }
+  }
+  @override
+  Future<List<GrammarLessonEntity>> getGrammarLessons() async {
+    try {
+      final lessons = await remoteDataSource.getGrammarLessons();
+      return lessons.map((e) => e as GrammarLessonEntity).toList();
+    } on ServerException {
+      return []; // Trả về rỗng nếu lỗi mạng
+    }
+  }
+
+  @override
+  Future<List<GrammarQuestionEntity>> getGrammarQuestions(String lessonId) async {
+    try {
+      final questions = await remoteDataSource.getGrammarQuestions(lessonId);
+      return questions.map((e) => e as GrammarQuestionEntity).toList();
+    } on ServerException {
+      return [];
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/extensions/context_extension.dart';
 
 class LearningProgressChart extends StatelessWidget {
   final Map<DateTime, int> data; // Key là ngày, Value là số từ vựng
@@ -16,7 +17,7 @@ class LearningProgressChart extends StatelessWidget {
         height: 200,
         alignment: Alignment.center,
         child: Text(
-          'Chưa có dữ liệu học tập.',
+          context.l10n.no_data,
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
         ),
       );
@@ -134,7 +135,7 @@ class LearningProgressChart extends StatelessWidget {
               getTooltipItems: (touchedSpots) {
                 return touchedSpots.map((spot) {
                   return LineTooltipItem(
-                    '${spot.y.toInt()} từ',
+                    '${spot.y.toInt()} ${context.l10n.words}',
                     const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                   );
                 }).toList();

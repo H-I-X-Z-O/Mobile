@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/learning_provider.dart';
 import 'vocabulary_hub_screen.dart';
 import 'grammar_list_screen.dart';
@@ -32,10 +33,10 @@ class LearningDashboardScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Học tập', style: AppTextStyles.headingLarge),
+                        Text(context.l10n.home, style: AppTextStyles.headingLarge),
                         const SizedBox(height: 4),
                         Text(
-                          'Từ vựng & Ngữ pháp mỗi ngày',
+                          context.l10n.learning_subtitle,
                           style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                         ),
                       ],
@@ -61,7 +62,7 @@ class LearningDashboardScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                 child: Text(
-                  'CHỌN KHU VỰC HỌC',
+                  context.l10n.choose_area,
                   style: AppTextStyles.labelMedium.copyWith(
                     color: t.textSecondary,
                     letterSpacing: 0.8,
@@ -78,8 +79,8 @@ class LearningDashboardScreen extends StatelessWidget {
                 delegate: SliverChildListDelegate([
                   _LearningAreaCard(
                     icon: Icons.menu_book_rounded,
-                    title: 'Từ vựng',
-                    description: 'Học theo chủ đề hoặc tra từ điển A-Z',
+                    title: context.l10n.vocabulary,
+                    description: context.l10n.vocab_area_desc,
                     color: AppColors.primary,
                     badge: null,
                     onTap: () => Navigator.push(
@@ -92,10 +93,10 @@ class LearningDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _LearningAreaCard(
                     icon: Icons.auto_stories_rounded,
-                    title: 'Ngữ pháp',
-                    description: 'Các quy tắc ngữ pháp từ cơ bản đến nâng cao',
+                    title: context.l10n.grammar,
+                    description: context.l10n.grammar_area_desc,
                     color: Colors.purple,
-                    badge: 'Mới',
+                    badge: context.l10n.new_badge,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const GrammarListScreen()),
@@ -104,8 +105,8 @@ class LearningDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _LearningAreaCard(
                     icon: Icons.history_edu_rounded,
-                    title: 'Lịch sử học tập',
-                    description: 'Xem lại những từ bạn đã học theo ngày',
+                    title: context.l10n.review,
+                    description: context.l10n.history_area_desc,
                     color: Colors.teal,
                     badge: null,
                     onTap: () => Navigator.push(
@@ -167,7 +168,7 @@ class _QuickProgressBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hôm nay bạn học được',
+                    context.l10n.learned_today_phrase,
                     style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                   ),
                   const SizedBox(height: 4),
@@ -185,7 +186,7 @@ class _QuickProgressBanner extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 6, left: 4),
                         child: Text(
-                          ' từ  •  Tổng: $total từ',
+                          ' ${context.l10n.words}  •  ${context.l10n.learned_total_count(total)}',
                           style: AppTextStyles.bodySmall.copyWith(color: t.textSecondary),
                         ),
                       ),

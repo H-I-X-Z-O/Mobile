@@ -1,5 +1,7 @@
-import '../entities/topic_entity.dart';
 import '../entities/word_entity.dart';
+import '../entities/topic_entity.dart';
+import '../entities/grammar_lesson_entity.dart';
+import '../entities/grammar_question_entity.dart';
 
 /// Interface cho Vocabulary Repository.
 ///
@@ -20,4 +22,7 @@ abstract class VocabularyRepository {
 
   /// Đánh dấu một từ đã được ghi nhớ (learned/memorized) cho người dùng [userId].
   Future<void> markWordAsLearned(String userId, String wordId, String topicId);
+
+  Future<List<GrammarLessonEntity>> getGrammarLessons();
+  Future<List<GrammarQuestionEntity>> getGrammarQuestions(String lessonId);
 }

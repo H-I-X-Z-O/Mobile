@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/auth_provider.dart';
 import 'main_shell.dart';
 
@@ -33,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin.')),
+        SnackBar(content: Text(context.l10n.register_error_msg)),
       );
       return;
     }
@@ -55,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-             content: Text(provider.errorMessage ?? 'Có lỗi xảy ra', style: const TextStyle(color: Colors.white)),
+             content: Text(provider.errorMessage ?? context.l10n.error, style: const TextStyle(color: Colors.white)),
             backgroundColor: AppColors.error,
           ),
         );
@@ -71,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           icon: const Icon(Icons.arrow_back_ios, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Đăng ký', style: AppTextStyles.headingMedium),
+        title: Text(context.l10n.register, style: AppTextStyles.headingMedium),
       ),
       body: SafeArea(
         child: Consumer<AuthProvider>(
@@ -95,47 +96,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  const Text('Tạo tài khoản mới',
+                  Text(context.l10n.create_account_title,
                       style: AppTextStyles.displayMedium, textAlign: TextAlign.center),
                   const SizedBox(height: 8),
-                  Text('Tham gia cùng cộng đồng học\ntiếng Anh VocabUp',
+                  Text(context.l10n.register_subtitle,
                       style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 40),
 
                   // Tên hiển thị
-                  const Text('Tên của bạn', style: AppTextStyles.inputLabel),
+                  Text(context.l10n.your_name_label, style: AppTextStyles.inputLabel),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      hintText: 'Nhập tên hiển thị',
-                      prefixIcon: Icon(Icons.person_outline, color: AppColors.textHint),
+                    decoration: InputDecoration(
+                      hintText: context.l10n.name_hint,
+                      prefixIcon: const Icon(Icons.person_outline, color: AppColors.textHint),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   // Email
-                  const Text('Email', style: AppTextStyles.inputLabel),
+                  Text(context.l10n.email, style: AppTextStyles.inputLabel),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      hintText: 'Nhập email của bạn',
-                      prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint),
+                    decoration: InputDecoration(
+                      hintText: context.l10n.email_hint,
+                      prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textHint),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   // Password
-                  const Text('Mật khẩu', style: AppTextStyles.inputLabel),
+                  Text(context.l10n.password, style: AppTextStyles.inputLabel),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
-                      hintText: 'Nhập mật khẩu (Ít nhất 6 ký tự)',
+                      hintText: context.l10n.password_hint_register,
                       prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textHint),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -157,7 +158,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onPressed: isLoading ? null : _handleRegister,
                     child: isLoading
                         ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text('Tạo tài khoản'),
+                        : Text(context.l10n.create_account_action),
                   ),
                 ],
               ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/extensions/context_extension.dart';
 import '../providers/learning_provider.dart';
 import '../widgets/topic_card.dart';
 import 'vocabulary_list_screen.dart';
@@ -29,7 +30,7 @@ class _TopicListScreenState extends State<TopicListScreen> {
     final t = context.appTheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chủ đề học tập', style: AppTextStyles.headingMedium),
+        title: Text(context.l10n.topics_title, style: AppTextStyles.headingMedium),
         centerTitle: true,
         actions: [
           IconButton(
@@ -49,7 +50,7 @@ class _TopicListScreenState extends State<TopicListScreen> {
               child: TextField(
                 style: TextStyle(color: t.textPrimary),
                 decoration: InputDecoration(
-                  hintText: 'Tìm kiếm chủ đề...',
+                  hintText: context.l10n.search_vocab_hint,
                   prefixIcon: Icon(Icons.search, color: t.textHint, size: 20),
                 ),
                 onChanged: (val) {
@@ -68,12 +69,12 @@ class _TopicListScreenState extends State<TopicListScreen> {
                   final inProgress = provider.topicsInProgress;
                   final allTopics = provider.filteredTopics;
                   if (allTopics.isEmpty) {
-                    return const Center(child: Text('Không tìm thấy chủ đề nào.'));
+                    return Center(child: Text(context.l10n.no_topics_found));
                   }
                   return CustomScrollView(
                     slivers: [
                       if (inProgress.isNotEmpty) ...[
-                        SliverToBoxAdapter(child: _sectionHeader(context, 'ĐANG HỌC')),
+                        SliverToBoxAdapter(child: _sectionHeader(context, context.l10n.learning_label)),
                         SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => TopicCard(
@@ -85,7 +86,7 @@ class _TopicListScreenState extends State<TopicListScreen> {
                           ),
                         ),
                       ],
-                      SliverToBoxAdapter(child: _sectionHeader(context, 'TẤT CẢ CHỦ ĐỀ')),
+                      SliverToBoxAdapter(child: _sectionHeader(context, context.l10n.all_topics_label)),
                       SliverToBoxAdapter(
                         child: Divider(indent: 20, endIndent: 20, height: 1, color: t.dividerColor),
                       ),

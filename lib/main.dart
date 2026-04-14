@@ -5,22 +5,29 @@ import 'package:provider/provider.dart';
 import 'features/exercise/presentation/providers/exercise_provider.dart';
 import 'features/profile_progress/presentation/providers/progress_provider.dart';
 import 'features/profile_progress/presentation/providers/theme_provider.dart';
+import 'features/profile_progress/presentation/providers/study_plan_provider.dart';
 import 'features/learning/presentation/providers/learning_provider.dart';
 import 'features/auth_shell/presentation/providers/auth_provider.dart';
 import 'features/auth_shell/presentation/screens/login_screen.dart';
 import 'features/auth_shell/presentation/screens/main_shell.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/onboarding/presentation/screens/welcome_screen.dart';
+import 'features/profile_progress/presentation/providers/locale_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/services/notification_service.dart';
+import 'package:vocabup/l10n/app_localizations.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
 
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProxyProvider<AuthProvider, LearningProvider>(
@@ -35,6 +42,10 @@ void main() {
           create: (_) => ProgressProvider(),
           update: (_, auth, provider) => (provider ?? ProgressProvider())..updateUser(auth.user?.id),
         ),
+        ChangeNotifierProxyProvider<AuthProvider, StudyPlanProvider>(
+          create: (_) => StudyPlanProvider(),
+          update: (_, auth, provider) => (provider ?? StudyPlanProvider())..updateUser(auth.user?.id),
+        ),
       ],
       // ĐIỂM SỬA 1: Đưa VocabUpApp ra ngoài cùng thay vì AppInitializer
       child: const VocabUpApp(),
@@ -47,14 +58,25 @@ class VocabUpApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
+    return Consumer2<ThemeProvider, LocaleProvider>(
+      builder: (context, themeProvider, localeProvider, _) {
         return MaterialApp(
           title: 'VocabUp',
           debugShowCheckedModeBanner: false,
           theme: VocabUpTheme.light(),
           darkTheme: VocabUpTheme.dark(),
           themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          locale: localeProvider.locale,
+          supportedLocales: const [
+            Locale('en'),
+            Locale('vi'),
+          ],
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           home: const AppInitializer(child: AuthWrapper()),
         );
       },

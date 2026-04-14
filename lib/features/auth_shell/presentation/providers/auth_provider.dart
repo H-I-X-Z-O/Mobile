@@ -170,6 +170,41 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateUserProfile({String? displayName}) async {
+    _authState = AuthState.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _repository.updateProfile(displayName: displayName);
+      await _checkCurrentUser(); // Refresh local user data
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _authState = AuthState.error;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> changePassword(String newPassword) async {
+    _authState = AuthState.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _repository.updatePassword(newPassword);
+      _authState = AuthState.authenticated;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _authState = AuthState.error;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     _authState = AuthState.loading;
     notifyListeners();
