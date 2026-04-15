@@ -6,6 +6,8 @@ import '../models/word_model.dart';
 import '../models/user_vocab_status_model.dart';
 import '../models/grammar_lesson_model.dart';
 import '../models/grammar_question_model.dart';
+import '../models/audio_exercise_model.dart';
+import '../models/audio_question_model.dart';
 
 abstract class LearningRemoteDataSource {
   Future<List<TopicModel>> getTopics(String? userId);
@@ -17,6 +19,9 @@ abstract class LearningRemoteDataSource {
   
   Future<List<GrammarLessonModel>> getGrammarLessons();
   Future<List<GrammarQuestionModel>> getGrammarQuestions(String lessonId);
+
+  Future<List<AudioExerciseModel>> getAudioExercises();
+  Future<List<AudioQuestionModel>> getAudioQuestions(String audioExerciseId);
 }
 
 class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
@@ -29,6 +34,8 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
   static const String _vocabStatusCollection = 'user_vocab_status';
   static const String _grammarCollection = 'grammar_lessons';
   static const String _grammarQuestionsCollection = 'grammar_questions';
+  static const String _audioExercisesCollection = 'audio_exercises';
+  static const String _audioQuestionsCollection = 'audio_question';
 
   @override
   Future<List<TopicModel>> getTopics(String? userId) async {
@@ -240,6 +247,45 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
           .toList();
     } catch (e) {
       throw ServerException('Lỗi khi lấy câu hỏi luyện tập ngữ pháp: $e');
+    }
+  }
+
+  @override
+  Future<List<AudioExerciseModel>> getAudioExercises() async {
+    try {
+      final querySnapshot = await firestore
+          .collection(_audioExercisesCollection)
+          .get();
+
+      final exercises = querySnapshot.docs
+          .map((doc) => AudioExerciseModel.fromFirestore(doc))
+          .toList();
+
+      // Sắp xếp thủ công in-memory để tránh lỗi missing index hoặc missing field
+      exercises.sort((a, b) => a.order.compareTo(b.order));
+      return exercises;
+    } catch (e) {
+      throw ServerException('Lỗi khi lấy danh sách bài nghe: $e');
+    }
+  }
+
+  @override
+  Future<List<AudioQuestionModel>> getAudioQuestions(String audioExerciseId) async {
+    try {
+      final querySnapshot = await firestore
+          .collection(_audioQuestionsCollection)
+          .where('audioExerciseId', isEqualTo: audioExerciseId)
+          .get();
+
+      final questions = querySnapshot.docs
+          .map((doc) => AudioQuestionModel.fromFirestore(doc))
+          .toList();
+      
+      // Sắp xếp thủ công để tránh lỗi missing index
+      questions.sort((a, b) => a.order.compareTo(b.order));
+      return questions;
+    } catch (e) {
+      throw ServerException('Lỗi khi lấy câu hỏi nghe: $e');
     }
   }
 }

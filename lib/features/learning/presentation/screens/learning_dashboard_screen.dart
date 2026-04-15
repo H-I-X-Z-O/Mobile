@@ -8,6 +8,7 @@ import '../providers/learning_provider.dart';
 import 'vocabulary_hub_screen.dart';
 import 'grammar_list_screen.dart';
 import 'learned_history_screen.dart';
+import 'audio_exercise_list_screen.dart';
 import '../../../profile_progress/presentation/screens/learning_statistics_screen.dart';
 
 class LearningDashboardScreen extends StatelessWidget {
@@ -112,6 +113,18 @@ class LearningDashboardScreen extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const LearnedHistoryScreen()),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _LearningAreaCard(
+                    icon: Icons.headphones_rounded,
+                    title: 'Luyện nghe',
+                    description: 'Luyện kỹ năng nghe hiểu với đề thi dài',
+                    color: Colors.blue,
+                    badge: context.l10n.new_badge,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AudioExerciseListScreen()),
                     ),
                   ),
                 ]),

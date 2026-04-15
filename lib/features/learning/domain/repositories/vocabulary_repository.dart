@@ -2,6 +2,8 @@ import '../entities/word_entity.dart';
 import '../entities/topic_entity.dart';
 import '../entities/grammar_lesson_entity.dart';
 import '../entities/grammar_question_entity.dart';
+import '../entities/audio_exercise_entity.dart';
+import '../entities/audio_question_entity.dart';
 
 /// Interface cho Vocabulary Repository.
 ///
@@ -25,4 +27,7 @@ abstract class VocabularyRepository {
 
   Future<List<GrammarLessonEntity>> getGrammarLessons();
   Future<List<GrammarQuestionEntity>> getGrammarQuestions(String lessonId);
+
+  Future<List<AudioExerciseEntity>> getAudioExercises();
+  Future<List<AudioQuestionEntity>> getAudioQuestions(String audioExerciseId);
 }

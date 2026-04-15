@@ -10,6 +10,7 @@ import 'features/learning/presentation/providers/learning_provider.dart';
 import 'features/auth_shell/presentation/providers/auth_provider.dart';
 import 'features/auth_shell/presentation/screens/login_screen.dart';
 import 'features/auth_shell/presentation/screens/main_shell.dart';
+import 'features/learning/presentation/providers/audio_practice_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/onboarding/presentation/screens/welcome_screen.dart';
 import 'features/profile_progress/presentation/providers/locale_provider.dart';
@@ -30,6 +31,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AudioPracticeProvider()),
         ChangeNotifierProxyProvider<AuthProvider, LearningProvider>(
           create: (_) => LearningProvider(),
           update: (_, auth, provider) => (provider ?? LearningProvider())..updateUser(auth.user?.id),

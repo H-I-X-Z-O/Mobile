@@ -3,6 +3,8 @@ import '../../domain/entities/word_entity.dart';
 import '../../domain/entities/topic_entity.dart';
 import '../../domain/entities/grammar_lesson_entity.dart';
 import '../../domain/entities/grammar_question_entity.dart';
+import '../../domain/entities/audio_exercise_entity.dart';
+import '../../domain/entities/audio_question_entity.dart';
 import '../../domain/repositories/vocabulary_repository.dart';
 import '../datasources/learning_local_data_source.dart';
 import '../datasources/learning_remote_data_source.dart';
@@ -92,6 +94,26 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
     try {
       final questions = await remoteDataSource.getGrammarQuestions(lessonId);
       return questions.map((e) => e as GrammarQuestionEntity).toList();
+    } on ServerException {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<AudioExerciseEntity>> getAudioExercises() async {
+    try {
+      final exercises = await remoteDataSource.getAudioExercises();
+      return exercises;
+    } on ServerException {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<AudioQuestionEntity>> getAudioQuestions(String audioExerciseId) async {
+    try {
+      final questions = await remoteDataSource.getAudioQuestions(audioExerciseId);
+      return questions;
     } on ServerException {
       return [];
     }
