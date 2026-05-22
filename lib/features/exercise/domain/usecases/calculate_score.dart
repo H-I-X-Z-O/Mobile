@@ -1,3 +1,6 @@
+/// Use case tính toán điểm số cho bài kiểm tra.
+/// Chứa logic cốt lõi để quy đổi số câu đúng thành điểm số, 
+/// cũng như xác định trạng thái đỗ/trượt dựa trên tỷ lệ phần trăm.
 class CalculateScore {
   /// Tính điểm số dựa trên số câu trả lời đúng.
   /// Dựa theo đặc tả: Mỗi câu đúng +10 điểm.

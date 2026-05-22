@@ -6,17 +6,22 @@ import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/audio_exercise_entity.dart';
 import '../providers/audio_practice_provider.dart';
 
+/// Màn hình hiển thị kết quả sau khi hoàn thành bài tập nghe.
+/// Hiển thị điểm số, phần kịch bản (transcript) và chi tiết các câu hỏi.
 class AudioResultScreen extends StatelessWidget {
   final AudioExerciseEntity exercise;
 
   const AudioResultScreen({super.key, required this.exercise});
 
+  /// Hàm build chính của màn hình kết quả.
+  /// Tính toán điểm số phần trăm và hiển thị giao diện tương ứng.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
     final provider = context.read<AudioPracticeProvider>();
     final score = provider.score;
     final total = provider.questions.length;
+    // Tính phần trăm điểm số đạt được dựa trên số câu trả lời đúng so với tổng số câu hỏi.
     final percent = (score / total * 100).toInt();
 
     return Scaffold(
@@ -73,6 +78,8 @@ class AudioResultScreen extends StatelessWidget {
     );
   }
 
+  /// Xây dựng phần tiêu đề hiển thị điểm số.
+  /// Màu sắc sẽ thay đổi tùy thuộc vào phần trăm điểm (Xanh >= 80, Cam >= 50, Đỏ < 50).
   Widget _buildScoreHeader(BuildContext context, int score, int total, int percent, AppThemeData t) {
     Color color = percent >= 80 ? Colors.green : (percent >= 50 ? Colors.orange : Colors.red);
     return Container(
@@ -116,6 +123,7 @@ class AudioResultScreen extends StatelessWidget {
     );
   }
 
+  /// Xây dựng phần hiển thị kịch bản (transcript) của bài nghe nếu có.
   Widget _buildTranscript(BuildContext context, String transcript, AppThemeData t) {
     return Container(
       width: double.infinity,
@@ -146,6 +154,8 @@ class AudioResultScreen extends StatelessWidget {
   }
 }
 
+/// Widget hiển thị chi tiết từng câu hỏi trong phần kết quả.
+/// Cho biết đáp án đúng, đáp án người dùng chọn và giải thích nếu có.
 class _ResultQuestionTile extends StatelessWidget {
   final int index;
   final dynamic question;
@@ -157,9 +167,12 @@ class _ResultQuestionTile extends StatelessWidget {
     this.selectedOption,
   });
 
+  /// Xây dựng giao diện chi tiết cho một câu hỏi.
+  /// Hiển thị câu hỏi, danh sách lựa chọn với đánh dấu đúng/sai và lời giải thích.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
+    // Kiểm tra xem người dùng đã chọn đúng đáp án hay chưa để hiển thị màu sắc phù hợp.
     final isCorrect = selectedOption == question.correctAnswer;
 
     return Container(

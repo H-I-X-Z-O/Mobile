@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-/// Base class cho tất cả các lỗi ở Domain Layer
+/// Lớp cơ sở (Base class) cho tất cả các lỗi (Failures) được định nghĩa ở Tầng Nghiệp vụ (Domain Layer).
+/// Khác với [AppException] (chỉ dùng ở Data Layer), [Failure] là lỗi đã được "mềm hóa" 
+/// và chứa thông báo (message) thân thiện, an toàn để hiển thị trực tiếp cho người dùng.
 abstract class Failure extends Equatable {
   final String message;
   const Failure(this.message);

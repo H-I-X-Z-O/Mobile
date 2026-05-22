@@ -1,29 +1,41 @@
 import 'package:equatable/equatable.dart';
 
-/// Thực thể từ vựng – khớp với bảng `vocabularies` trong DB.
-/// Chỉ chứa dữ liệu tĩnh (nội dung từ), KHÔNG chứa trạng thái tiến độ cá nhân.
+/// Thực thể từ vựng – khớp với bảng `vocabularies` trong cơ sở dữ liệu.
+/// Chỉ chứa dữ liệu tĩnh liên quan đến nội dung của từ, **KHÔNG** chứa trạng thái tiến độ học tập cá nhân.
 ///
-/// Fields:
-/// - [id]                   : Unique identifier (vocabId).
-/// - [topicId]              : ID chủ đề chứa từ này.
-/// - [englishWord]          : The English word (eng).
-/// - [vietnameseDefinition] : Vietnamese definition/translation (meaning).
-/// - [phonetic]             : Phonetic transcription (pronunciation).
-/// - [audioUrl]             : URL to the pronunciation audio file.
-/// - [exampleSentence]      : An example sentence using the word.
-/// - [imageUrl]             : URL ảnh minh hoạ cho từ.
-/// - [level]                : Cấp độ từ vựng (easy, medium, hard).
+/// Lớp này đóng vai trò quan trọng trong việc truyền tải dữ liệu từ vựng giữa các tầng của ứng dụng,
+/// đặc biệt là cung cấp dữ liệu nền tảng cho việc học và làm bài tập trắc nghiệm.
 class WordEntity extends Equatable {
+  /// Khóa chính định danh duy nhất cho từ vựng này (vocabId).
   final String id;
+
+  /// ID của chủ đề chứa từ vựng này. Dùng để phân loại từ vựng theo nhóm.
   final String topicId;
+
+  /// Từ vựng tiếng Anh gốc.
   final String englishWord;
+
+  /// Nghĩa của từ bằng tiếng Việt.
   final String vietnameseDefinition;
+
+  /// Phiên âm quốc tế (IPA) giúp người dùng biết cách phát âm từ.
   final String phonetic;
+
+  /// Đường dẫn URL tới file âm thanh phát âm chuẩn của từ.
   final String audioUrl;
+
+  /// Câu ví dụ chứa từ vựng, giúp người dùng hiểu ngữ cảnh sử dụng.
   final String exampleSentence;
+
+  /// Đường dẫn URL tới hình ảnh minh hoạ cho từ vựng (tùy chọn).
   final String? imageUrl;
+
+  /// Mức độ khó của từ vựng (ví dụ: easy, medium, hard). Mặc định là 'easy'.
   final String level;
 
+  /// Khởi tạo một đối tượng [WordEntity].
+  ///
+  /// Các trường [id], [englishWord], [vietnameseDefinition], [phonetic], và [exampleSentence] là bắt buộc.
   const WordEntity({
     required this.id,
     this.topicId = '',
@@ -36,13 +48,25 @@ class WordEntity extends Equatable {
     this.level = 'easy',
   });
 
-  /// Getter tiện ích – dùng bởi module Exercise (GenerateQuizUseCase).
-  String get text => englishWord;
+  /// Getter tiện ích trả về từ tiếng Anh.
+  /// 
+  /// Thường được sử dụng bởi module Exercise (cụ thể là `GenerateQuizUseCase`) để lấy nội dung text cho câu hỏi.
+  String get text {
+    // Trả về từ tiếng Anh gốc làm nội dung hiển thị chính
+    return englishWord;
+  }
 
-  /// Getter tiện ích – dùng bởi module Exercise (GenerateQuizUseCase).
-  String get definition => vietnameseDefinition;
+  /// Getter tiện ích trả về nghĩa tiếng Việt.
+  /// 
+  /// Thường được sử dụng bởi module Exercise (cụ thể là `GenerateQuizUseCase`) để so sánh đáp án hoặc hiển thị.
+  String get definition {
+    // Trả về định nghĩa tiếng Việt tương ứng
+    return vietnameseDefinition;
+  }
 
-  /// Returns a copy of this entity with the given fields replaced.
+  /// Tạo một bản sao của đối tượng hiện tại với các trường được chỉ định thay đổi.
+  ///
+  /// Hữu ích để cập nhật một hoặc vài thuộc tính của từ vựng mà vẫn giữ nguyên tính bất biến (immutability) của đối tượng gốc.
   WordEntity copyWith({
     String? id,
     String? topicId,
@@ -67,6 +91,7 @@ class WordEntity extends Equatable {
     );
   }
 
+  /// Trả về danh sách các thuộc tính để `Equatable` sử dụng trong việc so sánh hai đối tượng [WordEntity].
   @override
   List<Object?> get props => [
         id,
@@ -80,6 +105,7 @@ class WordEntity extends Equatable {
         level,
       ];
 
+  /// Biểu diễn chuỗi thân thiện cho mục đích debug.
   @override
   String toString() => 'WordEntity('
       'id: $id, '

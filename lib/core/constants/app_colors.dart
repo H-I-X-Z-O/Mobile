@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// App Color Palette - Derived from Figma designs (VocabUp)
-/// Centralized management for consistency across all widgets and themes.
+/// Bảng màu của ứng dụng - Trích xuất từ thiết kế Figma (VocabUp).
+/// Quản lý tập trung toàn bộ màu sắc để đảm bảo tính nhất quán trên tất cả các widget và theme.
 class AppColors {
   AppColors._();
 

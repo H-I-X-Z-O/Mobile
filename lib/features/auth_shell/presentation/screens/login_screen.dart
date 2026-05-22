@@ -9,6 +9,10 @@ import '../providers/auth_provider.dart';
 import 'main_shell.dart';
 import 'register_screen.dart';
 
+/// Màn hình [LoginScreen] xử lý xác thực người dùng đã có tài khoản.
+/// 
+/// Hỗ trợ đăng nhập qua Email/Mật khẩu truyền thống và đăng nhập qua Mạng xã hội 
+/// (Social Login: Google, Facebook).
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -28,6 +32,11 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  /// Xử lý hành động đăng nhập cơ bản bằng email và mật khẩu.
+  /// 
+  /// 1. Kiểm tra không được để trống thông tin.
+  /// 2. Gọi logic đăng nhập từ [AuthProvider].
+  /// 3. Nếu thành công, điều hướng đến [MainShell]; nếu lỗi, hiển thị thông báo.
   void _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -62,6 +71,9 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Xử lý hành động đăng nhập thông qua mạng xã hội.
+  /// 
+  /// Nhận vào một hàm tương ứng [loginMethod] như `signInWithGoogle` hay `signInWithFacebook`.
   void _handleSocialLogin(Future<bool> Function() loginMethod) async {
     final success = await loginMethod();
     if (success) {
@@ -81,6 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Xử lý quy trình Quên mật khẩu.
+  /// Hiển thị một `Dialog` để người dùng nhập địa chỉ email và yêu cầu khôi phục mật khẩu.
   void _handleForgotPassword() {
     final resetEmailController = TextEditingController(text: _emailController.text);
     final t = context.appTheme;

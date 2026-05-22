@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
-/// App Typography System
-/// Font: Inter (Google Fonts) – hiện đại, dễ đọc
+/// Hệ thống Kiểu chữ (App Typography System).
+/// Sử dụng font chữ Inter (Google Fonts) – thiết kế hiện đại, sạch sẽ và dễ đọc.
 class AppTextStyles {
   AppTextStyles._();
   // ─── Display / Heading ────────────────────────────────────────────────────

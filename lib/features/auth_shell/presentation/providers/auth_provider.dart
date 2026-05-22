@@ -4,8 +4,11 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 
+/// Các trạng thái xác thực có thể xảy ra trong ứng dụng.
 enum AuthState { initial, loading, authenticated, unauthenticated, error }
 
+/// [AuthProvider] là State Management (sử dụng [ChangeNotifier]) xử lý logic xác thực.
+/// Chịu trách nhiệm cung cấp trạng thái xác thực cho giao diện (UI) thông qua `Provider`.
 class AuthProvider extends ChangeNotifier {
   final AuthRepository _repository = AuthRepositoryImpl();
   
@@ -40,6 +43,8 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Cập nhật trạng thái "Ghi nhớ đăng nhập".
+  /// Lưu cờ `remember_me` vào [SharedPreferences].
   Future<void> setRememberMe(bool value) async {
     _rememberMe = value;
     final prefs = await SharedPreferences.getInstance();
@@ -75,6 +80,9 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Đăng nhập bằng [email] và [password].
+  /// Cập nhật trạng thái tải và thông báo lỗi (nếu có) lên UI.
+  /// Trả về `true` nếu đăng nhập thành công, ngược lại trả về `false`.
   Future<bool> login(String email, String password) async {
     _authState = AuthState.loading;
     _errorMessage = null;
@@ -98,6 +106,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Thực hiện quy trình đăng nhập bằng Google.
+  /// Trả về `true` nếu đăng nhập thành công.
   Future<bool> signInWithGoogle() async {
     _authState = AuthState.loading;
     _errorMessage = null;
@@ -116,6 +126,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Thực hiện quy trình đăng nhập bằng Facebook.
+  /// Trả về `true` nếu đăng nhập thành công.
   Future<bool> signInWithFacebook() async {
     _authState = AuthState.loading;
     _errorMessage = null;
@@ -134,6 +146,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Gửi yêu cầu khôi phục mật khẩu thông qua địa chỉ [email].
+  /// Trả về `true` nếu gửi email thành công.
   Future<bool> resetPassword(String email) async {
     _authState = AuthState.loading;
     _errorMessage = null;
@@ -152,6 +166,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Đăng ký tài khoản mới bằng [email], [password], và [displayName].
+  /// Trả về `true` nếu đăng ký thành công.
   Future<bool> register(String email, String password, String displayName) async {
     _authState = AuthState.loading;
     _errorMessage = null;
@@ -170,6 +186,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Cập nhật thông tin hồ sơ người dùng (ví dụ: Tên hiển thị [displayName]).
+  /// Trả về `true` nếu cập nhật thành công và tự động tải lại trạng thái người dùng.
   Future<bool> updateUserProfile({String? displayName}) async {
     _authState = AuthState.loading;
     _errorMessage = null;
@@ -187,6 +205,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Thay đổi mật khẩu người dùng thành [newPassword].
+  /// Yêu cầu người dùng đang đăng nhập và có xác thực gần đây.
   Future<bool> changePassword(String newPassword) async {
     _authState = AuthState.loading;
     _errorMessage = null;
@@ -205,6 +225,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Xử lý đăng xuất. Xóa bỏ phiên hiện tại trên Firebase cũng như Google/Facebook.
   Future<void> logout() async {
     _authState = AuthState.loading;
     notifyListeners();

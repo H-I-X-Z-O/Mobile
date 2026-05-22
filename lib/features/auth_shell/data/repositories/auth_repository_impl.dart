@@ -7,6 +7,8 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../models/user_model.dart';
 
+/// Lớp triển khai (Implementation) của [AuthRepository].
+/// Chịu trách nhiệm tương tác trực tiếp với các dịch vụ xác thực như Firebase, Google Sign-In và Facebook Auth.
 class AuthRepositoryImpl implements AuthRepository {
   late final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -19,6 +21,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Phương thức lấy thông tin người dùng hiện đang đăng nhập từ Firebase.
   @override
   Future<UserEntity?> getCurrentUser() async {
     if (!_isInitialized) return null;
@@ -34,6 +37,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
 
+  /// Xử lý quá trình đăng nhập qua Firebase bằng email và mật khẩu.
+  /// Ném ra ngoại lệ [Exception] với thông báo cụ thể nếu xảy ra lỗi.
   @override
   Future<UserEntity> login(String email, String password) async {
     if (!_isInitialized) {
@@ -65,6 +70,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Xử lý quá trình đăng ký tài khoản mới qua Firebase.
+  /// Cập nhật tên hiển thị [displayName] ngay sau khi tạo tài khoản thành công.
   @override
   Future<UserEntity> register(String email, String password, String displayName) async {
     if (!_isInitialized) {
@@ -98,6 +105,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Xử lý quy trình đăng nhập bằng Google.
+  /// Lấy thông tin xác thực từ [GoogleSignIn] sau đó đăng nhập vào Firebase.
   @override
   Future<UserEntity> signInWithGoogle() async {
     if (!_isInitialized) throw Exception('Firebase chưa initialized');
@@ -123,6 +132,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Xử lý quy trình đăng nhập bằng Facebook.
+  /// Lấy token xác thực từ [FacebookAuth] sau đó đăng nhập vào Firebase.
   @override
   Future<UserEntity> signInWithFacebook() async {
     if (!_isInitialized) throw Exception('Firebase chưa initialized');
@@ -147,6 +158,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Gửi email đặt lại mật khẩu cho người dùng thông qua Firebase.
   @override
   Future<void> sendPasswordResetEmail(String email) async {
     if (!_isInitialized) throw Exception('Firebase chưa initialized');
@@ -162,6 +174,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Cập nhật thông tin hồ sơ của người dùng đang đăng nhập trên Firebase.
   @override
   Future<void> updateProfile({String? displayName, String? photoUrl}) async {
     if (!_isInitialized) throw Exception('Firebase chưa initialized');
@@ -178,6 +191,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Cập nhật mật khẩu mới cho người dùng.
+  /// Yêu cầu người dùng phải có hành động xác thực (đăng nhập) gần đây.
   @override
   Future<void> updatePassword(String newPassword) async {
     if (!_isInitialized) throw Exception('Firebase chưa initialized');
@@ -196,6 +211,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Thực hiện đăng xuất khỏi Firebase, đồng thời cố gắng đăng xuất khỏi Google và Facebook
+  /// nhằm xóa hoàn toàn phiên làm việc của người dùng.
   @override
   Future<void> logout() async {
     if (!_isInitialized) return;

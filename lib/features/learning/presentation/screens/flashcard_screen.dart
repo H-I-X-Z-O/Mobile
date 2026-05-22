@@ -14,6 +14,8 @@ import '../widgets/flashcard_widget.dart';
 class FlashcardScreen extends StatelessWidget {
   const FlashcardScreen({super.key});
 
+  /// Xây dựng giao diện chính của màn hình Flashcard.
+  /// Quản lý trạng thái lật thẻ, thanh tiến trình học và các nút thao tác.
   @override
   Widget build(BuildContext context) {
     return Consumer<LearningProvider>(
@@ -43,6 +45,7 @@ class FlashcardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // ── Progress bar ────────────────────────────────────────
+                // Hiển thị thanh tiến trình học tập của người dùng trong phiên học hiện tại.
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,6 +72,7 @@ class FlashcardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 // ── Flashcard ──────────────────────────────────────────
+                // Hiển thị thẻ từ vựng ở giữa màn hình, cho phép lật để xem mặt sau.
                 Expanded(
                   child: Center(
                     child: FlashcardWidget(
@@ -80,9 +84,10 @@ class FlashcardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 // ── Action buttons ────────────────────────────────────
+                // Các nút hành động để đánh giá mức độ ghi nhớ của người dùng.
                 Row(
                   children: [
-                    // Nút "Chưa biết" – màu hồng/đỏ nhạt
+                    // Nút "Chưa biết" – màu cảnh báo, đánh dấu từ vựng cần ôn lại sau.
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: () => provider.markAsUnknown(),
@@ -103,12 +108,12 @@ class FlashcardScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Nút "Đã biết" – màu xanh lá
+                    // Nút "Đã biết" – màu chính, đánh dấu từ vựng đã thuộc.
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
                           provider.markAsKnown();
-                          // Nếu là thẻ cuối và đã biết → pop về
+                          // Xử lý chuyển hướng: Nếu là thẻ cuối cùng và người dùng đánh dấu đã biết, tự động quay về màn hình trước.
                           if (isLast) {
                             Navigator.pop(context);
                           }
@@ -135,7 +140,8 @@ class FlashcardScreen extends StatelessWidget {
     );
   }
 
-  // Màn hình hoàn thành khi đã học hết thẻ
+  /// Xây dựng màn hình hoàn thành sau khi học hết tất cả các thẻ flashcard.
+  /// Hiển thị lời chúc mừng và cung cấp tùy chọn học lại hoặc quay về danh sách.
   Widget _buildCompletionScreen(
       BuildContext context, LearningProvider provider) {
     final learned = provider.learnedWordsInCurrentTopic;

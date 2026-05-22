@@ -6,13 +6,16 @@ import 'package:provider/provider.dart';
 import '../providers/learning_provider.dart';
 
 /// Widget thẻ Flashcard với hiệu ứng lật 3D.
-/// Mặt trước: Tiếng Anh + phiên âm + gợi ý chạm.
-/// Mặt sau: Định nghĩa + ví dụ.
+/// Mặt trước: Hiển thị từ vựng Tiếng Anh + phiên âm + gợi ý chạm.
+/// Mặt sau: Hiển thị định nghĩa tiếng Việt + câu ví dụ.
 class FlashcardWidget extends StatefulWidget {
   final WordEntity word;
   final bool isFlipped;
   final VoidCallback onTap;
 
+  /// Khởi tạo widget thẻ Flashcard.
+  /// Yêu cầu cung cấp dữ liệu từ vựng [word], trạng thái lật [isFlipped],
+  /// và hàm gọi lại khi nhấn [onTap].
   const FlashcardWidget({
     super.key,
     required this.word,
@@ -24,11 +27,14 @@ class FlashcardWidget extends StatefulWidget {
   State<FlashcardWidget> createState() => _FlashcardWidgetState();
 }
 
+/// Lớp trạng thái cho [FlashcardWidget], quản lý hiệu ứng lật thẻ (Animation).
 class _FlashcardWidgetState extends State<FlashcardWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
+  /// Khởi tạo bộ điều khiển hoạt ảnh (AnimationController) để quản lý
+  /// hiệu ứng lật và thiết lập đường cong thời gian.
   @override
   void initState() {
     super.initState();
@@ -41,9 +47,12 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
     );
   }
 
+  /// Theo dõi sự thay đổi cấu hình từ widget cha để kích hoạt hiệu ứng
+  /// lật thẻ khi biến [isFlipped] thay đổi.
   @override
   void didUpdateWidget(FlashcardWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Kích hoạt hoạt ảnh lật thẻ khi trạng thái isFlipped thay đổi từ bên ngoài
     if (widget.isFlipped != oldWidget.isFlipped) {
       if (widget.isFlipped) {
         _controller.forward();
@@ -53,12 +62,14 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
     }
   }
 
+  /// Giải phóng bộ nhớ của bộ điều khiển hoạt ảnh khi widget bị hủy.
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  /// Xây dựng khung hiển thị có hỗ trợ hoạt ảnh xoay 3D (Transform).
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -66,20 +77,20 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          // Tính góc xoay: 0 -> π (180 độ)
+          // Tính góc xoay: 0 -> π (tương đương 0 đến 180 độ)
           final angle = _animation.value * 3.14159;
-          // Khi quá nửa đường lật thì hiển thị mặt sau
+          // Khi thẻ lật quá nửa đường (góc > 90 độ) thì hiển thị mặt sau
           final showBack = _animation.value > 0.5;
 
           return Transform(
             alignment: Alignment.center,
             transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.001) // Perspective
+              ..setEntry(3, 2, 0.001) // Tạo hiệu ứng phối cảnh 3D (Perspective)
               ..rotateY(angle),
             child: showBack
                 ? Transform(
                     alignment: Alignment.center,
-                    transform: Matrix4.identity()..rotateY(3.14159),
+                    transform: Matrix4.identity()..rotateY(3.14159), // Lật ngược lại mặt sau để nội dung không bị ngược
                     child: _buildBackFace(),
                   )
                 : _buildFrontFace(),
@@ -89,7 +100,7 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
     );
   }
 
-  // Mặt trước: hiển thị từ tiếng Anh
+  /// Xây dựng giao diện mặt trước của thẻ Flashcard (Từ vựng tiếng Anh).
   Widget _buildFrontFace() {
     return _buildCardContainer(
       child: Stack(
@@ -144,7 +155,7 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
     );
   }
 
-  // Mặt sau: hiển thị định nghĩa + ví dụ
+  /// Xây dựng giao diện mặt sau của thẻ Flashcard (Định nghĩa và ví dụ).
   Widget _buildBackFace() {
     return _buildCardContainer(
       backgroundColor: AppColors.backgroundMint,
@@ -213,6 +224,7 @@ class _FlashcardWidgetState extends State<FlashcardWidget>
     );
   }
 
+  /// Widget vùng chứa thẻ (Container) dùng chung cho cả mặt trước và mặt sau.
   Widget _buildCardContainer({
     required Widget child,
     Color backgroundColor = AppColors.surface,

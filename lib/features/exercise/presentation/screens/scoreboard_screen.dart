@@ -8,6 +8,8 @@ import '../providers/exercise_provider.dart';
 import '../../../profile_progress/presentation/providers/progress_provider.dart';
 import 'review_wrong_screen.dart';
 
+/// Màn hình tổng kết điểm số sau khi hoàn thành bài kiểm tra.
+/// Hiển thị thông báo, điểm số và các tùy chọn thao tác tiếp theo.
 class ScoreboardScreen extends StatelessWidget {
   final int correctCount;
   final int totalQuestions;

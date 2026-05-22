@@ -1,27 +1,36 @@
 import 'package:equatable/equatable.dart';
 
-/// Đại diện cho một chủ đề học tập (Topic) trong lộ trình.
-/// Khớp với bảng `topics` trong DB.
-///
-/// Fields:
-/// - [id]           : ID duy nhất của chủ đề.
-/// - [name]         : Tên chủ đề (VD: "Greetings", "Animals").
-/// - [description]  : Mô tả ngắn gọn chủ đề.
-/// - [imageUrl]     : URL ảnh hoặc icon minh họa cho chủ đề.
-/// - [order]        : Thứ tự sắp xếp chủ đề (từ dễ đến khó).
-/// - [totalWords]   : Tổng số từ vựng trong chủ đề (tính toán aggregate).
-/// - [learnedWords] : Số từ đã học (tính toán từ user_vocab_status).
+/// Thực thể đại diện cho một chủ đề học tập (Topic) trong lộ trình.
+/// Khớp với dữ liệu bảng `topics` trong cơ sở dữ liệu.
 class TopicEntity extends Equatable {
+  /// ID duy nhất của chủ đề.
   final String id;
+  
+  /// Tên chủ đề hiển thị bằng tiếng Việt (VD: "Chào hỏi", "Động vật").
   final String name;
+  
+  /// Tên chủ đề hiển thị bằng tiếng Anh (nếu có).
   final String? nameEn;
+  
+  /// Mô tả ngắn gọn về nội dung của chủ đề (tiếng Việt).
   final String description;
+  
+  /// Mô tả ngắn gọn về nội dung của chủ đề (tiếng Anh) (nếu có).
   final String? descriptionEn;
+  
+  /// URL trỏ đến ảnh hoặc icon minh họa cho chủ đề (nếu có).
   final String? imageUrl;
+  
+  /// Thứ tự sắp xếp chủ đề (thường từ dễ đến khó).
   final int order;
+  
+  /// Tổng số từ vựng có trong chủ đề (tính toán tổng hợp - aggregate).
   final int totalWords;
+  
+  /// Số lượng từ vựng mà người dùng đã học trong chủ đề này (dựa trên trạng thái học).
   final int learnedWords;
 
+  /// Tạo mới thực thể chủ đề [TopicEntity].
   const TopicEntity({
     required this.id,
     required this.name,
@@ -36,12 +45,16 @@ class TopicEntity extends Equatable {
 
   /// Tính phần trăm hoàn thành của chủ đề.
   double get progressPercent =>
+      // Đảm bảo không chia cho 0; nếu chưa có từ nào, tiến độ là 0%
       totalWords > 0 ? (learnedWords / totalWords) * 100 : 0;
 
   /// Kiểm tra chủ đề đã hoàn thành chưa.
-  bool get isCompleted => totalWords > 0 && learnedWords >= totalWords;
+  bool get isCompleted => 
+      // Đánh dấu hoàn thành khi có từ vựng và số từ đã học đạt mức tối đa
+      totalWords > 0 && learnedWords >= totalWords;
 
-  /// Returns a copy of this entity with the given fields replaced.
+  /// Tạo và trả về một bản sao của [TopicEntity] với các trường được thay thế 
+  /// bằng giá trị mới nếu chúng được truyền vào.
   TopicEntity copyWith({
     String? id,
     String? name,
@@ -66,6 +79,7 @@ class TopicEntity extends Equatable {
     );
   }
 
+  /// Danh sách các thuộc tính để `Equatable` sử dụng khi so sánh tính bằng nhau của 2 đối tượng.
   @override
   List<Object?> get props => [
         id,
@@ -79,6 +93,7 @@ class TopicEntity extends Equatable {
         learnedWords,
       ];
 
+  /// Trả về chuỗi mô tả thực thể, hỗ trợ tốt cho việc ghi log và debug.
   @override
   String toString() => 'TopicEntity('
       'id: $id, '

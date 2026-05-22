@@ -7,7 +7,9 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình cho phép người dùng thiết lập mục tiêu học tập (ví dụ: chứng chỉ TOEIC hoặc Giao tiếp).
 class LearningGoalScreen extends StatefulWidget {
+  /// Khởi tạo màn hình thiết lập mục tiêu.
   const LearningGoalScreen({super.key});
 
   @override
@@ -269,9 +271,15 @@ class _LearningGoalScreenState extends State<LearningGoalScreen> {
   }
 }
 
+/// Class hỗ trợ để cấu trúc thông tin cho một loại mục tiêu học tập.
 class _GoalOption {
+  /// Biểu tượng của mục tiêu.
   final IconData icon;
+  
+  /// Tên tiêu đề của mục tiêu.
   final String title;
+  
+  /// Màu sắc chủ đạo của mục tiêu.
   final Color color;
 
   _GoalOption({required this.icon, required this.title, required this.color});

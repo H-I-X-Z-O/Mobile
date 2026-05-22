@@ -9,9 +9,14 @@ import '../widgets/word_list_item.dart';
 import 'flashcard_screen.dart';
 import '../../../exercise/presentation/screens/exercise_screen.dart';
 
+/// Màn hình hiển thị danh sách từ vựng của một chủ đề cụ thể.
+/// Cung cấp thanh tiến độ học và các nút điều hướng tới bài tập, flashcard.
 class VocabularyListScreen extends StatelessWidget {
+  /// Khởi tạo màn hình danh sách từ vựng.
   const VocabularyListScreen({super.key});
 
+  /// Xây dựng giao diện cho màn hình danh sách từ vựng.
+  /// Lắng nghe [LearningProvider] để hiển thị thông tin chủ đề, tiến độ và danh sách từ vựng.
   @override
   Widget build(BuildContext context) {
     return Consumer<LearningProvider>(
@@ -39,6 +44,7 @@ class VocabularyListScreen extends StatelessWidget {
           body: Column(
             children: [
               // ── Progress header ───────────────────────────────────────
+              // Hiển thị phần tóm tắt tiến độ học tập của chủ đề nếu có
               if (topic != null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p12, AppDimensions.p20, AppDimensions.p8),
@@ -75,6 +81,7 @@ class VocabularyListScreen extends StatelessWidget {
               const Divider(height: 1),
               
               // ── Word list ─────────────────────────────────────────────
+              // Hiển thị danh sách từ vựng với các trạng thái tương ứng: đang tải, lỗi, trống, hoặc danh sách dữ liệu
               Expanded(
                 child: provider.wordState == LearningState.loading
                     ? const Center(
@@ -126,6 +133,7 @@ class VocabularyListScreen extends StatelessWidget {
             ],
           ),
           // ── Bottom Action Buttons ──────────────────────────────────────
+          // Khu vực chứa các nút bấm hành động (Học qua Flashcard, Làm bài tập) hiển thị ở dưới cùng
           bottomNavigationBar: words.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p12, AppDimensions.p20, AppDimensions.p32),

@@ -8,8 +8,14 @@ import '../providers/learning_provider.dart';
 import '../widgets/topic_card.dart';
 import 'vocabulary_list_screen.dart';
 
+/// Màn hình Quản lý Danh sách Chủ đề Từ vựng (Topic List Screen).
+/// Giao diện này cung cấp trải nghiệm khám phá và tìm kiếm các chủ đề học tập.
+/// Phân loại rõ ràng giữa các chủ đề đang trong quá trình học và toàn bộ danh mục chủ đề có sẵn.
 class TopicListScreen extends StatefulWidget {
+  /// Hàm callback được kích hoạt để chuyển hướng giữa các tab chính của ứng dụng.
   final Function(int)? onNavigate;
+  
+  /// Khởi tạo màn hình danh sách chủ đề.
   const TopicListScreen({super.key, this.onNavigate});
 
   @override
@@ -17,6 +23,10 @@ class TopicListScreen extends StatefulWidget {
 }
 
 class _TopicListScreenState extends State<TopicListScreen> {
+  
+  /// Khởi tạo trạng thái ban đầu của màn hình.
+  /// Sử dụng `addPostFrameCallback` để đảm bảo giao diện đã được render hoàn chỉnh 
+  /// trước khi gọi API tải danh sách chủ đề, tránh lỗi liên quan đến context.
   @override
   void initState() {
     super.initState();
@@ -119,6 +129,10 @@ class _TopicListScreenState extends State<TopicListScreen> {
     );
   }
 
+  /// Xây dựng thành phần tiêu đề phân cách cho các nhóm danh sách.
+  /// Dùng để làm nổi bật các khu vực như "Đang học" hoặc "Tất cả chủ đề".
+  /// 
+  /// [title] là chuỗi văn bản hiển thị trên tiêu đề.
   Widget _sectionHeader(BuildContext context, String title) {
     final t = context.appTheme;
     return Padding(
@@ -134,6 +148,10 @@ class _TopicListScreenState extends State<TopicListScreen> {
     );
   }
 
+  /// Xử lý logic điều hướng người dùng tới màn hình chi tiết từ vựng của một chủ đề.
+  /// Đồng thời kích hoạt tải danh sách từ vựng tương ứng với chủ đề đó.
+  /// 
+  /// [topic] chứa dữ liệu của chủ đề được chọn.
   void _navigateToTopic(BuildContext context, topic) {
     context.read<LearningProvider>().loadWordsForTopic(topic);
     Navigator.push(

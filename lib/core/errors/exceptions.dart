@@ -1,8 +1,7 @@
-// App-level Exception classes
-// Được ném ra từ Data Layer, sau đó được bắt và chuyển đổi thành [Failure]
-// ở Repository Implementation
-
-// ─── Base ─────────────────────────────────────────────────────────────────────
+/// Tập hợp các lớp Ngoại lệ (Exception) cấp ứng dụng.
+/// Các exception này thường được ném ra từ Tầng Dữ liệu (Data Layer - Data Sources).
+/// Sau đó, tại Tầng Kho lưu trữ (Repository Implementation), chúng sẽ được bắt (`catch`) 
+/// và chuyển đổi thành các [Failure] tương ứng để trả về cho Tầng Giao diện (Presentation Layer).
 abstract class AppException implements Exception {
   final String message;
   const AppException(this.message);

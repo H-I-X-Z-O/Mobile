@@ -9,7 +9,8 @@ enum QuestionType {
   matching               // Nối từ (mở rộng sau này)
 }
 
-/// Đại diện cho một câu hỏi trong bài tập hoặc bài kiểm tra
+/// Đại diện cho một câu hỏi trong bài tập hoặc bài kiểm tra.
+/// Bao gồm loại câu hỏi, nội dung, đáp án đúng và các thông tin phụ trợ.
 class QuestionEntity extends Equatable {
   final String id;
   final QuestionType type;

@@ -5,7 +5,9 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../auth_shell/presentation/providers/auth_provider.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình chỉnh sửa thông tin cá nhân (hiện tại chỉ hỗ trợ đổi tên hiển thị).
 class EditProfileScreen extends StatefulWidget {
+  /// Khởi tạo màn hình chỉnh sửa hồ sơ.
   const EditProfileScreen({super.key});
 
   @override
@@ -29,6 +31,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  /// Xử lý việc lưu thông tin người dùng lên server (Firebase).
+  /// Gọi [AuthProvider.updateUserProfile] và hiển thị thông báo kết quả.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 

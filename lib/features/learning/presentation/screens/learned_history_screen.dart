@@ -7,7 +7,12 @@ import '../../../../core/extensions/context_extension.dart';
 import '../providers/learning_provider.dart';
 import '../../domain/entities/word_entity.dart';
 
+/// Màn hình lịch sử học tập (Learned History Screen).
+/// Giao diện này cung cấp cái nhìn tổng quan về quá trình học từ vựng của người dùng,
+/// hiển thị thông kê từ vựng đã học trong 7 ngày gần nhất và liệt kê chi tiết danh sách từ
+/// vựng theo từng ngày (Hôm nay, Hôm qua, ...).
 class LearnedHistoryScreen extends StatelessWidget {
+  /// Khởi tạo màn hình lịch sử học tập.
   const LearnedHistoryScreen({super.key});
 
   @override
@@ -83,6 +88,8 @@ class LearnedHistoryScreen extends StatelessWidget {
     );
   }
 
+  /// Khởi tạo khóa định danh (key) cho ngày hiện tại dưới định dạng chuẩn `yyyy-MM-dd`.
+  /// Định dạng này được dùng để đồng bộ và truy xuất dữ liệu từ vựng đã học trong ngày.
   String _todayKey() {
     final now = DateTime.now();
     return '${now.year.toString().padLeft(4, '0')}-'
@@ -90,6 +97,9 @@ class LearnedHistoryScreen extends StatelessWidget {
         '${now.day.toString().padLeft(2, '0')}';
   }
 
+  /// Khởi tạo khóa định danh (key) dựa trên độ lệch số ngày so với hiện tại.
+  /// Định dạng trả về là `yyyy-MM-dd`. Ví dụ: `days = -1` trả về khóa của ngày hôm qua.
+  /// [days] là khoảng thời gian lệch (số ngày) so với thời điểm hiện tại.
   String _offsetKey(int days) {
     final dt = DateTime.now().add(Duration(days: days));
     return '${dt.year.toString().padLeft(4, '0')}-'
@@ -99,9 +109,14 @@ class LearnedHistoryScreen extends StatelessWidget {
 }
 
 // ── Banner tổng kết 7 ngày ───────────────────────────────────────────────────
+/// Thành phần giao diện (Banner) hiển thị tóm tắt hiệu suất học tập trong tuần.
+/// Hiển thị tổng số lượng từ vựng đã thành thạo trong vòng 7 ngày qua cũng như 
+/// tổng số từ vựng người dùng đã tích lũy được từ trước tới nay.
 class _WeeklySummaryBanner extends StatelessWidget {
+  /// Đối tượng [LearningProvider] cung cấp trạng thái và dữ liệu học tập hiện tại.
   final LearningProvider provider;
 
+  /// Khởi tạo banner tổng kết.
   const _WeeklySummaryBanner({required this.provider});
 
   @override
@@ -192,12 +207,23 @@ class _WeeklySummaryBanner extends StatelessWidget {
 }
 
 // ── Section header ngày ───────────────────────────────────────────────────────
+/// Widget hiển thị tiêu đề nhóm cho danh sách từ vựng theo thời gian.
+/// Tiêu đề này phân tách rạch ròi các nhóm ngày như "Hôm nay", "Hôm qua", hoặc 
+/// một ngày cụ thể trong quá khứ, đi kèm với số lượng từ vựng của ngày đó.
 class _SectionHeader extends StatelessWidget {
+  /// Chuỗi định danh ngày (định dạng: `yyyy-MM-dd` hoặc `'unknown'`).
   final String dateKey;
+  
+  /// Tổng số lượng từ vựng đã học được trong ngày tương ứng.
   final int count;
+  
+  /// Cờ boolean xác định xem nhóm này có phải là ngày hôm nay hay không.
   final bool isToday;
+  
+  /// Cờ boolean xác định xem nhóm này có phải là ngày hôm qua hay không.
   final bool isYesterday;
 
+  /// Khởi tạo tiêu đề nhóm ngày.
   const _SectionHeader({
     required this.dateKey,
     required this.count,
@@ -205,6 +231,8 @@ class _SectionHeader extends StatelessWidget {
     required this.isYesterday,
   });
 
+  /// Chuyển đổi [dateKey] thành một chuỗi văn bản thân thiện với người dùng để hiển thị.
+  /// Ưu tiên hiển thị "Hôm nay" hoặc "Hôm qua", các ngày xa hơn sẽ dùng định dạng `dd/MM/yyyy`.
   String _displayDate(BuildContext context) {
     if (isToday) return context.l10n.today;
     if (isYesterday) return context.l10n.yesterday;
@@ -256,9 +284,14 @@ class _SectionHeader extends StatelessWidget {
 }
 
 // ── Row hiển thị từ đã học ───────────────────────────────────────────────────
+/// Thẻ (Card) hiển thị thông tin chi tiết của một từ vựng đã học thành công.
+/// Bao gồm từ vựng tiếng Anh, định nghĩa tiếng Việt, phiên âm và một biểu tượng 
+/// đánh dấu xác nhận trạng thái hoàn thành.
 class _WordHistoryTile extends StatelessWidget {
+  /// Đối tượng [WordEntity] chứa thông tin chi tiết về từ vựng.
   final WordEntity word;
 
+  /// Khởi tạo widget hiển thị từ vựng.
   const _WordHistoryTile({required this.word});
 
   @override

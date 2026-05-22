@@ -3,6 +3,9 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter/foundation.dart';
 
+/// Dịch vụ quản lý thông báo cục bộ (Local Notifications).
+/// Sử dụng mẫu thiết kế Singleton để đảm bảo chỉ có một instance duy nhất.
+/// Hỗ trợ lên lịch nhắc nhở học tập hàng ngày.
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -11,6 +14,8 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
+  /// Khởi tạo cấu hình cho Local Notification (cấp quyền nền tảng, timezone).
+  /// Cần được gọi ở `main()` trước khi UI của ứng dụng bắt đầu chạy.
   Future<void> init() async {
     tz.initializeTimeZones();
 
@@ -37,6 +42,8 @@ class NotificationService {
     );
   }
 
+  /// Lên lịch gửi thông báo nhắc nhở học tập hàng ngày vào một khung giờ cố định.
+  /// Sử dụng [id] để quản lý, [title] và [body] cho nội dung, [hour] và [minute] cho thời gian.
   Future<void> scheduleDailyNotification({
     required int id,
     required String title,

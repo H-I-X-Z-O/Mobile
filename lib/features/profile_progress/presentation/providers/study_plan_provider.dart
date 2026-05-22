@@ -3,14 +3,25 @@ import 'package:flutter/foundation.dart';
 import '../../domain/entities/study_plan_entity.dart';
 import '../../../../core/services/notification_service.dart';
 
+/// Provider quản lý kế hoạch học tập của người dùng.
+/// Xử lý logic tải, lưu kế hoạch, và đồng bộ lịch thông báo nhắc nhở.
 class StudyPlanProvider extends ChangeNotifier {
+  /// Kế hoạch học tập hiện tại.
   StudyPlanEntity? _studyPlan;
+  
+  /// Trạng thái đang tải dữ liệu.
   bool _isLoading = false;
+  
+  /// ID của người dùng hiện hành.
   String? _currentUserId;
 
+  /// Lấy thông tin kế hoạch học tập.
   StudyPlanEntity? get studyPlan => _studyPlan;
+  
+  /// Kiểm tra xem liệu dữ liệu có đang được tải hay không.
   bool get isLoading => _isLoading;
 
+  /// Cập nhật thông tin [userId] và gọi hàm tải kế hoạch học tập tương ứng.
   void updateUser(String? userId) {
     if (_currentUserId != userId) {
       _currentUserId = userId;
@@ -23,6 +34,8 @@ class StudyPlanProvider extends ChangeNotifier {
     }
   }
 
+  /// Tải thông tin kế hoạch học tập của người dùng từ Firestore.
+  /// Sẽ tự động reset danh sách công việc hàng ngày nếu đã sang ngày mới.
   Future<void> fetchStudyPlan() async {
     if (_currentUserId == null) return;
 
@@ -43,19 +56,19 @@ class StudyPlanProvider extends ChangeNotifier {
         final data = doc.data()!;
         final entity = _mapToEntity(data);
         
-        // Logic reset hàng ngày
+        // Kiểm tra xem liệu đã sang ngày mới chưa để reset danh sách công việc (tasks)
         if (entity.lastUpdatedDate != today) {
           _studyPlan = entity.copyWith(
-            todayTasks: {}, // Reset nhiệm vụ ngày mới
+            todayTasks: {}, // Xóa toàn bộ task khi qua ngày mới
             lastUpdatedDate: today,
           );
-          // Lưu trạng thái reset ngay lập tức
+          // Lưu trạng thái ngay lập tức lên Firestore để đồng bộ
           await updatePlan(_studyPlan!);
         } else {
           _studyPlan = entity;
         }
       } else {
-        // Trạng thái trống cho tài khoản mới
+        // Nếu người dùng chưa từng tạo kế hoạch học tập, khởi tạo kế hoạch trống
         _studyPlan = StudyPlanEntity(
           userId: _currentUserId!,
           lastUpdatedDate: today,
@@ -69,6 +82,7 @@ class StudyPlanProvider extends ChangeNotifier {
     }
   }
 
+  /// Thay đổi trạng thái hoàn thành của một công việc (task).
   Future<void> toggleTask(String taskName) async {
     if (_studyPlan == null) return;
     
@@ -79,6 +93,7 @@ class StudyPlanProvider extends ChangeNotifier {
     await updatePlan(_studyPlan!.copyWith(todayTasks: newTasks));
   }
 
+  /// Thêm một công việc mới vào danh sách công việc trong ngày.
   Future<void> addTask(String taskName) async {
     if (_studyPlan == null || taskName.trim().isEmpty) return;
     
@@ -89,6 +104,7 @@ class StudyPlanProvider extends ChangeNotifier {
     }
   }
 
+  /// Xóa một công việc khỏi danh sách công việc trong ngày.
   Future<void> deleteTask(String taskName) async {
     if (_studyPlan == null) return;
     
@@ -99,11 +115,13 @@ class StudyPlanProvider extends ChangeNotifier {
     }
   }
 
+  /// Lấy chuỗi biểu diễn ngày hiện tại (định dạng 'yyyy-MM-dd') để so sánh reset ngày mới.
   String _getTodayDateString() {
     final now = DateTime.now();
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 
+  /// Lưu đối tượng [newPlan] lên Firestore và đồng bộ thông báo cục bộ.
   Future<void> updatePlan(StudyPlanEntity newPlan) async {
     if (_currentUserId == null) return;
 
@@ -126,6 +144,7 @@ class StudyPlanProvider extends ChangeNotifier {
     }
   }
 
+  /// Xóa thông báo cũ và lập lịch thông báo mới dựa trên các thời gian nhắc nhở trong [plan].
   void _syncNotifications(StudyPlanEntity plan) async {
     final ns = NotificationService();
     await ns.cancelAll();
@@ -144,6 +163,7 @@ class StudyPlanProvider extends ChangeNotifier {
     }
   }
 
+  /// Helper method chuyển đổi từ Map (dữ liệu Firestore) sang đối tượng [StudyPlanEntity].
   StudyPlanEntity _mapToEntity(Map<String, dynamic> data) {
     return StudyPlanEntity(
       userId: _currentUserId!,
@@ -162,6 +182,7 @@ class StudyPlanProvider extends ChangeNotifier {
     );
   }
 
+  /// Helper method chuyển đổi từ [StudyPlanEntity] thành Map để đẩy lên Firestore.
   Map<String, dynamic> _mapFromEntity(StudyPlanEntity entity) {
     return {
       'dailyMinutesGoal': entity.dailyMinutesGoal,

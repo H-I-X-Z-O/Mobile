@@ -12,25 +12,43 @@ import '../../data/repositories/vocabulary_repository_impl.dart';
 
 enum LearningState { initial, loading, loaded, error }
 
+/// Provider quản lý toàn bộ trạng thái học tập của ứng dụng (Từ vựng, Ngữ pháp).
+/// Chứa logic tương tác với kho dữ liệu và xử lý các sự kiện từ người dùng.
 class LearningProvider extends ChangeNotifier {
   // Tách biệt trạng thái của 2 màn hình
+  /// Trạng thái tải danh sách chủ đề.
   LearningState _topicState = LearningState.initial;
+  /// Trạng thái tải từ vựng hoặc bài học.
   LearningState _wordState = LearningState.initial;
 
+  /// Danh sách chủ đề.
   List<TopicEntity> _topics = [];
+  /// Danh sách từ vựng của chủ đề đang chọn.
   List<WordEntity> _currentWords = [];
+  /// Bộ nhớ đệm chứa toàn bộ từ vựng.
   List<WordEntity> _allWordsCache = [];
+  /// Danh sách các bài học ngữ pháp.
   List<GrammarLessonEntity> _grammarLessons = [];
+  /// Danh sách câu hỏi ngữ pháp cho bài học đang chọn.
   List<GrammarQuestionEntity> _currentGrammarQuestions = [];
+  /// Chủ đề hiện tại được chọn.
   TopicEntity? _selectedTopic;
+  /// Bài học ngữ pháp hiện tại được chọn.
   GrammarLessonEntity? _selectedGrammarLesson;
+  /// Chỉ số thẻ Flashcard hiện tại.
   int _flashcardIndex = 0;
+  /// Đánh dấu thẻ đã được lật hay chưa.
   bool _isCardFlipped = false;
+  /// Thông điệp lỗi nếu quá trình lấy dữ liệu thất bại.
   String? _errorMessage;
+  /// Từ khóa người dùng nhập để tìm kiếm.
   String _searchQuery = '';
+  /// Công cụ phát âm Text-To-Speech (TTS).
   final FlutterTts _tts = FlutterTts();
+  /// Cờ đánh dấu công cụ TTS đã sẵn sàng.
   bool _isTtsInitialized = false;
-  String? _currentUserId; // ← ID người dùng thực từ Firebase Auth
+  /// ID của người dùng hiện tại lấy từ Firebase Auth.
+  String? _currentUserId;
 
   // ── Repository ─────────────────────────────────────────────────────────────
   late final VocabularyRepositoryImpl _repository;
@@ -43,6 +61,7 @@ class LearningProvider extends ChangeNotifier {
     _initRepository();
   }
 
+  /// Khởi tạo [VocabularyRepository] kết nối với Firebase và dữ liệu cục bộ.
   void _initRepository() {
     try {
       final remoteDs = LearningRemoteDataSourceImpl(
@@ -60,7 +79,9 @@ class LearningProvider extends ChangeNotifier {
     }
   }
 
+  /// Cập nhật [userId] hiện tại của người dùng.
   /// Được gọi từ main.dart qua ProxyProvider mỗi khi trạng thái Auth thay đổi.
+  /// Nếu người dùng đã đăng nhập, tự động tải danh sách các chủ đề.
   void updateUser(String? userId) {
     if (_currentUserId != userId) {
       _currentUserId = userId;
@@ -73,25 +94,39 @@ class LearningProvider extends ChangeNotifier {
 
 
   // ── Getters ──────────────────────────────────────────────────────────────
+  /// Trạng thái tải của danh sách chủ đề.
   LearningState get topicState => _topicState;
+  /// Trạng thái tải của danh sách từ vựng.
   LearningState get wordState => _wordState;
+  /// Danh sách tất cả chủ đề học.
   List<TopicEntity> get topics => _topics;
+  /// Danh sách từ vựng của chủ đề đang chọn.
   List<WordEntity> get currentWords => _currentWords;
+  /// Danh sách các bài học ngữ pháp hiện có.
   List<GrammarLessonEntity> get grammarLessons => _grammarLessons;
+  /// Danh sách câu hỏi ngữ pháp của bài học hiện hành.
   List<GrammarQuestionEntity> get currentGrammarQuestions => _currentGrammarQuestions;
+  /// Chủ đề từ vựng đang được chọn.
   TopicEntity? get selectedTopic => _selectedTopic;
+  /// Bài học ngữ pháp đang được chọn.
   GrammarLessonEntity? get selectedGrammarLesson => _selectedGrammarLesson;
+  /// Chỉ số thẻ Flashcard hiện hành trong danh sách.
   int get flashcardIndex => _flashcardIndex;
+  /// Trạng thái lật của thẻ Flashcard (mặt trước / mặt sau).
   bool get isCardFlipped => _isCardFlipped;
+  /// Thông báo lỗi nếu có sự cố xảy ra.
   String? get errorMessage => _errorMessage;
 
+  /// Thẻ từ vựng hiện đang được hiển thị. Trả về null nếu danh sách rỗng hoặc sai chỉ số.
   WordEntity? get currentFlashcard =>
       _currentWords.isNotEmpty && _flashcardIndex < _currentWords.length
           ? _currentWords[_flashcardIndex]
           : null;
 
+  /// Kiểm tra xem người dùng đang ở thẻ Flashcard cuối cùng chưa.
   bool get isLastCard => _flashcardIndex >= _currentWords.length - 1;
 
+  /// Danh sách các chủ đề đã được lọc qua từ khóa tìm kiếm [searchQuery].
   List<TopicEntity> get filteredTopics {
     if (_searchQuery.isEmpty) return _topics;
     final lowerQuery = _searchQuery.toLowerCase();
@@ -103,14 +138,19 @@ class LearningProvider extends ChangeNotifier {
     }).toList();
   }
 
+  /// Danh sách các chủ đề đang học dở (đã có từ vựng thuộc nhưng chưa hoàn thành 100%).
   List<TopicEntity> get topicsInProgress =>
       filteredTopics.where((t) => t.learnedWords > 0 && !t.isCompleted).toList();
 
   // ── Getter thống kê tổng (phục vụ HomeScreen) ──────────────────────────
+  /// Tổng số từ đã học trong tất cả chủ đề.
   int get totalLearnedWords => _topics.fold(0, (acc, t) => acc + t.learnedWords);
+  /// Tổng số từ vựng trong tất cả chủ đề.
   int get totalWords => _topics.fold(0, (acc, t) => acc + t.totalWords);
+  /// Tỷ lệ tiến độ tổng thể (từ 0.0 đến 1.0).
   double get overallProgress => totalWords > 0 ? totalLearnedWords / totalWords : 0.0;
 
+  /// Trả về tất cả từ vựng đã được bộ nhớ đệm (cache).
   List<WordEntity> get allWords => _allWordsCache;
 
   /// Toàn bộ từ vựng sắp xếp theo thứ tự A-Z
@@ -182,6 +222,8 @@ class LearningProvider extends ChangeNotifier {
 
 
   // ── Load dữ liệu tiến độ thực tế từ Firebase ──────────────────────────
+  
+  /// Tải tiến độ học từ vựng thực tế của người dùng từ Firebase.
   Future<void> _loadRealVocabStatus() async {
     final uid = _currentUserId;
     if (uid == null || uid.isEmpty) return;
@@ -201,6 +243,8 @@ class LearningProvider extends ChangeNotifier {
   }
 
 
+  /// Cập nhật tổng số từ đã học cho mỗi chủ đề (Topic) dựa trên 
+  /// dữ liệu lưu trữ tiến độ [vocabStatusMap].
   void _updateTopicsLearnedCount() {
     // Cập nhật lại thuộc tính learnedWords của từng TopicEntity trong list _topics
     for (int i = 0; i < _topics.length; i++) {
@@ -212,6 +256,8 @@ class LearningProvider extends ChangeNotifier {
     }
   }
 
+  /// Tải danh sách các chủ đề từ vựng (Topics) từ kho dữ liệu.
+  /// Đồng thời tải tiến độ học và toàn bộ từ vựng hiện có.
   Future<void> loadTopics() async {
     _topicState = LearningState.loading;
     _errorMessage = null;
@@ -233,6 +279,7 @@ class LearningProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Tải danh sách các bài học ngữ pháp.
   Future<void> loadGrammarLessons() async {
     _topicState = LearningState.loading;
     _errorMessage = null;
@@ -248,6 +295,7 @@ class LearningProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Tải danh sách câu hỏi ngữ pháp theo một [lessonId] cụ thể.
   Future<void> loadGrammarQuestions(String lessonId) async {
     _wordState = LearningState.loading;
     _currentGrammarQuestions = [];
@@ -263,6 +311,7 @@ class LearningProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Tải tất cả từ vựng từ cơ sở dữ liệu và lưu vào cache.
   Future<void> loadAllWords() async {
     try {
       _allWordsCache = await _repository.getAllWords();
@@ -271,11 +320,13 @@ class LearningProvider extends ChangeNotifier {
     }
   }
 
+  /// Tìm kiếm chủ đề theo chuỗi [query].
   void searchTopics(String query) {
     _searchQuery = query;
     notifyListeners();
   }
 
+  /// Phát âm thanh (Text-to-Speech) cho chuỗi [text].
   Future<void> speakWord(String text) async {
     if (!_isTtsInitialized) {
       await _initTts();
@@ -294,6 +345,8 @@ class LearningProvider extends ChangeNotifier {
       if (kDebugMode) print('⚠️ LearningProvider: Lỗi khởi tạo TTS — $e');
     }
   }
+  /// Tải danh sách từ vựng thuộc về một [topic] nhất định.
+  /// Reset các trạng thái của thẻ Flashcard và cập nhật lại tiến độ học.
   Future<void> loadWordsForTopic(TopicEntity topic) async {
     _selectedTopic = topic;
     _wordState = LearningState.loading;
@@ -343,11 +396,14 @@ class LearningProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Lật thẻ Flashcard hiện tại.
   void flipCard() {
     _isCardFlipped = !_isCardFlipped;
     notifyListeners();
   }
 
+  /// Đánh dấu thẻ từ vựng hiện tại là "Đã thuộc" (Known).
+  /// Cập nhật tiến độ trên giao diện và đồng bộ lưu với Firebase.
   void markAsKnown() {
     if (currentFlashcard == null || _selectedTopic == null) return;
     final wordId = currentFlashcard!.id;
@@ -383,7 +439,8 @@ class LearningProvider extends ChangeNotifier {
     }
   }
 
-  /// Hàm dùng để bật/tắt trạng thái "đã thuộc" trực tiếp từ danh sách từ vựng
+  /// Hàm dùng để bật/tắt trạng thái "đã thuộc" trực tiếp từ danh sách từ vựng.
+  /// Cập nhật lại UI sau đó lưu thông tin lên Firebase.
   Future<void> toggleWordLearned(String wordId, String topicId) async {
     final uid = _currentUserId;
     final isCurrentlyRemembered = isWordRemembered(wordId);
@@ -420,6 +477,8 @@ class LearningProvider extends ChangeNotifier {
     }
   }
 
+  /// Đánh dấu thẻ từ vựng hiện tại là "Chưa thuộc" (Unknown).
+  /// Chuyển sang thẻ tiếp theo.
   void markAsUnknown() {
     _nextCard();
   }
@@ -432,6 +491,8 @@ class LearningProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Đặt lại trạng thái tiến trình học Flashcard về từ vựng đầu tiên
+  /// và hủy bỏ các tiến độ học tạm thời trong topic hiện hành.
   void resetFlashcard() {
     _flashcardIndex = 0;
     _isCardFlipped = false;

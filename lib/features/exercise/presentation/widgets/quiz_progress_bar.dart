@@ -4,6 +4,8 @@ import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Thanh tiến trình hiển thị số lượng câu hỏi đã làm trên tổng số câu hỏi.
+/// Dùng để chỉ báo trực quan cho người dùng biết họ đang ở câu số mấy.
 class QuizProgressBar extends StatelessWidget {
   final int currentIndex;
   final int totalQuestions;

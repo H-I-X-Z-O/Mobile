@@ -4,6 +4,7 @@ import '../../domain/entities/topic_entity.dart';
 
 /// Data Model cho chủ đề học tập – kế thừa từ [TopicEntity].
 class TopicModel extends TopicEntity {
+  /// Khởi tạo một đối tượng [TopicModel].
   const TopicModel({
     required super.id,
     required super.name,
@@ -17,6 +18,8 @@ class TopicModel extends TopicEntity {
   });
 
   // ── Factory: Tạo từ Map<String, dynamic> (JSON thuần) ───────────────────
+  /// Khởi tạo [TopicModel] từ cấu trúc JSON.
+  /// Thường được sử dụng khi parse dữ liệu từ Local Storage (SharedPreferences/SQLite).
   factory TopicModel.fromJson(Map<String, dynamic> json) {
     return TopicModel(
       id: json['id'] as String,
@@ -32,10 +35,13 @@ class TopicModel extends TopicEntity {
   }
 
   // ── Factory: Tạo từ Firestore DocumentSnapshot ──────────────────────────
+  /// Khởi tạo [TopicModel] từ [DocumentSnapshot] lấy từ Firestore.
   factory TopicModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return TopicModel(
-      // Ưu tiên dùng topicId (t1, t2...) từ field để mapping với collection vocabularies
+      // Ưu tiên sử dụng trường 'topicId' (ví dụ: 't1', 't2') từ dữ liệu document
+      // để liên kết chính xác với các collection từ vựng (vocabularies).
+      // Nếu không có, dự phòng (fallback) sử dụng ID của document (doc.id).
       id: data['topicId'] as String? ?? doc.id,
       name: data['name'] as String? ?? 'No Name',
       nameEn: data['name_en'] as String?,
@@ -48,6 +54,8 @@ class TopicModel extends TopicEntity {
     );
   }
 
+  /// Cung cấp khả năng sao chép đối tượng [TopicModel] hiện tại, 
+  /// kết hợp với các thuộc tính mới được truyền vào.
   @override
   TopicModel copyWith({
     String? id,
@@ -74,6 +82,7 @@ class TopicModel extends TopicEntity {
   }
 
   // ── Chuyển đổi sang Map để lưu xuống Local/Firebase ───────────────────
+  /// Trả về đối tượng dưới dạng JSON Map (Map<String, dynamic>).
   Map<String, dynamic> toJson() {
     return {
       'id': id,

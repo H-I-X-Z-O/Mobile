@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// App Dimensions & Spacing System
-/// Centralized management for margins, paddings, and border radii.
+/// Hệ thống Kích thước & Khoảng cách (App Dimensions & Spacing System).
+/// Quản lý tập trung các giá trị margin, padding, và bo góc (border radius).
 class AppDimensions {
   AppDimensions._();
 
@@ -44,7 +44,7 @@ class AppDimensions {
   static const double inputHeight = 56.0;
 }
 
-/// Extension for easy access to EdgeInsets using standard tokens
+/// Tiện ích mở rộng (Extension) giúp truy cập nhanh [EdgeInsets] và [SizedBox] từ kiểu số (num).
 extension AppSpacingExtension on num {
   EdgeInsets get all => EdgeInsets.all(toDouble());
   EdgeInsets get horizontal => EdgeInsets.symmetric(horizontal: toDouble());

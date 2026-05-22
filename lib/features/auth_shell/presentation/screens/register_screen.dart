@@ -6,6 +6,7 @@ import '../../../../core/extensions/context_extension.dart';
 import '../providers/auth_provider.dart';
 import 'main_shell.dart';
 
+/// Màn hình [RegisterScreen] dùng để đăng ký tài khoản mới bằng email và mật khẩu.
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -27,6 +28,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  /// Xử lý hành động đăng ký tài khoản.
+  /// 
+  /// Phương thức này thực hiện:
+  /// 1. Kiểm tra tính hợp lệ (các trường không được để trống).
+  /// 2. Gọi logic đăng ký từ [AuthProvider].
+  /// 3. Điều hướng người dùng tới [MainShell] nếu thành công, hoặc hiển thị lỗi qua [SnackBar].
   void _handleRegister() async {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();

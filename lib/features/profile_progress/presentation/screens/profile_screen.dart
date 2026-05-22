@@ -17,7 +17,10 @@ import 'weekly_study_plan_screen.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình hồ sơ cá nhân, nơi hiển thị tổng quan tiến độ học tập,
+/// kế hoạch trong ngày và các tùy chọn cài đặt khác.
 class ProfileScreen extends StatefulWidget {
+  /// Khởi tạo màn hình hồ sơ cá nhân.
   const ProfileScreen({super.key});
 
   @override
@@ -653,13 +656,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
+/// Data class nội bộ định nghĩa một mục công việc trong kế hoạch học tập.
 class _PlanItem {
+  /// Tên công việc.
   final String title;
+  
+  /// Thông tin mô tả thời lượng hoặc loại công việc.
   final String duration;
+  
+  /// Trạng thái đã hoàn thành.
   final bool isDone;
+  
+  /// Cờ đánh dấu đây có phải là công việc được hệ thống tự tạo không.
   final bool isSystem;
+  
+  /// Hành động khi người dùng nhấn vào thẻ.
   final VoidCallback? onTap;
+  
+  /// Hành động khi người dùng nhấn vào ô checkbox.
   final VoidCallback? onToggle;
+  
+  /// Hành động xóa công việc (chỉ áp dụng với task do user tạo).
   final VoidCallback? onDelete;
 
   _PlanItem({

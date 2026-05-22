@@ -8,7 +8,10 @@ import '../../domain/entities/study_plan_entity.dart';
 import 'reminder_settings_screen.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình thiết lập lịch học hàng tuần, bao gồm mục tiêu thời gian mỗi ngày,
+/// các ngày học trong tuần và cài đặt thông báo nhắc nhở.
 class WeeklyStudyPlanScreen extends StatefulWidget {
+  /// Khởi tạo màn hình thiết lập lịch học.
   const WeeklyStudyPlanScreen({super.key});
 
   @override

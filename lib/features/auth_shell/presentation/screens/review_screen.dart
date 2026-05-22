@@ -8,6 +8,10 @@ import '../../../exercise/presentation/screens/exercise_screen.dart';
 import '../../../learning/presentation/providers/learning_provider.dart';
 import '../../../exercise/domain/entities/question_entity.dart';
 
+/// Màn hình Ôn tập [ReviewScreen].
+/// 
+/// Nơi người dùng có thể chọn các chế độ ôn tập khác nhau (như luyện nghe, luyện viết, trắc nghiệm) 
+/// từ danh sách từ vựng đã học.
 class ReviewScreen extends StatelessWidget {
   const ReviewScreen({super.key});
 
@@ -103,6 +107,11 @@ class ReviewScreen extends StatelessWidget {
     );
   }
 
+  /// Xử lý bắt đầu bài tập luyện tập.
+  /// 
+  /// [words] là danh sách các từ vựng dùng trong bài kiểm tra.
+  /// [type] là thể loại câu hỏi (ví dụ: nghe, viết, trắc nghiệm). 
+  /// Nếu [type] là null, ứng dụng sẽ tạo bộ câu hỏi tổng hợp nhiều loại.
   void _startExercise(BuildContext context, words, QuestionType? type) {
     if (words.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -118,6 +127,10 @@ class ReviewScreen extends StatelessWidget {
     ));
   }
 
+  /// Widget xây dựng các thẻ (card) đại diện cho từng kỹ năng ôn tập.
+  /// 
+  /// Tùy chỉnh biểu tượng [icon], tiêu đề [title], mô tả [description] và màu sắc [color].
+  /// Sự kiện khi người dùng chọn được xử lý qua hàm callback [onTap].
   Widget _buildSkillCard(
     BuildContext context, {
     required IconData icon,

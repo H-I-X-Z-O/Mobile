@@ -11,10 +11,14 @@ import '../repositories/vocabulary_repository.dart';
 /// Trả về [Right(null)] nếu thành công,
 /// hoặc [Left(Failure)] nếu có lỗi.
 class MarkWordAsLearned {
+  /// Kho lưu trữ chứa các phương thức tương tác với dữ liệu từ vựng.
   final VocabularyRepository repository;
 
+  /// Khởi tạo [MarkWordAsLearned] với [repository]
   MarkWordAsLearned(this.repository);
 
+  /// Thực thi use case, nhận vào [userId], [wordId], và [topicId].
+  /// Trả về [Right(null)] nếu thành công hoặc [Left(Failure)] nếu có lỗi.
   Future<Either<Failure, void>> call(
       String userId, String wordId, String topicId) async {
     try {

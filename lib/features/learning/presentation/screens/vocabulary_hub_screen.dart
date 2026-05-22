@@ -9,8 +9,16 @@ import '../widgets/topic_card.dart';
 import '../widgets/word_list_item.dart';
 import 'vocabulary_list_screen.dart';
 
+/// Màn hình Trung tâm Từ vựng (Vocabulary Hub Screen).
+/// Đóng vai trò là đầu mối chính quản lý toàn bộ hệ thống từ vựng của người dùng.
+/// Cung cấp hai phương pháp tiếp cận dữ liệu thông qua các tab:
+/// 1. Khám phá từ vựng theo các nhóm Chủ đề (Topics).
+/// 2. Tra cứu danh sách toàn bộ từ vựng được phân loại theo Bảng chữ cái (A-Z).
 class VocabularyHubScreen extends StatefulWidget {
+  /// Hàm callback hỗ trợ chuyển hướng tới các chức năng khác trên thanh điều hướng chung.
   final Function(int)? onNavigate;
+  
+  /// Khởi tạo màn hình trung tâm từ vựng.
   const VocabularyHubScreen({super.key, this.onNavigate});
 
   @override
@@ -19,17 +27,27 @@ class VocabularyHubScreen extends StatefulWidget {
 
 class _VocabularyHubScreenState extends State<VocabularyHubScreen>
     with SingleTickerProviderStateMixin {
+  
+  /// Bộ điều khiển cho thanh TabBar, quản lý chuyển đổi giữa tab Chủ đề và tab A-Z.
   late TabController _tabController;
-  final _searchController = TextEditingController();
+  
+  /// Bộ điều khiển trường nhập liệu tìm kiếm văn bản.
+  final TextEditingController _searchController = TextEditingController();
+  
+  /// Lưu trữ chuỗi truy vấn hiện tại để thực hiện lọc danh sách từ vựng hoặc chủ đề.
   String _searchQuery = '';
 
+  /// Khởi tạo trạng thái và thiết lập các bộ điều khiển.
+  /// Lắng nghe sự thay đổi của Tab để tự động dọn dẹp kết quả tìm kiếm khi chuyển qua lại giữa các tab.
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // Tải dữ liệu chủ đề khi khởi tạo màn hình
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LearningProvider>().loadTopics();
     });
+    // Xóa bộ lọc tìm kiếm khi người dùng chuyển tab
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
         _searchController.clear();
@@ -38,6 +56,7 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
     });
   }
 
+  /// Giải phóng tài nguyên của các bộ điều khiển khi màn hình bị hủy.
   @override
   void dispose() {
     _tabController.dispose();
@@ -110,9 +129,13 @@ class _VocabularyHubScreenState extends State<VocabularyHubScreen>
   }
 }
 
+/// Giao diện con (Tab) chuyên phụ trách hiển thị danh sách các Chủ đề học tập.
+/// Các chủ đề được phân tách thành khu vực "Đang học" và "Tất cả chủ đề".
 class _TopicTabView extends StatelessWidget {
+  /// Hàm callback điều hướng.
   final Function(int)? onNavigate;
 
+  /// Khởi tạo tab chủ đề.
   const _TopicTabView({this.onNavigate});
 
   @override
@@ -182,6 +205,9 @@ class _TopicTabView extends StatelessWidget {
     );
   }
 
+  /// Xây dựng tiêu đề phân loại khu vực danh sách (ví dụ: "Chủ đề đang học").
+  ///
+  /// [title] là đoạn văn bản nội dung của tiêu đề.
   Widget _sectionHeader(BuildContext context, String title) {
     final t = context.appTheme;
     return Padding(
@@ -197,6 +223,8 @@ class _TopicTabView extends StatelessWidget {
     );
   }
 
+  /// Xử lý điều hướng sang màn hình chứa danh sách từ vựng chi tiết của một chủ đề cụ thể.
+  /// Gọi phương thức tải từ vựng từ `LearningProvider` trước khi chuyển trang.
   void _navigateToTopic(BuildContext context, LearningProvider provider, dynamic topic) {
     provider.loadWordsForTopic(topic);
     Navigator.push(
@@ -206,9 +234,13 @@ class _TopicTabView extends StatelessWidget {
   }
 }
 
+/// Giao diện con (Tab) chuyên phụ trách hiển thị toàn bộ từ vựng theo cấu trúc Bảng chữ cái.
+/// Hỗ trợ tìm kiếm thời gian thực để tra cứu nhanh từ vựng dựa trên tiếng Anh hoặc nghĩa tiếng Việt.
 class _AlphabeticalTabView extends StatelessWidget {
+  /// Chuỗi tìm kiếm hiện tại để lọc từ vựng.
   final String searchQuery;
 
+  /// Khởi tạo tab bảng chữ cái.
   const _AlphabeticalTabView({required this.searchQuery});
 
   @override
@@ -245,7 +277,7 @@ class _AlphabeticalTabView extends StatelessWidget {
           );
         }
 
-        // Nhóm theo chữ cái đầu
+        // Nhóm các từ vựng theo chữ cái đầu tiên của từ tiếng Anh
         final grouped = <String, List<dynamic>>{};
         for (final word in words) {
           final letter = word.englishWord.isNotEmpty
@@ -253,6 +285,7 @@ class _AlphabeticalTabView extends StatelessWidget {
               : '#';
           grouped.putIfAbsent(letter, () => []).add(word);
         }
+        // Lấy danh sách các chữ cái và sắp xếp theo thứ tự tăng dần
         final letters = grouped.keys.toList()..sort();
 
         return CustomScrollView(
@@ -293,9 +326,13 @@ class _AlphabeticalTabView extends StatelessWidget {
   }
 }
 
+/// Thành phần hiển thị ký tự cái đầu tiên (ví dụ: 'A', 'B') đóng vai trò làm tiêu đề 
+/// chia nhóm cho danh sách từ vựng bên trong tab Bảng chữ cái.
 class _LetterHeader extends StatelessWidget {
+  /// Chữ cái tiêu đề.
   final String letter;
 
+  /// Khởi tạo tiêu đề chữ cái.
   const _LetterHeader({required this.letter});
 
   @override

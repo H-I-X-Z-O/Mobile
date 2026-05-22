@@ -10,8 +10,14 @@ import '../../../learning/presentation/widgets/topic_card.dart';
 import '../../../learning/presentation/screens/vocabulary_list_screen.dart';
 import '../../../profile_progress/presentation/screens/learning_statistics_screen.dart';
 import '../../../../core/constants/app_text_styles.dart';
+/// Màn hình Trang chủ [HomeScreen].
+/// 
+/// Hiển thị tổng quan về tiến trình học tập của người dùng, "Từ vựng của ngày",
+/// và gợi ý các chủ đề học tập tiếp theo.
 class HomeScreen extends StatelessWidget {
+  /// Callback khi người dùng muốn điều hướng đến tab khác từ trang chủ.
   final Function(int)? onNavigate;
+  
   const HomeScreen({super.key, this.onNavigate});
 
   @override
@@ -300,6 +306,9 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Trả về câu chào hỏi phù hợp dựa vào thời gian hiện tại trong ngày.
+  /// 
+  /// Ví dụ: "Chào buổi sáng", "Chào buổi chiều" theo ngôn ngữ của [context].
   String _getGreeting(BuildContext context, String name) {
     final hour = DateTime.now().hour;
     if (hour < 12) return context.l10n.greeting_morning(name);
@@ -307,6 +316,9 @@ class HomeScreen extends StatelessWidget {
     return context.l10n.greeting_evening(name);
   }
 
+  /// Điều hướng sang màn hình Danh sách Từ vựng dựa trên chủ đề [topic] đã chọn.
+  /// 
+  /// Phương thức này cũng cập nhật từ vựng cho chủ đề đó trong [LearningProvider].
   void _navigateToTopic(BuildContext context, LearningProvider provider, dynamic topic) {
     provider.loadWordsForTopic(topic);
     Navigator.push(context, MaterialPageRoute(builder: (_) => const VocabularyListScreen()));

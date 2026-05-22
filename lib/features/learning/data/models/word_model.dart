@@ -5,6 +5,7 @@ import '../../domain/entities/word_entity.dart';
 /// Data Model cho từ vựng – kế thừa từ [WordEntity].
 /// Chứa logic chuyển đổi dữ liệu (Serialization / Deserialization).
 class WordModel extends WordEntity {
+  /// Khởi tạo một đối tượng [WordModel].
   const WordModel({
     required super.id,
     super.topicId = '',
@@ -18,6 +19,10 @@ class WordModel extends WordEntity {
   });
 
   // ── Factory: Tạo từ Map<String, dynamic> (JSON thuần) ───────────────────
+  /// Khởi tạo [WordModel] thông qua dữ liệu JSON Map.
+  /// Quá trình giải mã (deserialization) hỗ trợ nhiều alias khác nhau cho các trường
+  /// (vd: `topicId` hoặc `topic_id`, `eng` hoặc `english_word`) nhằm đảm bảo tính
+  /// tương thích tốt với nhiều định dạng nguồn dữ liệu khác nhau.
   factory WordModel.fromJson(Map<String, dynamic> json) {
     return WordModel(
       id: json['id'] as String? ?? '',
@@ -33,6 +38,8 @@ class WordModel extends WordEntity {
   }
 
   // ── Factory: Tạo từ Firestore DocumentSnapshot ──────────────────────────
+  /// Khởi tạo [WordModel] từ cấu trúc document lấy trên Firestore.
+  /// ID của model sẽ được gán tự động thông qua id của document (`doc.id`).
   factory WordModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return WordModel(
@@ -49,6 +56,8 @@ class WordModel extends WordEntity {
   }
 
   // ── Chuyển đổi sang Map để lưu xuống Local/Firebase ───────────────────
+  /// Tạo ra JSON Map từ thể hiện hiện tại, phục vụ cho việc lưu trữ nội bộ (SQLite/SharedPreferences)
+  /// hay đồng bộ dữ liệu lên Firebase/server bên ngoài.
   Map<String, dynamic> toJson() {
     return {
       'id': id,

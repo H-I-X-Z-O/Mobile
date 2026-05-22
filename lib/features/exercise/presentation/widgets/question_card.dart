@@ -5,6 +5,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../../domain/entities/question_entity.dart';
 
+/// Thẻ hiển thị nội dung câu hỏi phía trên danh sách đáp án.
+/// Hiển thị nhãn loại câu hỏi và nội dung (từ vựng/nghĩa) tùy theo [QuestionType].
 class QuestionCard extends StatelessWidget {
   final QuestionEntity question;
 

@@ -9,21 +9,37 @@ import '../models/grammar_question_model.dart';
 import '../models/audio_exercise_model.dart';
 import '../models/audio_question_model.dart';
 
+/// Interface định nghĩa các phương thức lấy và lưu dữ liệu học tập từ máy chủ từ xa (Firebase).
 abstract class LearningRemoteDataSource {
+  /// Lấy danh sách các chủ đề. Nếu có [userId], hệ thống sẽ tính thêm số lượng từ đã học của user đó.
   Future<List<TopicModel>> getTopics(String? userId);
+  
+  /// Lấy danh sách các từ vựng thuộc về một chủ đề cụ thể qua [topicId].
   Future<List<WordModel>> getWordsByTopic(String topicId);
+  
+  /// Lấy toàn bộ danh sách từ vựng có trong hệ thống (dùng cho chức năng tìm kiếm hoặc tổng hợp).
   Future<List<WordModel>> getAllWords();
+  
+  /// Lấy trạng thái học từ vựng (tiến độ) của người dùng thông qua [userId].
   Future<List<UserVocabStatusModel>> getUserVocabStatus(String userId);
-  /// Đánh dấu từ [wordId] thuộc chủ đề [topicId] đã học cho người dùng [userId] trên Firestore.
+
+  /// Đánh dấu từ [wordId] thuộc chủ đề [topicId] là đã học đối với người dùng [userId] trên Firestore.
   Future<void> markWordAsLearned(String userId, String wordId, String topicId);
   
+  /// Lấy danh sách các bài học ngữ pháp.
   Future<List<GrammarLessonModel>> getGrammarLessons();
+  
+  /// Lấy danh sách các câu hỏi luyện tập ngữ pháp thuộc về [lessonId].
   Future<List<GrammarQuestionModel>> getGrammarQuestions(String lessonId);
 
+  /// Lấy danh sách các bài luyện nghe (audio exercises).
   Future<List<AudioExerciseModel>> getAudioExercises();
+  
+  /// Lấy danh sách câu hỏi cho một bài luyện nghe cụ thể thông qua [audioExerciseId].
   Future<List<AudioQuestionModel>> getAudioQuestions(String audioExerciseId);
 }
 
+/// Lớp triển khai thực tế của [LearningRemoteDataSource] sử dụng [FirebaseFirestore].
 class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
   final FirebaseFirestore firestore;
 
@@ -48,10 +64,13 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
           .get()
           .timeout(const Duration(seconds: 10));
 
+      // Tạo danh sách các tác vụ bất đồng bộ (Futures) để xử lý song song từng document Topic
       final List<Future<TopicModel>> topicFutures = querySnapshot.docs.map((doc) async {
         final topic = TopicModel.fromFirestore(doc);
         
-        // Chạy song song 2 truy vấn count: tổng số từ và số từ đã thuộc
+        // Chạy song song 2 truy vấn đếm (count queries) để tối ưu hóa thời gian thực thi:
+        // 1. Tổng số từ vựng trong chủ đề
+        // 2. Số lượng từ vựng người dùng đã học (nếu đã đăng nhập)
         final List<Future<int>> countFutures = [
           // 1. Đếm tổng số từ
           firestore
@@ -103,7 +122,6 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
     print('[FIREBASE_DEBUG] Fetching words for topicId: $topicId from root collection: $_wordsCollection');
     
     try {
-      // Sửa từ sub-collection sang root collection query: where('topicId', == topicId)
       final querySnapshot = await firestore
           .collection(_wordsCollection)
           .where('topicId', isEqualTo: topicId)
@@ -171,11 +189,10 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
     }
   }
 
-  /// Lưu trạng thái "đã thuộc" vào root collection user_vocab_status
   @override
   Future<void> markWordAsLearned(String userId, String wordId, String topicId) async {
     try {
-      // Dùng ID kết hợp để không bị trùng lặp dữ liệu cho cùng 1 user/word
+      // Sử dụng document ID kết hợp giữa userId và wordId để tránh trùng lặp dữ liệu và dễ dàng cập nhật
       final statusDocId = '${userId}_$wordId';
       
       await firestore
@@ -184,9 +201,9 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
           .set({
         'userId': userId,
         'vocabId': wordId,
-        'topicId': topicId, // Thêm topicId để dễ dàng đếm tiến độ
+        'topicId': topicId, // Lưu thêm topicId để phục vụ truy vấn đếm tiến độ theo chủ đề
         'isRemembered': true,
-        'reviewCount': FieldValue.increment(1),
+        'reviewCount': FieldValue.increment(1), // Tăng biến đếm số lần ôn tập lên 1
         'learnedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true)).timeout(const Duration(seconds: 10), onTimeout: () {
         throw ServerException('Kết nối Firestore quá hạn khi lưu tiến độ.');
@@ -218,8 +235,8 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
   @override
   Future<List<GrammarQuestionModel>> getGrammarQuestions(String lessonId) async {
     try {
-      // 1. First, try fetching from root collection 'grammar_questions' (User's current structure)
-      // This collection uses 'exerciseId' to link to the lesson
+      // 1. Thử lấy dữ liệu từ root collection 'grammar_questions' trước (Cấu trúc hiện tại của dự án)
+      // Collection này sử dụng trường 'exerciseId' để liên kết với bài học (lesson)
       final rootQuery = await firestore
           .collection(_grammarQuestionsCollection)
           .where('exerciseId', isEqualTo: lessonId)
@@ -230,12 +247,13 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
             .map((doc) => GrammarQuestionModel.fromJson({'id': doc.id, ...doc.data()}))
             .toList();
         
-        // Sort locally in-memory to avoid Firestore index requirement
+        // Sắp xếp các câu hỏi ở phía máy khách (in-memory) theo trường 'order'
+        // Điều này giúp tránh việc phải cấu hình Composite Index trên Firestore cho từng truy vấn nhỏ
         questions.sort((a, b) => a.order.compareTo(b.order));
         return questions;
       }
 
-      // 2. Fallback: try sub-collection 'exercises' under Lesson document (Legacy/Initial suggestion)
+      // 2. Dự phòng (Fallback): Thử lấy dữ liệu từ sub-collection 'exercises' bên trong document Lesson (cấu trúc cũ)
       final subQuery = await firestore
           .collection(_grammarCollection)
           .doc(lessonId)
@@ -261,7 +279,8 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
           .map((doc) => AudioExerciseModel.fromFirestore(doc))
           .toList();
 
-      // Sắp xếp thủ công in-memory để tránh lỗi missing index hoặc missing field
+      // Sắp xếp thủ công trên client (in-memory) theo trường order
+      // nhằm tránh lỗi thiếu trường order ở một số document hoặc lỗi Firebase missing index.
       exercises.sort((a, b) => a.order.compareTo(b.order));
       return exercises;
     } catch (e) {
@@ -281,7 +300,8 @@ class LearningRemoteDataSourceImpl implements LearningRemoteDataSource {
           .map((doc) => AudioQuestionModel.fromFirestore(doc))
           .toList();
       
-      // Sắp xếp thủ công để tránh lỗi missing index
+      // Sắp xếp thủ công các bài luyện nghe ở phía máy khách (in-memory) theo trường 'order'
+      // Việc này giúp tránh phát sinh lỗi thiếu index (missing index) từ phía Firestore
       questions.sort((a, b) => a.order.compareTo(b.order));
       return questions;
     } catch (e) {

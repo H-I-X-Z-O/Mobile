@@ -6,12 +6,16 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../../domain/entities/topic_entity.dart';
 
-/// Widget hiển thị một chủ đề trong danh sách.
+/// Widget hiển thị một chủ đề học tập trong danh sách.
+/// Hỗ trợ hai chế độ hiển thị: thẻ nổi bật ([isHighlighted] = true) và mục danh sách thông thường.
 class TopicCard extends StatelessWidget {
   final TopicEntity topic;
   final VoidCallback onTap;
   final bool isHighlighted;
 
+  /// Khởi tạo widget thẻ chủ đề.
+  /// Yêu cầu cung cấp dữ liệu chủ đề [topic], hàm xử lý khi nhấn [onTap].
+  /// Cờ [isHighlighted] dùng để chuyển đổi giữa hai kiểu hiển thị.
   const TopicCard({
     super.key,
     required this.topic,
@@ -19,14 +23,18 @@ class TopicCard extends StatelessWidget {
     this.isHighlighted = false,
   });
 
+  /// Xây dựng giao diện thẻ chủ đề, lựa chọn chế độ hiển thị nổi bật
+  /// hoặc danh sách dựa trên giá trị của [isHighlighted].
   @override
   Widget build(BuildContext context) {
     if (isHighlighted) return _buildHighlightedCard(context);
     return _buildListCard(context);
   }
 
+  /// Xây dựng giao diện thẻ chủ đề nổi bật, thường dùng cho phần trên cùng của màn hình.
   Widget _buildHighlightedCard(BuildContext context) {
     final t = context.appTheme;
+    // Tính toán tỷ lệ phần trăm tiến độ học tập của chủ đề hiện tại
     final progress = topic.totalWords > 0 ? topic.learnedWords / topic.totalWords : 0.0;
 
     return GestureDetector(
@@ -96,8 +104,10 @@ class TopicCard extends StatelessWidget {
     );
   }
 
+  /// Xây dựng giao diện mục danh sách chủ đề thông thường.
   Widget _buildListCard(BuildContext context) {
     final t = context.appTheme;
+    // Tính toán tỷ lệ phần trăm tiến độ học tập của chủ đề hiện tại
     final progress = topic.totalWords > 0 ? topic.learnedWords / topic.totalWords : 0.0;
 
     return GestureDetector(
@@ -141,6 +151,7 @@ class TopicCard extends StatelessWidget {
     );
   }
 
+  /// Xây dựng hộp chứa biểu tượng (Icon) của chủ đề với màu nền tương ứng.
   Widget _buildTopicIconBox({required double size}) {
     return Container(
       width: size,
@@ -153,6 +164,7 @@ class TopicCard extends StatelessWidget {
     );
   }
 
+  /// Lấy biểu tượng tương ứng dựa trên mã chủ đề (ID).
   IconData _topicIcon() {
     switch (topic.id) {
       case 't1': return Icons.flight_takeoff;
@@ -165,6 +177,7 @@ class TopicCard extends StatelessWidget {
     }
   }
 
+  /// Lấy màu nền cho hộp chứa biểu tượng tương ứng với chủ đề.
   Color _iconBgColor() {
     switch (topic.id) {
       case 't1': return AppColors.catTravelBg;
@@ -177,6 +190,7 @@ class TopicCard extends StatelessWidget {
     }
   }
 
+  /// Lấy màu biểu tượng tương ứng với chủ đề.
   Color _iconColor() {
     switch (topic.id) {
       case 't1': return AppColors.catTravel;
@@ -189,6 +203,8 @@ class TopicCard extends StatelessWidget {
     }
   }
 
+  /// Xác định màu của thanh tiến trình dựa trên mức độ hoàn thành.
+  /// Xanh dương/Primary (>=70%), Xanh lơ/Info (>=30%), Đỏ/Error (<30%).
   Color _progressColor(double progress) {
     if (progress >= 0.7) return AppColors.primary;
     if (progress >= 0.3) return AppColors.info;

@@ -6,6 +6,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../providers/audio_practice_provider.dart';
 import 'audio_practice_screen.dart';
 
+/// Màn hình danh sách các bài luyện nghe (Audio Exercises).
+/// Hiển thị các bài luyện nghe để người dùng chọn và bắt đầu làm bài.
 class AudioExerciseListScreen extends StatefulWidget {
   const AudioExerciseListScreen({super.key});
 
@@ -17,6 +19,7 @@ class _AudioExerciseListScreenState extends State<AudioExerciseListScreen> {
   @override
   void initState() {
     super.initState();
+    // Gọi tải dữ liệu sau khi frame đầu tiên được vẽ để tránh lỗi sửa đổi trạng thái (state modification) trong lúc build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AudioPracticeProvider>().loadExercises();
     });
@@ -47,6 +50,7 @@ class _AudioExerciseListScreenState extends State<AudioExerciseListScreen> {
     );
   }
 
+  /// Xây dựng giao diện hiển thị khi không có bài tập nào.
   Widget _buildEmptyState(BuildContext context, AppThemeData t) {
     return Center(
       child: Column(
@@ -64,6 +68,8 @@ class _AudioExerciseListScreenState extends State<AudioExerciseListScreen> {
   }
 }
 
+/// Widget hiển thị thông tin tóm tắt của một bài luyện nghe (Card).
+/// Chứa tiêu đề, thời lượng, cấp độ và số câu hỏi.
 class _AudioExerciseCard extends StatelessWidget {
   final dynamic exercise;
 
@@ -118,6 +124,7 @@ class _AudioExerciseCard extends StatelessWidget {
     );
   }
 
+  /// Xây dựng một badge nhỏ chứa [icon] và [label] với [color] chỉ định.
   Widget _infoBadge(IconData icon, String label, Color color) {
     return Row(
       children: [

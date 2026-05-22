@@ -8,6 +8,10 @@ import 'review_screen.dart';
 import '../../../profile_progress/presentation/screens/profile_screen.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình [MainShell] đóng vai trò là "vỏ" (shell) chứa điều hướng chính của ứng dụng.
+/// 
+/// Lớp này quản lý một [BottomNavigationBar] để chuyển đổi giữa các màn hình (tab) chính như:
+/// Home, Topics (Học tập), Review (Ôn tập) và Profile (Hồ sơ).
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -16,7 +20,12 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  /// Chỉ mục hiện tại của tab đang được chọn
   int _currentIndex = 0;
+  
+  /// Tập hợp các tab đã từng được truy cập.
+  /// Được sử dụng cho [IndexedStack] nhằm tối ưu hóa bộ nhớ (lazy load), 
+  /// chỉ render các tab khi người dùng đã thực sự mở chúng.
   final Set<int> _visitedPages = {0};
 
   late final List<Widget> _pages = [
@@ -26,6 +35,9 @@ class _MainShellState extends State<MainShell> {
     const ProfileScreen(),
   ];
 
+  /// Xử lý sự kiện chuyển tab.
+  ///
+  /// Cập nhật [_currentIndex] thành [index] mới và thêm tab đó vào danh sách [_visitedPages].
   void _navigateToTab(int index) {
     setState(() {
       _currentIndex = index;

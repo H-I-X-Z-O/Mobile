@@ -11,7 +11,9 @@ import 'edit_profile_screen.dart';
 import 'change_password_screen.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình cài đặt tổng hợp của ứng dụng (Tài khoản, Thông báo, Giao diện, v.v.).
 class SettingsScreen extends StatefulWidget {
+  /// Khởi tạo màn hình cài đặt.
   const SettingsScreen({super.key});
 
   @override
@@ -27,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadSettings();
   }
 
+  /// Nạp các thiết lập đã được lưu trong [SharedPreferences].
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -34,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
+  /// Đảo ngược trạng thái bật/tắt thông báo và lưu xuống bộ nhớ.
   Future<void> _toggleNotifications(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notifications_enabled', value);
@@ -297,6 +301,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  /// Xử lý việc đăng xuất người dùng, hiển thị hộp thoại xác nhận trước khi thực hiện.
   Future<void> _handleLogout(BuildContext context) async {
     final t = context.appTheme;
     final confirmed = await showDialog<bool>(

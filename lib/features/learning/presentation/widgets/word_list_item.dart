@@ -6,16 +6,22 @@ import '../../../../core/theme/app_theme.dart';
 import '../../domain/entities/word_entity.dart';
 import '../providers/learning_provider.dart';
 
+/// Widget hiển thị một mục từ vựng trong danh sách.
+/// Bao gồm thông tin từ vựng, phiên âm, nghĩa tiếng Việt, nút phát âm thanh và đánh dấu đã học.
 class WordListItem extends StatelessWidget {
   final WordEntity word;
   final VoidCallback? onTap;
 
+  /// Khởi tạo widget mục danh sách từ vựng.
+  /// Yêu cầu cung cấp dữ liệu từ vựng [word], và tùy chọn hàm [onTap] khi người dùng nhấn vào.
   const WordListItem({super.key, required this.word, this.onTap});
 
+  /// Xây dựng giao diện cho mục danh sách, bao gồm icon, thông tin từ, và các nút thao tác.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
     final provider = context.watch<LearningProvider>();
+    // Kiểm tra xem từ vựng này đã được đánh dấu là "đã học" (ghi nhớ) hay chưa
     final isRemembered = provider.isWordRemembered(word.id);
 
     return GestureDetector(
@@ -90,6 +96,7 @@ class WordListItem extends StatelessWidget {
     );
   }
 
+  /// Hiển thị cửa sổ Bottom Sheet chứa chi tiết thông tin từ vựng (ví dụ, cấp độ, câu ví dụ).
   void _showWordDetails(BuildContext context) {
     final t = context.appTheme;
     showModalBottomSheet(

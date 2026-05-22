@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+/// Thực thể đại diện cho kết quả của một bài kiểm tra.
+/// Chứa thông tin về điểm số, số câu đúng và liên kết với người dùng.
 class QuizResultEntity extends Equatable {
   final String id;
   final String userId; // ID người dùng thực tế từ Firebase Auth

@@ -1,6 +1,9 @@
 import '../../domain/entities/grammar_question_entity.dart';
 
+/// Data Model cho câu hỏi ngữ pháp - kế thừa từ [GrammarQuestionEntity].
+/// Cung cấp các phương thức chuyển đổi dữ liệu (Serialization / Deserialization).
 class GrammarQuestionModel extends GrammarQuestionEntity {
+  /// Khởi tạo một đối tượng [GrammarQuestionModel].
   const GrammarQuestionModel({
     required super.id,
     required super.type,
@@ -11,19 +14,21 @@ class GrammarQuestionModel extends GrammarQuestionEntity {
     required super.order,
   });
 
+  /// Tạo đối tượng [GrammarQuestionModel] từ dữ liệu JSON (Map<String, dynamic>).
   factory GrammarQuestionModel.fromJson(Map<String, dynamic> json) {
-    // Determine the type from 'type' or 'questionType'
+    // Lấy loại câu hỏi từ trường 'type' hoặc 'questionType'.
     final rawType = json['type'] as String? ?? json['questionType'] as String?;
     final type = _parseType(rawType);
 
-    // Get options list
+    // Trích xuất danh sách các đáp án lựa chọn, ép kiểu về String.
     final options = (json['options'] as List<dynamic>?)?.map((e) => e as String).toList();
 
-    // Determine the correct answer
-    // It could be the direct string 'correct_answer' or an index 'correctAnswer' (int)
+    // Xác định đáp án đúng.
+    // Có thể là chuỗi trực tiếp từ 'correct_answer' hoặc là chỉ mục (index) từ 'correctAnswer'.
     String correctAnswer = json['correct_answer'] as String? ?? '';
     if (correctAnswer.isEmpty && json['correctAnswer'] != null) {
       final ca = json['correctAnswer'];
+      // Nếu đáp án lưu dưới dạng số nguyên (chỉ số của mảng options).
       if (ca is int && options != null && ca >= 0 && ca < options.length) {
         correctAnswer = options[ca];
       } else {
@@ -42,6 +47,7 @@ class GrammarQuestionModel extends GrammarQuestionEntity {
     );
   }
 
+  /// Hàm hỗ trợ parse kiểu dữ liệu chuỗi thành enum [GrammarQuestionType].
   static GrammarQuestionType _parseType(String? type) {
     switch (type) {
       case 'fill_blank':
@@ -56,6 +62,7 @@ class GrammarQuestionModel extends GrammarQuestionEntity {
     }
   }
 
+  /// Chuyển đổi đối tượng [GrammarQuestionModel] sang JSON Map.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -68,6 +75,7 @@ class GrammarQuestionModel extends GrammarQuestionEntity {
     };
   }
 
+  /// Hàm hỗ trợ chuyển đổi enum [GrammarQuestionType] về chuỗi.
   static String _typeToString(GrammarQuestionType type) {
     switch (type) {
       case GrammarQuestionType.fillInTheBlank:

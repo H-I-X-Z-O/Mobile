@@ -3,11 +3,19 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Widget biểu đồ hoạt động (kiểu GitHub contribution calendar).
+/// Hiển thị tần suất học tập theo tháng thông qua cường độ màu sắc của từng ngày.
 class ActivityCalendarGraph extends StatefulWidget {
+  /// Tập hợp các ngày người dùng có hoạt động (chuỗi định dạng yyyy-MM-dd).
   final Set<String> activeDays;
+  
+  /// Bản đồ lưu trữ số từ học được theo từng ngày.
   final Map<String, int> learnedWordsMap;
+  
+  /// Số lượng từ học được nhiều nhất trong một ngày để làm mốc tính opacity.
   final int maxWords;
 
+  /// Khởi tạo biểu đồ nhiệt.
   const ActivityCalendarGraph({
     super.key,
     required this.activeDays,
@@ -20,6 +28,7 @@ class ActivityCalendarGraph extends StatefulWidget {
 }
 
 class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
+  /// Tháng hiện tại đang được hiển thị.
   late DateTime _focusedMonth;
 
   @override
@@ -29,12 +38,14 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
     _focusedMonth = DateTime(now.year, now.month, 1);
   }
 
+  /// Chuyển về tháng trước đó.
   void _previousMonth() {
     setState(() {
       _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1, 1);
     });
   }
 
+  /// Chuyển tới tháng tiếp theo.
   void _nextMonth() {
     // Ngăn người dùng lướt tới các tháng trong tương lai nếu muốn, nhưng ở đây cứ cho tự do
     setState(() {
@@ -60,6 +71,7 @@ class _ActivityCalendarGraphState extends State<ActivityCalendarGraph> {
     }
   }
 
+  /// Trả về widget hộp vuông nhỏ hiển thị cường độ màu ở phần chú thích.
   Widget _buildIntensityBox(Color color) {
     return Container(
       width: 14,

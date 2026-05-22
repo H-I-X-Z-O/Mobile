@@ -6,9 +6,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../auth_shell/presentation/screens/login_screen.dart';
 import 'personalization_screen.dart';
 
+/// Màn hình Chào mừng [WelcomeScreen].
+/// 
+/// Đây là màn hình đầu tiên người dùng nhìn thấy khi mở ứng dụng lần đầu (Onboarding).
+/// Từ đây người dùng có thể bắt đầu quá trình cá nhân hóa hoặc chuyển thẳng tới màn hình Đăng nhập.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
+  /// Xử lý hoàn tất quá trình Onboarding và điều hướng thẳng đến màn hình đăng nhập.
+  /// 
+  /// Phương thức này lưu cờ `has_seen_onboarding` vào [SharedPreferences] để
+  /// các lần mở ứng dụng tiếp theo sẽ bỏ qua màn hình chào mừng.
   Future<void> _completeOnboardingAndGoLogin(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('has_seen_onboarding', true);

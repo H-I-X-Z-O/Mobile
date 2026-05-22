@@ -3,8 +3,11 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/theme/app_theme.dart';
 
+/// Trạng thái của một nút chọn đáp án.
 enum OptionStatus { normal, selected, correct, wrong }
 
+/// Nút bấm dùng để chọn đáp án trong các dạng câu hỏi trắc nghiệm (Multiple Choice).
+/// Hỗ trợ thay đổi giao diện theo [OptionStatus] để biểu thị đúng/sai.
 class OptionButton extends StatelessWidget {
   final String text;
   final OptionStatus status;

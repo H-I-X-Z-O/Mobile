@@ -5,9 +5,13 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Biểu đồ đường (Line Chart) hiển thị tiến độ học từ vựng theo thời gian.
+/// Sử dụng package `fl_chart`.
 class LearningProgressChart extends StatelessWidget {
-  final Map<DateTime, int> data; // Key là ngày, Value là số từ vựng
+  /// Dữ liệu đầu vào: Key là ngày, Value là số lượng từ vựng học được.
+  final Map<DateTime, int> data; 
 
+  /// Khởi tạo biểu đồ tiến độ.
   const LearningProgressChart({super.key, required this.data});
 
   @override

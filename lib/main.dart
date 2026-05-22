@@ -21,6 +21,8 @@ import 'package:vocabup/l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+/// Điểm khởi chạy (Entry point) của ứng dụng VocabUp.
+/// Khởi tạo các Service nền tảng (Notifications, Provider) trước khi chạy UI.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().init();
@@ -55,6 +57,9 @@ void main() async {
   );
 }
 
+/// Widget gốc (Root Widget) của toàn bộ ứng dụng.
+/// Quản lý cấu hình Theme (giao diện sáng/tối) và Locale (ngôn ngữ đa quốc gia).
+/// Lắng nghe sự thay đổi từ [ThemeProvider] và [LocaleProvider].
 class VocabUpApp extends StatelessWidget {
   const VocabUpApp({super.key});
 
@@ -86,6 +91,9 @@ class VocabUpApp extends StatelessWidget {
   }
 }
 
+/// Widget làm nhiệm vụ khởi tạo các dịch vụ bất đồng bộ (như Firebase).
+/// Sẽ hiển thị màn hình chờ (Loading) trong khoảng thời gian khởi tạo
+/// để đảm bảo các dịch vụ backend sẵn sàng trước khi vào app.
 class AppInitializer extends StatefulWidget {
   final Widget child;
   const AppInitializer({super.key, required this.child});
@@ -140,6 +148,13 @@ class _AppInitializerState extends State<AppInitializer> {
   }
 }
 
+/// Trình bọc (Wrapper) điều hướng luồng người dùng đầu tiên dựa trên trạng thái xác thực (Authentication).
+/// Luồng xử lý:
+/// 1. Nếu đang tải (Loading) -> Hiển thị [CircularProgressIndicator]
+/// 2. Nếu đã đăng nhập -> Chuyển đến màn hình chính [MainShell]
+/// 3. Nếu chưa đăng nhập:
+///    a. Kiểm tra SharedPreferences, nếu chưa xem Onboarding -> [WelcomeScreen]
+///    b. Đã xem Onboarding -> [LoginScreen]
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 

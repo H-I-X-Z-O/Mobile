@@ -10,8 +10,12 @@ import '../../data/datasources/exercise_local_data_source.dart';
 import '../../data/datasources/exercise_remote_data_source.dart';
 import '../../data/repositories/exercise_repository_impl.dart';
 
+/// Trạng thái của bài kiểm tra hiện tại.
 enum QuizState { initial, loading, inProgress, showingAnswer, finished }
 
+/// Provider chịu trách nhiệm quản lý toàn bộ trạng thái (state) và logic của module Exercise.
+/// Liên kết trực tiếp với [ExerciseRepository] để lưu lịch sử làm bài.
+/// Cung cấp các phương thức sinh bài kiểm tra, trả lời câu hỏi và tính điểm.
 class ExerciseProvider extends ChangeNotifier {
   QuizState _state = QuizState.initial;
   List<QuestionEntity> _questions = [];
@@ -250,6 +254,7 @@ class ExerciseProvider extends ChangeNotifier {
   }
 
 
+  /// Chuyển sang câu hỏi tiếp theo trong danh sách.
   void nextQuestion() {
     if (_currentIndex < _questions.length - 1) {
       _currentIndex++;
@@ -296,6 +301,7 @@ class ExerciseProvider extends ChangeNotifier {
     }
   }
 
+  /// Khởi động lại bài kiểm tra hiện tại (xóa kết quả cũ, giữ nguyên câu hỏi).
   void restartQuiz() {
     _currentIndex = 0;
     _userAnswers.clear();

@@ -7,6 +7,10 @@ import '../../domain/entities/grammar_lesson_entity.dart';
 import '../../domain/entities/grammar_question_entity.dart';
 import '../providers/learning_provider.dart';
 
+/// Màn hình luyện tập ngữ pháp (Grammar Practice Screen).
+/// Giao diện này cung cấp trải nghiệm làm bài tập tương tác, hỗ trợ đa dạng các loại câu hỏi 
+/// như trắc nghiệm (multiple choice) hoặc điền từ vào chỗ trống (fill in the blank), 
+/// nhằm giúp người dùng củng cố kiến thức ngữ pháp vừa học.
 class GrammarPracticeScreen extends StatefulWidget {
   final GrammarLessonEntity lesson;
 
@@ -17,12 +21,24 @@ class GrammarPracticeScreen extends StatefulWidget {
 }
 
 class _GrammarPracticeScreenState extends State<GrammarPracticeScreen> {
+  /// Chỉ số của câu hỏi hiện tại trong danh sách bài tập.
   int _currentIndex = 0;
+  
+  /// Đáp án được người dùng lựa chọn (dành cho câu hỏi trắc nghiệm).
   String? _selectedAnswer;
+  
+  /// Cờ trạng thái xác định việc hiển thị giải thích chi tiết sau khi kiểm tra đáp án.
   bool _showExplanation = false;
+  
+  /// Trạng thái biểu thị câu trả lời của người dùng là chính xác hay sai.
   bool _isCorrect = false;
+  
+  /// Bộ điều khiển văn bản quản lý nội dung nhập vào (dành cho câu hỏi điền từ).
   final TextEditingController _fillController = TextEditingController();
 
+  /// Khởi tạo trạng thái của màn hình.
+  /// Tự động kích hoạt quá trình tải dữ liệu câu hỏi luyện tập tương ứng với bài học hiện tại,
+  /// đảm bảo danh sách câu hỏi sẵn sàng trước khi hiển thị cho người dùng.
   @override
   void initState() {
     super.initState();
@@ -33,11 +49,16 @@ class _GrammarPracticeScreenState extends State<GrammarPracticeScreen> {
     });
   }
 
+  /// Xử lý logic kiểm tra tính chính xác của câu trả lời từ người dùng.
+  /// Dựa vào [question.type], phương thức sẽ so sánh kết quả trắc nghiệm hoặc 
+  /// nội dung điền từ với đáp án chuẩn, sau đó cập nhật trạng thái hiển thị kết quả.
   void _checkAnswer(GrammarQuestionEntity question) {
     String userAnswer = '';
     if (question.type == GrammarQuestionType.multipleChoice) {
+      // Lấy đáp án đối với câu hỏi trắc nghiệm
       userAnswer = _selectedAnswer ?? '';
     } else {
+      // Lấy đáp án đối với câu hỏi điền từ
       userAnswer = _fillController.text.trim().toLowerCase();
     }
 
@@ -47,6 +68,11 @@ class _GrammarPracticeScreenState extends State<GrammarPracticeScreen> {
     });
   }
 
+  /// Xử lý chuyển đổi sang câu hỏi kế tiếp trong danh sách bài tập.
+  /// Nếu người dùng đã hoàn thành câu hỏi cuối cùng, hệ thống sẽ kết thúc phiên luyện tập,
+  /// đóng màn hình hiện tại và hiển thị thông báo hoàn thành (SnackBar).
+  ///
+  /// [total] là tổng số lượng câu hỏi của bài tập hiện tại.
   void _nextQuestion(int total) {
     if (_currentIndex < total - 1) {
       setState(() {
@@ -63,6 +89,10 @@ class _GrammarPracticeScreenState extends State<GrammarPracticeScreen> {
     }
   }
 
+  /// Xây dựng giao diện đồ họa cho màn hình luyện tập.
+  /// Cây widget bao gồm: thanh tiến trình (progress bar), tiêu đề câu hỏi, 
+  /// danh sách các lựa chọn trả lời hoặc trường nhập liệu, 
+  /// cùng với khu vực giải thích kết quả và nút điều hướng.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
@@ -191,6 +221,12 @@ class _GrammarPracticeScreenState extends State<GrammarPracticeScreen> {
     );
   }
 
+  /// Xây dựng thành phần giao diện đại diện cho một tùy chọn đáp án (câu hỏi trắc nghiệm).
+  /// Phương thức này tự động quản lý logic thay đổi màu sắc và biểu tượng của thẻ 
+  /// dựa trên trạng thái hiện tại: đang chọn, trả lời đúng, hoặc trả lời sai.
+  ///
+  /// [option] là nội dung của lựa chọn hiện tại.
+  /// [correctAnswer] là đáp án chính xác dùng để đối chiếu.
   Widget _buildOption(String option, String correctAnswer) {
     final t = context.appTheme;
     final isSelected = _selectedAnswer == option;

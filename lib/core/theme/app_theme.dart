@@ -3,9 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 
-/// ─────────────────────────────────────────────────────────────────────────────
-/// AppTheme — Nguồn màu DÙNG CHUNG duy nhất cho toàn ứng dụng.
-/// ─────────────────────────────────────────────────────────────────────────────
+/// Lớp trung gian quản lý các màu sắc động (Dynamic Colors) dựa trên chế độ Sáng/Tối.
+/// Đảm bảo ứng dụng tự động đổi màu mượt mà khi người dùng thay đổi Theme.
 class AppThemeData {
   final bool isDark;
   AppThemeData(this.isDark);
@@ -94,7 +93,9 @@ extension AppThemeExtension on BuildContext {
   }
 }
 
-/// Build ThemeData chuẩn cho MaterialApp – được gọi từ main.dart
+/// Lớp tiện ích cung cấp [ThemeData] hoàn chỉnh cho [MaterialApp].
+/// Được cấu hình sẵn toàn bộ màu sắc, typography (Google Fonts) và kiểu dáng của các widget
+/// (như AppBar, Button, Card, BottomNavigationBar, v.v.).
 class VocabUpTheme {
   VocabUpTheme._();
 

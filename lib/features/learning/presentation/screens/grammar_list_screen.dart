@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/extensions/context_extension.dart';
 import '../../domain/entities/grammar_lesson_entity.dart';
 import 'grammar_detail_screen.dart';
+/// Màn hình hiển thị danh sách các bài học ngữ pháp được phân loại theo cấp độ.
 class GrammarListScreen extends StatefulWidget {
   const GrammarListScreen({super.key});
 
@@ -13,7 +14,9 @@ class GrammarListScreen extends StatefulWidget {
   State<GrammarListScreen> createState() => _GrammarListScreenState();
 }
 
+/// State quản lý vòng đời và giao diện của màn hình danh sách ngữ pháp.
 class _GrammarListScreenState extends State<GrammarListScreen> {
+  /// Khởi tạo và yêu cầu tải danh sách bài học ngữ pháp sau khi frame đầu tiên được vẽ.
   @override
   void initState() {
     super.initState();
@@ -22,6 +25,8 @@ class _GrammarListScreenState extends State<GrammarListScreen> {
     });
   }
 
+  /// Xây dựng giao diện danh sách bài học.
+  /// Phân chia các bài học thành 3 cấp độ: Cơ bản, Trung cấp và Cao cấp.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
@@ -48,7 +53,7 @@ class _GrammarListScreenState extends State<GrammarListScreen> {
 
           return CustomScrollView(
             slivers: [
-              // Mô tả
+              // Hiển thị phần mô tả tổng quan về tính năng ngữ pháp.
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(AppDimensions.p20, AppDimensions.p16, AppDimensions.p20, AppDimensions.p24),
@@ -81,11 +86,13 @@ class _GrammarListScreenState extends State<GrammarListScreen> {
   }
 }
 
+/// Sliver widget hiển thị tiêu đề cho từng cấp độ ngữ pháp (Cơ bản, Trung cấp, Cao cấp).
 class _SliverLevelHeader extends StatelessWidget {
   final GrammarLevel level;
 
   const _SliverLevelHeader({required this.level});
 
+  /// Trả về màu sắc đại diện cho cấp độ của danh sách ngữ pháp.
   Color get _color {
     switch (level) {
       case GrammarLevel.beginner:
@@ -97,6 +104,7 @@ class _SliverLevelHeader extends StatelessWidget {
     }
   }
 
+  /// Trả về chuỗi văn bản nhãn kèm biểu tượng cho cấp độ ngữ pháp.
   String _getLabel(BuildContext context) {
     switch (level) {
       case GrammarLevel.beginner:
@@ -108,6 +116,7 @@ class _SliverLevelHeader extends StatelessWidget {
     }
   }
 
+  /// Xây dựng giao diện phần tiêu đề cho danh sách bài học ngữ pháp theo cấp độ.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
@@ -141,11 +150,13 @@ class _SliverLevelHeader extends StatelessWidget {
   }
 }
 
+/// Sliver widget hiển thị danh sách các bài học ngữ pháp thuộc cùng một cấp độ.
 class _SliverLessonList extends StatelessWidget {
   final List<GrammarLessonEntity> lessons;
 
   const _SliverLessonList({required this.lessons});
 
+  /// Xây dựng danh sách các bài học (sliver list) thuộc một cấp độ cụ thể.
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
@@ -160,11 +171,13 @@ class _SliverLessonList extends StatelessWidget {
   }
 }
 
+/// Widget thẻ bài học, hiển thị thông tin cơ bản và điều hướng đến màn hình chi tiết bài học.
 class _GrammarLessonCard extends StatelessWidget {
   final GrammarLessonEntity lesson;
 
   const _GrammarLessonCard({required this.lesson});
 
+  /// Trả về màu sắc tương ứng với cấp độ khó của bài học để hiển thị trên thẻ.
   Color get _levelColor {
     switch (lesson.level) {
       case GrammarLevel.beginner:
@@ -176,6 +189,8 @@ class _GrammarLessonCard extends StatelessWidget {
     }
   }
 
+  /// Xây dựng giao diện thẻ bài học ngữ pháp.
+  /// Hiển thị số thứ tự, tiêu đề, phụ đề và điều hướng sang màn hình chi tiết khi được nhấn.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;

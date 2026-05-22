@@ -7,7 +7,9 @@ import '../providers/study_plan_provider.dart';
 import '../../domain/entities/study_plan_entity.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình thêm và chỉnh sửa thời gian nhắc nhở học tập hàng ngày.
 class ReminderSettingsScreen extends StatefulWidget {
+  /// Khởi tạo màn hình cài đặt nhắc nhở.
   const ReminderSettingsScreen({super.key});
 
   @override
@@ -15,8 +17,10 @@ class ReminderSettingsScreen extends StatefulWidget {
 }
 
 class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
+  /// Biến trạng thái lưu thời gian người dùng đang chọn. Mặc định là 20:00.
   TimeOfDay _selectedTime = const TimeOfDay(hour: 20, minute: 0);
 
+  /// Mở hộp thoại chọn giờ của hệ thống (TimePicker) và cập nhật [_selectedTime].
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -29,6 +33,7 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
     }
   }
 
+  /// Xử lý logic lưu thông báo mới vào [StudyPlanProvider] và đóng màn hình.
   void _handleSave() {
     final provider = context.read<StudyPlanProvider>();
     final plan = provider.studyPlan ?? StudyPlanEntity(userId: '');

@@ -6,11 +6,14 @@ import '../../domain/entities/grammar_lesson_entity.dart';
 import '../../../../core/extensions/context_extension.dart';
 import 'grammar_practice_screen.dart';
 
+/// Màn hình hiển thị chi tiết một bài học ngữ pháp.
+/// Bao gồm nội dung bài học, ví dụ và nút chuyển sang màn hình luyện tập.
 class GrammarDetailScreen extends StatelessWidget {
   final GrammarLessonEntity lesson;
 
   const GrammarDetailScreen({super.key, required this.lesson});
 
+  /// Trả về màu sắc tương ứng với cấp độ khó của bài học ngữ pháp.
   Color get _levelColor {
     switch (lesson.level) {
       case GrammarLevel.beginner:
@@ -22,6 +25,7 @@ class GrammarDetailScreen extends StatelessWidget {
     }
   }
 
+  /// Hàm build chính, hiển thị thông tin bài học và phần nội dung dạng markdown.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;
@@ -99,6 +103,7 @@ class GrammarDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Xây dựng nút nổi FloatingActionButton để bắt đầu luyện tập ngữ pháp.
   Widget? _buildFloatingActionButton(BuildContext context, AppThemeData t) {
     return FloatingActionButton.extended(
       onPressed: () => Navigator.push(
@@ -113,12 +118,14 @@ class GrammarDetailScreen extends StatelessWidget {
   }
 }
 
+/// Widget dùng để render nội dung bài học từ định dạng tương tự Markdown.
 class _MarkdownCard extends StatelessWidget {
   final String content;
   final AppThemeData themeData;
 
   const _MarkdownCard({required this.content, required this.themeData});
 
+  /// Xây dựng giao diện thẻ hiển thị nội dung bài học bằng cách chuyển đổi Markdown.
   @override
   Widget build(BuildContext context) {
     final t = themeData;
@@ -138,6 +145,8 @@ class _MarkdownCard extends StatelessWidget {
     );
   }
 
+  /// Phân tích cú pháp văn bản Markdown (đơn giản) và chuyển đổi thành danh sách các Widget.
+  /// Hỗ trợ bảng, tiêu đề, blockquote, danh sách và văn bản in đậm.
   List<Widget> _parseMarkdown(String text, AppThemeData t, BuildContext context) {
     final lines = text.trim().split('\n');
     final widgets = <Widget>[];
@@ -237,6 +246,7 @@ class _MarkdownCard extends StatelessWidget {
     return widgets;
   }
 
+  /// Xây dựng văn bản có định dạng phong phú (RichText), hỗ trợ in đậm cho nội dung nằm giữa các dấu **.
   Widget _buildRichText(String line, AppThemeData t, BuildContext context) {
     final spans = <TextSpan>[];
     final regex = RegExp(r'\*\*(.+?)\*\*');
@@ -268,6 +278,7 @@ class _MarkdownCard extends StatelessWidget {
     return RichText(text: TextSpan(children: spans));
   }
 
+  /// Xây dựng bảng từ các hàng dữ liệu Markdown.
   Widget _buildTable(List<String> rows, AppThemeData t, BuildContext context) {
     final dataRows = rows.where((r) => !r.contains('---')).toList();
     if (dataRows.isEmpty) return const SizedBox.shrink();
@@ -316,11 +327,13 @@ class _MarkdownCard extends StatelessWidget {
   }
 }
 
+/// Widget hiển thị một câu ví dụ minh họa ngữ pháp.
 class _ExampleTile extends StatelessWidget {
   final String example;
 
   const _ExampleTile({required this.example});
 
+  /// Xây dựng giao diện cho một câu ví dụ, hiển thị biểu tượng trích dẫn và nội dung.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;

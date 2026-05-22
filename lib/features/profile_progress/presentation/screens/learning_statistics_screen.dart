@@ -9,7 +9,10 @@ import '../widgets/learning_progress_chart.dart';
 import '../widgets/activity_calendar_graph.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình hiển thị các thống kê chi tiết về quá trình học tập của người dùng.
+/// Cung cấp biểu đồ, tổng số từ, điểm số, và chuỗi ngày học (streak).
 class LearningStatisticsScreen extends StatelessWidget {
+  /// Khởi tạo màn hình thống kê học tập.
   const LearningStatisticsScreen({super.key});
 
   @override
@@ -35,6 +38,8 @@ class LearningStatisticsScreen extends StatelessWidget {
           final activeDays = <String>{};
           final learnedWordsMap = <String, int>{};
           int maxWords = 0;
+
+          // Lặp qua dữ liệu thống kê để format ngày cho Activity Calendar
 
           if (stats != null) {
             for (final date in stats.activeDays) {
@@ -117,10 +122,15 @@ class LearningStatisticsScreen extends StatelessWidget {
 }
 
 // ── Widget: 3 Metric Cards ────────────────────────────────────────────────────
+/// Widget nội bộ hiển thị 3 thẻ chỉ số chính (Từ vựng, Điểm, Phiên học).
 class _OverviewCards extends StatelessWidget {
+  /// Tổng số từ vựng đã học.
   final int totalLearned;
+  /// Tổng số từ vựng hiện có trong ứng dụng.
   final int totalWords;
+  /// Tổng điểm tích lũy.
   final int totalScore;
+  /// Số lượng bài kiểm tra đã làm.
   final int quizzesTaken;
 
   const _OverviewCards({
@@ -242,9 +252,13 @@ class _MetricCard extends StatelessWidget {
 }
 
 // ── Widget: Progress Bar ──────────────────────────────────────────────────────
+/// Widget nội bộ hiển thị thanh tiến độ học tập tổng quan (số từ đã học / tổng từ).
 class _ProgressSection extends StatelessWidget {
+  /// Phần trăm hoàn thành (giá trị từ 0.0 đến 1.0).
   final double progress;
+  /// Số từ đã hoàn thành (học).
   final int learned;
+  /// Tổng số từ vựng.
   final int total;
 
   const _ProgressSection({
@@ -319,14 +333,18 @@ class _ProgressSection extends StatelessWidget {
 }
 
 // ── Widget: Streak Summary ────────────────────────────────────────────────────
+/// Widget nội bộ hiển thị chuỗi ngày học liên tiếp (streak) và tổng số ngày.
 class _StreakSummary extends StatelessWidget {
+  /// Danh sách các ngày hoạt động (định dạng yyyy-MM-dd).
   final Set<String> activeDays;
 
   const _StreakSummary({required this.activeDays});
 
+  /// Tính toán số ngày học liên tiếp hiện tại (streak).
   int _calcStreak() {
     int streak = 0;
     var check = DateTime.now();
+    // Bắt đầu đếm ngược từ hôm nay, nếu liên tục tìm thấy ngày học thì cộng 1
     while (true) {
       final key = '${check.year}-${check.month}-${check.day}';
       if (activeDays.contains(key)) {

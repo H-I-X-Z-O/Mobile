@@ -4,7 +4,9 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../auth_shell/presentation/providers/auth_provider.dart';
 import '../../../../core/extensions/context_extension.dart';
 
+/// Màn hình cho phép người dùng thay đổi mật khẩu hiện tại.
 class ChangePasswordScreen extends StatefulWidget {
+  /// Khởi tạo màn hình đổi mật khẩu.
   const ChangePasswordScreen({super.key});
 
   @override
@@ -24,6 +26,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     super.dispose();
   }
 
+  /// Xử lý logic khi người dùng nhấn nút lưu mật khẩu mới.
+  /// Validate form, gọi API qua [AuthProvider], và hiển thị thông báo tương ứng.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 

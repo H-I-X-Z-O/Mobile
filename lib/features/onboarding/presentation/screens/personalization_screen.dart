@@ -5,6 +5,10 @@ import '../../../../core/extensions/context_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../auth_shell/presentation/screens/register_screen.dart';
 
+/// Màn hình Cá nhân hóa [PersonalizationScreen].
+/// 
+/// Cho phép người dùng thiết lập mục tiêu học tập (ví dụ: học để làm việc, du lịch), 
+/// cấp độ hiện tại, và thời gian dự kiến học mỗi ngày.
 class PersonalizationScreen extends StatefulWidget {
   const PersonalizationScreen({super.key});
 
@@ -18,6 +22,10 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
   String? _selectedTime;
 
 
+  /// Xử lý hoàn tất quá trình thiết lập mục tiêu học tập.
+  /// 
+  /// Lưu các thông số cấu hình của người dùng ([_selectedGoal], [_selectedLevel], [_selectedTime]) 
+  /// vào [SharedPreferences] để sử dụng sau này, và chuyển hướng đến màn hình đăng ký.
   Future<void> _completeOnboarding() async {
     // Optionally: save personalization choices to local database or memory to be synced later
     final prefs = await SharedPreferences.getInstance();
@@ -119,6 +127,9 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     );
   }
 
+  /// Widget hỗ trợ tạo ra các thẻ lựa chọn (Chip) cho phần thiết lập cá nhân.
+  /// 
+  /// Cập nhật giá trị đã chọn khi được nhấn thông qua callback [onSelected].
   Widget _buildChoiceChip(String label, String? selectedValue, ValueChanged<String> onSelected) {
     final isSelected = label == selectedValue;
     return ChoiceChip(

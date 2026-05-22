@@ -11,9 +11,16 @@ import 'learned_history_screen.dart';
 import 'audio_exercise_list_screen.dart';
 import '../../../profile_progress/presentation/screens/learning_statistics_screen.dart';
 
+/// Màn hình Bảng điều khiển Học tập (Learning Dashboard Screen).
+/// Đóng vai trò là trung tâm điều hướng chính của ứng dụng học tập,
+/// cho phép người dùng theo dõi tiến độ nhanh và dễ dàng truy cập vào các 
+/// phân hệ học tập khác nhau như: Từ vựng, Ngữ pháp, Luyện nghe và Ôn tập.
 class LearningDashboardScreen extends StatelessWidget {
+  /// Hàm callback được kích hoạt khi người dùng muốn điều hướng thông qua thanh điều hướng chung (Navigation Bar).
+  /// Truyền vào chỉ số (index) của tab cần chuyển đến.
   final Function(int)? onNavigate;
 
+  /// Khởi tạo màn hình bảng điều khiển học tập.
   const LearningDashboardScreen({super.key, this.onNavigate});
 
   @override
@@ -140,9 +147,13 @@ class LearningDashboardScreen extends StatelessWidget {
 }
 
 // ── Banner tiến độ nhanh ──────────────────────────────────────────────────────
+/// Thành phần giao diện hiển thị nhanh tiến độ học tập trong ngày của người dùng.
+/// Cung cấp cái nhìn tổng quan về số từ vựng đã học hôm nay so với tổng số từ vựng tích lũy.
 class _QuickProgressBanner extends StatelessWidget {
+  /// Hàm callback để điều hướng, tương tự như màn hình chính.
   final Function(int)? onNavigate;
 
+  /// Khởi tạo banner tiến độ.
   const _QuickProgressBanner({this.onNavigate});
 
   @override
@@ -215,6 +226,8 @@ class _QuickProgressBanner extends StatelessWidget {
     );
   }
 
+  /// Khởi tạo khóa định danh cho ngày hiện tại dưới định dạng chuẩn `yyyy-MM-dd`.
+  /// Được sử dụng để truy xuất chính xác số lượng từ vựng người dùng đã học trong ngày hôm nay.
   String _todayKey() {
     final now = DateTime.now();
     return '${now.year.toString().padLeft(4, '0')}-'
@@ -224,14 +237,29 @@ class _QuickProgressBanner extends StatelessWidget {
 }
 
 // ── Card Khu vực học ─────────────────────────────────────────────────────────
+/// Thẻ (Card) điều hướng tùy chỉnh dành riêng cho các phân hệ học tập.
+/// Được thiết kế với biểu tượng, màu sắc chủ đạo, mô tả ngắn gọn và hỗ trợ hiển thị 
+/// huy hiệu (badge) nổi bật để thu hút sự chú ý của người dùng.
 class _LearningAreaCard extends StatelessWidget {
+  /// Biểu tượng đại diện cho phân hệ học tập.
   final IconData icon;
+  
+  /// Tiêu đề chính của phân hệ.
   final String title;
+  
+  /// Mô tả ngắn gọn về nội dung hoặc mục đích của phân hệ.
   final String description;
+  
+  /// Màu sắc chủ đạo dùng để tô điểm cho biểu tượng và huy hiệu.
   final Color color;
+  
+  /// Văn bản hiển thị trên huy hiệu nổi bật (ví dụ: "Mới", "Hot"). Có thể là `null` nếu không có.
   final String? badge;
+  
+  /// Hành động được thực thi khi người dùng chạm vào thẻ.
   final VoidCallback onTap;
 
+  /// Khởi tạo card khu vực học tập.
   const _LearningAreaCard({
     required this.icon,
     required this.title,

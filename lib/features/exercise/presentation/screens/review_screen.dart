@@ -4,6 +4,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../providers/exercise_provider.dart';
 
+/// Màn hình xem lại các câu trả lời sai chi tiết.
+/// Truy cập trực tiếp trạng thái từ [ExerciseProvider] để hiển thị.
 class ReviewScreen extends StatelessWidget {
   const ReviewScreen({super.key});
 

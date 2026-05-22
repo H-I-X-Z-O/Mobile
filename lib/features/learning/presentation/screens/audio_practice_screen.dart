@@ -7,6 +7,8 @@ import '../providers/audio_practice_provider.dart';
 import '../widgets/audio_player_widget.dart';
 import 'audio_result_screen.dart';
 
+/// Màn hình luyện nghe, hiển thị trình phát audio và danh sách câu hỏi trắc nghiệm.
+/// Cho phép người dùng nghe đoạn hội thoại và chọn đáp án, sau đó nộp bài.
 class AudioPracticeScreen extends StatefulWidget {
   final AudioExerciseEntity exercise;
 
@@ -16,7 +18,10 @@ class AudioPracticeScreen extends StatefulWidget {
   State<AudioPracticeScreen> createState() => _AudioPracticeScreenState();
 }
 
+/// Lớp State quản lý trạng thái của màn hình luyện nghe.
 class _AudioPracticeScreenState extends State<AudioPracticeScreen> {
+  /// Khởi tạo trạng thái ban đầu của màn hình.
+  /// Gọi [AudioPracticeProvider] để thiết lập, tải câu hỏi và bắt đầu phát audio.
   @override
   void initState() {
     super.initState();
@@ -28,6 +33,8 @@ class _AudioPracticeScreenState extends State<AudioPracticeScreen> {
     });
   }
 
+  /// Xây dựng giao diện cho màn hình luyện nghe.
+  /// Bao gồm thanh tiêu đề, trình phát audio luôn hiển thị (sticky) và danh sách câu hỏi.
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AudioPracticeProvider>();
@@ -87,6 +94,7 @@ class _AudioPracticeScreenState extends State<AudioPracticeScreen> {
     );
   }
 
+  /// Xử lý sự kiện nộp bài, gọi provider tính điểm và chuyển hướng sang màn hình kết quả.
   void _handleSubmit(BuildContext context, AudioPracticeProvider provider) {
     provider.submitTest();
     Navigator.pushReplacement(
@@ -98,6 +106,8 @@ class _AudioPracticeScreenState extends State<AudioPracticeScreen> {
   }
 }
 
+/// Widget hiển thị một câu hỏi trắc nghiệm âm thanh.
+/// Bao gồm đề bài và danh sách các lựa chọn (A, B, C, D).
 class _AudioQuestionTile extends StatelessWidget {
   final int index;
   final dynamic question;
@@ -111,6 +121,7 @@ class _AudioQuestionTile extends StatelessWidget {
     required this.onSelect,
   });
 
+  /// Xây dựng giao diện của từng câu hỏi và các lựa chọn đáp án.
   @override
   Widget build(BuildContext context) {
     final t = context.appTheme;

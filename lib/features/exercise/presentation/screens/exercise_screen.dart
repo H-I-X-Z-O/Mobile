@@ -14,6 +14,9 @@ import '../widgets/fill_blank_input_widget.dart';
 import '../widgets/listening_question_widget.dart';
 import 'scoreboard_screen.dart';
 
+/// Màn hình chính của giao diện làm bài tập / kiểm tra.
+/// Hiển thị câu hỏi động dựa trên [words] truyền vào và quản lý giao diện
+/// theo từng loại câu hỏi khác nhau (trắc nghiệm, điền từ, nghe).
 class ExerciseScreen extends StatefulWidget {
   final List<WordEntity> words;
   final QuestionType? initialType;

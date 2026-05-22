@@ -6,8 +6,13 @@ import '../../../learning/domain/repositories/vocabulary_repository.dart';
 import '../entities/question_entity.dart';
 import '../repositories/exercise_repository.dart';
 
+/// Use case tạo bài kiểm tra tự động từ danh sách từ vựng.
+/// Liên kết với [VocabularyRepository] để lấy dữ liệu từ vựng,
+/// sau đó tự động sinh ra các câu hỏi trắc nghiệm ngẫu nhiên.
 class GenerateQuizUseCase {
+  /// Repository xử lý dữ liệu bài tập
   final ExerciseRepository exerciseRepository;
+  /// Repository xử lý dữ liệu từ vựng (từ module Learning)
   final VocabularyRepository vocabularyRepository;
 
   GenerateQuizUseCase({
@@ -15,6 +20,9 @@ class GenerateQuizUseCase {
     required this.vocabularyRepository,
   });
 
+  /// Thực thi logic sinh câu hỏi bài kiểm tra.
+  /// Trộn ngẫu nhiên danh sách từ vựng từ [topicId] và lấy ra [quantity] từ.
+  /// Tự động sinh đáp án nhiễu (distractors) từ các từ vựng khác trong cùng chủ đề.
   Future<Either<Failure, List<QuestionEntity>>> call({
     required String topicId,
     required int quantity,
