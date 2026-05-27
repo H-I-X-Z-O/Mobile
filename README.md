@@ -1,4 +1,4 @@
-# Mobile
+# Mobile App Học Ngôn Ngữ
 # Hướng dẫn Cài đặt và Triển khai Dự án
 
 Hệ thống được phát triển bằng **Flutter Framework** và ngôn ngữ **Dart**. Dưới đây là các bước chi tiết để thiết lập môi trường, cấu hình và chạy dự án.
