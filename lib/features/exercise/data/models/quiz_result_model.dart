@@ -57,3 +57,4 @@ class QuizResultModel extends QuizResultEntity {
     };
   }
 }
+

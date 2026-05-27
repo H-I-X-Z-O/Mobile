@@ -310,3 +310,4 @@ class ExerciseProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+

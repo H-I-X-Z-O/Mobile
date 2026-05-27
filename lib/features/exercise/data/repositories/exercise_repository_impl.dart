@@ -92,3 +92,4 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     }
   }
 }
+
